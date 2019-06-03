@@ -6,6 +6,7 @@ use App\Models\User\UserModelInterface;
 use Illuminate\Support\Facades\Hash;
 use Mockery\MockInterface;
 use Test\AuthHelper;
+use Test\ModelHelper;
 use Test\UserHelper;
 
 /**
@@ -15,6 +16,7 @@ class UserDoctrineModelFactoryTest extends TestCase
 {
 
     use AuthHelper;
+    use ModelHelper;
     use UserHelper;
 
     //region Tests
@@ -317,20 +319,128 @@ class UserDoctrineModelFactoryTest extends TestCase
 
     /**
      * @return void
+     */
+    public function testCreateWithPasswordResetToken(): void
+    {
+        $data = [
+            UserModelInterface::PROPERTY_EMAIL      => $this->getFaker()->safeEmail,
+            UserModelInterface::PROPERTY_PASSWORD   => $this->getFaker()->password(),
+            UserModelInterface::PROPERTY_PASSWORD_RESET_TOKENS => [
+                $this->createPasswordResetTokenModel(),
+            ],
+        ];
+
+        $this->assertEquals(
+            $data[UserModelInterface::PROPERTY_PASSWORD_RESET_TOKENS],
+            $this->getUserModelFactory()->create($data)->getPasswordResetTokens()->all()
+        );
+    }
+
+    /**
+     * @return void
+     */
+    public function testCreateWithInvalidPasswordResetToken(): void
+    {
+        $this->expectException(InvalidParameterException::class);
+
+        $this->getUserModelFactory()->create([
+            UserModelInterface::PROPERTY_EMAIL      => $this->getFaker()->safeEmail,
+            UserModelInterface::PROPERTY_PASSWORD   => $this->getFaker()->password(),
+            UserModelInterface::PROPERTY_PASSWORD_RESET_TOKENS => [
+                $this->getFaker()->uuid,
+            ],
+        ]);
+    }
+
+    /**
+     * @return void
+     */
+    public function testCreateWithPasswordResetTokenWithoutPasswordResetTokenArray(): void
+    {
+        $this->expectException(InvalidParameterException::class);
+
+        $this->getUserModelFactory()->create([
+            UserModelInterface::PROPERTY_EMAIL      => $this->getFaker()->safeEmail,
+            UserModelInterface::PROPERTY_PASSWORD   => $this->getFaker()->password(),
+            UserModelInterface::PROPERTY_PASSWORD_RESET_TOKENS => $this->createPasswordResetTokenModel(),
+        ]);
+    }
+
+    /**
+     * @return void
+     */
+    public function testCreateWithPasswordResetTokenDataArray(): void
+    {
+        $passwordResetToken = $this->createPasswordResetTokenModel();
+        $data = [
+            UserModelInterface::PROPERTY_EMAIL => $this->getFaker()->safeEmail,
+            UserModelInterface::PROPERTY_PASSWORD => $this->getFaker()->password,
+            UserModelInterface::PROPERTY_PASSWORD_RESET_TOKENS => [
+                [$this->getFaker()->uuid],
+            ],
+        ];
+
+        $passwordResetTokenModelFactory = $this->createPasswordResetTokenModelFactory();
+        $this->mockModelFactoryCreate(
+            $passwordResetTokenModelFactory,
+            $passwordResetToken,
+            $data[UserModelInterface::PROPERTY_PASSWORD_RESET_TOKENS][0]
+        );
+
+        $this->assertEquals(
+            [$passwordResetToken],
+            $this->getUserModelFactory()
+                ->setPasswordResetTokenModelFactory($passwordResetTokenModelFactory)
+                ->create($data)->getPasswordResetTokens()->all()
+        );
+    }
+
+    /**
+     * @return void
+     */
+    public function testCreateWithInvalidPasswordResetTokenDataArray(): void
+    {
+        $data = [
+            UserModelInterface::PROPERTY_EMAIL => $this->getFaker()->safeEmail,
+            UserModelInterface::PROPERTY_PASSWORD => $this->getFaker()->password,
+            UserModelInterface::PROPERTY_PASSWORD_RESET_TOKENS => [
+                [$this->getFaker()->uuid],
+            ],
+        ];
+
+        $passwordResetTokenModelFactory = $this->createPasswordResetTokenModelFactory();
+        $this->mockModelFactoryCreate(
+            $passwordResetTokenModelFactory,
+            new InvalidParameterException(),
+            $data[UserModelInterface::PROPERTY_PASSWORD_RESET_TOKENS][0]
+        );
+
+        $this->expectException(InvalidParameterException::class);
+
+        $this->getUserModelFactory()
+            ->setPasswordResetTokenModelFactory($passwordResetTokenModelFactory)
+            ->create($data)->getPasswordResetTokens()->all();
+    }
+
+    /**
+     * @return void
      *
      * @throws InvalidParameterException
      */
     public function testFill(): void
     {
         $data = [
-            UserModelInterface::PROPERTY_EMAIL          => $this->getFaker()->safeEmail,
-            UserModelInterface::PROPERTY_PASSWORD       => $this->getFaker()->password(),
-            UserModelInterface::PROPERTY_ID             => $this->getFaker()->numberBetween(),
-            UserModelInterface::PROPERTY_CREATED_AT     => $this->getFaker()->dateTime(),
-            UserModelInterface::PROPERTY_UPDATED_AT     => $this->getFaker()->dateTime(),
-            UserModelInterface::PROPERTY_DELETED_AT     => $this->getFaker()->dateTime(),
-            UserModelInterface::PROPERTY_REFRESH_TOKENS => [
+            UserModelInterface::PROPERTY_EMAIL                 => $this->getFaker()->safeEmail,
+            UserModelInterface::PROPERTY_PASSWORD              => $this->getFaker()->password(),
+            UserModelInterface::PROPERTY_ID                    => $this->getFaker()->numberBetween(),
+            UserModelInterface::PROPERTY_CREATED_AT            => $this->getFaker()->dateTime(),
+            UserModelInterface::PROPERTY_UPDATED_AT            => $this->getFaker()->dateTime(),
+            UserModelInterface::PROPERTY_DELETED_AT            => $this->getFaker()->dateTime(),
+            UserModelInterface::PROPERTY_REFRESH_TOKENS        => [
                 $this->createRefreshToken(),
+            ],
+            UserModelInterface::PROPERTY_PASSWORD_RESET_TOKENS => [
+                $this->createPasswordResetTokenModel(),
             ],
         ];
 
@@ -343,6 +453,7 @@ class UserDoctrineModelFactoryTest extends TestCase
         $this->assertEquals($data[UserModelInterface::PROPERTY_UPDATED_AT], $user->getUpdatedAt());
         $this->assertEquals($data[UserModelInterface::PROPERTY_DELETED_AT], $user->getDeletedAt());
         $this->assertEquals($data[UserModelInterface::PROPERTY_REFRESH_TOKENS], $user->getRefreshTokens()->all());
+        $this->assertEquals($data[UserModelInterface::PROPERTY_PASSWORD_RESET_TOKENS], $user->getPasswordResetTokens()->all());
     }
 
     /**

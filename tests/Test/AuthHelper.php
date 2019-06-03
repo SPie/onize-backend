@@ -2,8 +2,12 @@
 
 namespace Test;
 
+use App\Models\Auth\PasswordResetTokenDoctrineModel;
+use App\Models\Auth\PasswordResetTokenModel;
+use App\Models\Auth\PasswordResetTokenModelFactory;
 use App\Models\Auth\RefreshTokenModel;
 use App\Models\Auth\RefreshTokenModelFactory;
+use App\Models\User\UserModelInterface;
 use App\Repositories\Auth\RefreshTokenRepository;
 use Mockery;
 use Mockery\MockInterface;
@@ -47,5 +51,41 @@ trait AuthHelper
     protected function createJWT(): JWT
     {
         return Mockery::spy(JWT::class);
+    }
+
+    /**
+     * @return PasswordResetTokenModel|MockInterface
+     */
+    protected function createPasswordResetTokenModel()
+    {
+        return Mockery::spy(PasswordResetTokenModel::class);
+    }
+
+    /**
+     * @param string|null             $token
+     * @param \DateTime|null          $validUntil
+     * @param UserModelInterface|null $user
+     *
+     * @return PasswordResetTokenDoctrineModel
+     */
+    protected function createPasswordResetTokenDoctrineModel(
+        string $token = null,
+        \DateTime $validUntil = null,
+        UserModelInterface $user = null
+    ): PasswordResetTokenDoctrineModel
+    {
+        return new PasswordResetTokenDoctrineModel(
+            $token ?: $this->getFaker()->uuid,
+            $validUntil ?: $this->getFaker()->dateTime,
+            $user ?: $this->createUserDoctrineModel()
+        );
+    }
+
+    /**
+     * @return PasswordResetTokenModelFactory|MockInterface
+     */
+    protected function createPasswordResetTokenModelFactory()
+    {
+        return Mockery::spy(PasswordResetTokenModelFactory::class);
     }
 }

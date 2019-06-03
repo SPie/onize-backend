@@ -18,15 +18,19 @@ use Symfony\Component\HttpFoundation\Response;
 class AuthController extends Controller
 {
 
-    const ROUTE_NAME_LOGIN   = 'auth.login';
-    const ROUTE_NAME_LOGOUT  = 'auth.logout';
-    const ROUTE_NAME_USER    = 'auth.user';
-    const ROUTE_NAME_REFRESH = 'refresh';
+    const ROUTE_NAME_LOGIN                  = 'auth.login';
+    const ROUTE_NAME_LOGOUT                 = 'auth.logout';
+    const ROUTE_NAME_USER                   = 'auth.user';
+    const ROUTE_NAME_REFRESH                = 'refresh';
+    const ROUTE_NAME_PASSWORD_RESET_REQUEST = 'users.requestPasswordReset';
 
     const REQUEST_PARAMETER_REMEMBER = 'remember';
 
     const RESPONSE_PARAMETER_USER = 'user';
 
+    /**
+     * @var JWTService
+     */
     private $jwtService;
 
     /**
@@ -103,6 +107,11 @@ class AuthController extends Controller
         return $this->getJwtService()->refreshAccessToken(
             $this->createResponse([], Response::HTTP_NO_CONTENT)
         );
+    }
+
+    public function passwordResetRequest(Request $request): JsonResponse
+    {
+        // TODO
     }
 
     //endregion

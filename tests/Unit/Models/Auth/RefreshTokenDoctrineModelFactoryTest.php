@@ -87,9 +87,7 @@ class RefreshTokenDoctrineModelFactoryTest extends TestCase
         ];
 
         $userModelFactory = $this->createUserModelFactory();
-        $userModelFactory
-            ->shouldReceive('create')
-            ->andReturn($user);
+        $this->mockUserModelFactoryCreate($userModelFactory, $user, $data[RefreshTokenModel::PROPERTY_USER]);
 
         $this->assertEquals(
             (new RefreshTokenDoctrineModel(
@@ -98,11 +96,6 @@ class RefreshTokenDoctrineModelFactoryTest extends TestCase
             )),
             $this->createRefreshTokenDoctrineModelFactory($userModelFactory)->create($data)
         );
-
-        $userModelFactory
-            ->shouldHaveReceived('create')
-            ->with($data[RefreshTokenModel::PROPERTY_USER])
-            ->once();
     }
 
     /**

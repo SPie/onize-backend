@@ -15,7 +15,7 @@ use Doctrine\ORM\Mapping as ORM;
  *
  * @package App\Models\Auth
  */
-final class RefreshTokenDoctrineModel extends AbstractDoctrineModel implements RefreshTokenModel
+class RefreshTokenDoctrineModel extends AbstractDoctrineModel implements RefreshTokenModel
 {
 
     use Timestamps;

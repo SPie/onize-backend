@@ -3,6 +3,8 @@
 namespace App\Providers;
 
 use App\Http\Middleware\ApiSignature;
+use App\Models\Auth\PasswordResetTokenDoctrineModelFactory;
+use App\Models\Auth\PasswordResetTokenModelFactory;
 use App\Models\Auth\RefreshTokenDoctrineModel;
 use App\Models\Auth\RefreshTokenDoctrineModelFactory;
 use App\Models\Auth\RefreshTokenModelFactory;
@@ -10,6 +12,8 @@ use App\Models\User\UserDoctrineModel;
 use App\Models\User\UserDoctrineModelFactory;
 use App\Models\User\UserModelFactoryInterface;
 use App\Models\User\UserModelInterface;
+use App\Repositories\Auth\PasswordResetTokenDoctrineRepository;
+use App\Repositories\Auth\PasswordResetTokenRepository;
 use App\Repositories\Auth\RefreshTokenRepository;
 use App\Repositories\User\UserRepositoryInterface;
 use App\Services\JWT\JWTRefreshTokenRepository;
@@ -72,6 +76,10 @@ class AppServiceProvider extends ServiceProvider
             return $entityManager->getRepository(RefreshTokenDoctrineModel::class);
         });
 
+        $this->app->singleton(PasswordResetTokenRepository::class, function () use ($entityManager) {
+            return $entityManager->getRepository(PasswordResetTokenDoctrineRepository::class);
+        });
+
         return $this;
     }
 
@@ -82,6 +90,7 @@ class AppServiceProvider extends ServiceProvider
     {
         $this->app->singleton(UserModelFactoryInterface::class, UserDoctrineModelFactory::class);
         $this->app->singleton(RefreshTokenModelFactory::class, RefreshTokenDoctrineModelFactory::class);
+        $this->app->singleton(PasswordResetTokenModelFactory::class, PasswordResetTokenDoctrineModelFactory::class);
         return $this;
     }
 
@@ -129,8 +138,12 @@ class AppServiceProvider extends ServiceProvider
     {
         $userModelFactory = $this->app->get(UserModelFactoryInterface::class);
         $refreshTokenFactory = $this->app->get(RefreshTokenModelFactory::class);
+        $passwordResetTokenModelFactory = $this->app->get(PasswordResetTokenModelFactory::class);
+
         $userModelFactory->setRefreshTokenModelFactory($refreshTokenFactory);
         $refreshTokenFactory->setUserModelFactory($userModelFactory);
+        $userModelFactory->setPasswordResetTokenModelFactory($passwordResetTokenModelFactory);
+        $passwordResetTokenModelFactory->setUserModelFactory($userModelFactory);
 
         return $this;
     }

@@ -36,6 +36,9 @@ class UsersController extends Controller
      */
     private $usersService;
 
+    /**
+     * @var JWTService
+     */
     private $jwtService;
 
     /**

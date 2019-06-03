@@ -9,6 +9,7 @@ use App\Repositories\User\UserRepositoryInterface;
 use App\Services\User\UsersServiceInterface;
 use Illuminate\Support\Collection;
 use Mockery;
+use Mockery\MockInterface;
 
 /**
  * Trait UserHelper
@@ -38,6 +39,26 @@ trait UserHelper
     protected function createUserModelFactory(): UserModelFactoryInterface
     {
         return Mockery::spy(UserModelFactoryInterface::class);
+    }
+
+    /**
+     * @param UserModelFactoryInterface|MockInterface $userModelFactory
+     * @param UserModelInterface|\Exception|null      $user
+     * @param array                                   $userData
+     *
+     * @return $this
+     */
+    protected function mockUserModelFactoryCreate(
+        MockInterface $userModelFactory,
+        $user = null,
+        array $userData = []
+    )
+    {
+        $expectation = $userModelFactory
+            ->shouldReceive('create')
+            ->andThrow($user);
+
+        return $this;
     }
 
     /**

@@ -2,6 +2,7 @@
 
 namespace App\Models\User;
 
+use App\Models\Auth\PasswordResetTokenModelFactory;
 use App\Models\Auth\RefreshTokenModelFactory;
 use App\Models\ModelFactoryInterface;
 use App\Models\ModelInterface;
@@ -19,8 +20,15 @@ interface UserModelFactoryInterface extends ModelFactoryInterface
      *
      * @return UserModelFactoryInterface
      */
-    public function setRefreshTokenModelFactory(
-        RefreshTokenModelFactory $refreshTokenModelFactory
+    public function setRefreshTokenModelFactory(RefreshTokenModelFactory $refreshTokenModelFactory): UserModelFactoryInterface;
+
+    /**
+     * @param PasswordResetTokenModelFactory $passwordResetTokenModelFactory
+     *
+     * @return UserModelFactoryInterface
+     */
+    public function setPasswordResetTokenModelFactory(
+        PasswordResetTokenModelFactory $passwordResetTokenModelFactory
     ): UserModelFactoryInterface;
 
     /**

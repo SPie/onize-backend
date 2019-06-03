@@ -2,7 +2,9 @@
 
 namespace Test;
 
-use Illuminate\Support\Collection;
+use App\Models\ModelFactoryInterface;
+use App\Models\ModelInterface;
+use Mockery\MockInterface;
 
 /**
  * Trait ModelHelper
@@ -13,30 +15,19 @@ trait ModelHelper
 {
 
     /**
-     * @param string      $modelClass
-     * @param int         $times
-     * @param array       $data
-     * @param string|null $state
+     * @param ModelFactoryInterface|MockInterface $modelFactory
+     * @param ModelInterface|\Exception           $model
+     * @param array                               $data
      *
-     * @return Collection
+     * @return $this
      */
-    private function createModels(
-        string $modelClass,
-        int $times = 1,
-        array $data = [],
-        string $state = null
-    ): Collection
+    public function mockModelFactoryCreate(MockInterface $modelFactory, $model, array $data)
     {
-        if ($times == 1) {
-            return new Collection([
-                $state
-                    ? entity($modelClass, $state, $times)->create($data)
-                    : entity($modelClass, $times)->create($data)
-            ]);
-        }
+        $modelFactory
+            ->shouldReceive('create')
+            ->with($data)
+            ->andThrow($model);
 
-        return $state
-            ? entity($modelClass, $state, $times)->create($data)
-            : entity($modelClass, $times)->create($data);
+        return $this;
     }
 }

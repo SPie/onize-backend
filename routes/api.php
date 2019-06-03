@@ -33,6 +33,8 @@ $router->group(
         $router->group(['prefix' => 'auth'], function (Router $router) {
             $router->post('login', ['as' => AuthController::ROUTE_NAME_LOGIN, 'uses' => 'Auth\AuthController@login']);
 
+            $router->get('password', ['as' => AuthController::ROUTE_NAME_PASSWORD_RESET_REQUEST, 'uses' => 'Auth\AuthController@passwordResetRequest']);
+
             $router->group(['middleware' => 'token'], function (Router $router) {
                 $router->get('user', ['as'    => AuthController::ROUTE_NAME_USER, 'uses' => 'Auth\AuthController@authenticatedUser']);
                 $router->get('refresh', ['as' => AuthController::ROUTE_NAME_REFRESH, 'uses' => 'Auth\AuthController@refreshAccessToken']);

@@ -3,6 +3,7 @@
 namespace App\Models\User;
 
 use App\Models\AbstractDoctrineModel;
+use App\Models\Auth\PasswordResetTokenModel;
 use App\Models\Auth\RefreshTokenModel;
 use App\Models\Authenticate;
 use App\Models\SoftDelete;
@@ -42,11 +43,19 @@ class UserDoctrineModel extends AbstractDoctrineModel implements UserModelInterf
     private $refreshTokens;
 
     /**
+     * @ORM\OneToMany(targetEntity="App\Models\Auth\PasswordResetTokenDoctrineModel", mappedBy="user", cascade={"persist"})
+     *
+     * @var PasswordResetTokenModel[]|ArrayCollection
+     */
+    private $passwordResetTokens;
+
+    /**
      * UserDoctrineModel constructor.
      *
      * @param string         $email
      * @param string         $password
      * @param array          $refreshTokens
+     * @param array          $passwordResetTokens
      * @param \DateTime|null $createdAt
      * @param \DateTime|null $updatedAt
      * @param \DateTime|null $deletedAt
@@ -57,15 +66,17 @@ class UserDoctrineModel extends AbstractDoctrineModel implements UserModelInterf
         array $refreshTokens = [],
         \DateTime $createdAt = null,
         \DateTime $updatedAt = null,
-        \DateTime $deletedAt = null
+        \DateTime $deletedAt = null,
+        array $passwordResetTokens = []
     )
     {
         $this->email = $email;
         $this->password = Hash::make($password);
-        $this->refreshTokens = new ArrayCollection($refreshTokens);
+        $this->passwordResetTokens = new ArrayCollection($passwordResetTokens);
         $this->createdAt = $createdAt;
         $this->updatedAt = $updatedAt;
         $this->deletedAt = $deletedAt;
+        $this->refreshTokens = new ArrayCollection($refreshTokens);
     }
 
     /**
@@ -120,6 +131,40 @@ class UserDoctrineModel extends AbstractDoctrineModel implements UserModelInterf
     public function getRefreshTokens(): Collection
     {
         return new Collection($this->refreshTokens->toArray());
+    }
+
+    /**
+     * @param array $passwordResetTokens
+     *
+     * @return UserModelInterface
+     */
+    public function setPasswordResetTokens(array $passwordResetTokens): UserModelInterface
+    {
+        $this->passwordResetTokens = new ArrayCollection($passwordResetTokens);
+
+        return $this;
+    }
+
+    /**
+     * @param PasswordResetTokenModel $passwordResetToken
+     *
+     * @return UserModelInterface
+     */
+    public function addPasswordResetToken(PasswordResetTokenModel $passwordResetToken): UserModelInterface
+    {
+        if (!$this->passwordResetTokens->contains($passwordResetToken)) {
+            $this->passwordResetTokens->add($passwordResetToken);
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return PasswordResetTokenModel[]|Collection
+     */
+    public function getPasswordResetTokens(): Collection
+    {
+        return new Collection($this->passwordResetTokens->toArray());
     }
 
     /**
