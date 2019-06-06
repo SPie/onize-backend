@@ -6,6 +6,7 @@ use App\Models\User\UserDoctrineModel;
 use App\Models\User\UserModelFactoryInterface;
 use App\Models\User\UserModelInterface;
 use App\Repositories\User\UserRepositoryInterface;
+use App\Services\JWT\JWTService;
 use App\Services\User\UsersServiceInterface;
 use Illuminate\Support\Collection;
 use Mockery;
@@ -31,6 +32,29 @@ trait UserHelper
             $email ?: $this->getFaker()->safeEmail,
             $password ?: $this->getFaker()->password
         );
+    }
+
+    /**
+     * @return UserModelInterface|MockInterface
+     */
+    protected function createUserModel(): UserModelInterface
+    {
+        return Mockery::spy(UserModelInterface::class);
+    }
+
+    /**
+     * @param MockInterface $user
+     * @param int|null      $id
+     *
+     * @return $this
+     */
+    protected function mockUserModelGetId(MockInterface $user, int $id = null)
+    {
+        $user
+            ->shouldReceive('getId')
+            ->andReturn($id);
+
+        return $this;
     }
 
     /**
@@ -67,6 +91,14 @@ trait UserHelper
     protected function createUserRepository(): UserRepositoryInterface
     {
         return Mockery::spy(UserRepositoryInterface::class);
+    }
+
+    /**
+     * @return JWTService
+     */
+    protected function createJWTService(): JWTService
+    {
+        return Mockery::spy(JWTService::class);
     }
 
     /**

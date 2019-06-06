@@ -8,7 +8,7 @@ use LaravelDoctrine\Migrations\Testing\DatabaseMigrations;
 /**
  * Class TestCase
  */
-abstract class TestCase extends Laravel\Lumen\Testing\TestCase
+abstract class IntegrationTestCase extends Laravel\Lumen\Testing\TestCase
 {
 
     const BEARER_AUTHORIZATION = 'Authorization';

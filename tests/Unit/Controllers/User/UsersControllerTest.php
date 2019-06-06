@@ -14,12 +14,15 @@ use Illuminate\Validation\Rule;
 use Illuminate\Validation\ValidationException;
 use Mockery\MockInterface;
 use Symfony\Component\HttpFoundation\Response;
+use Test\AuthHelper;
 
 /**
  * Class UsersControllerTest
  */
-class UsersControllerTest extends TestCase
+class UsersControllerTest extends IntegrationTestCase
 {
+
+    use AuthHelper;
 
     //region Tests
 
@@ -297,6 +300,94 @@ class UsersControllerTest extends TestCase
         $this->createUsersController($this->createUserService(), $jwtService)->changePassword(new Request());
     }
 
+//    /**
+//     * @return void
+//     */
+//    public function testLogin(): void
+//    {
+//        $response = new JsonResponse([], 204);
+//        $response->headers->set($this->getFaker()->uuid, $this->getFaker()->uuid);
+//        $credentials = [
+//            'email'    => $this->getFaker()->safeEmail,
+//            'password' => $this->getFaker()->password,
+//        ];
+//
+//        $jwtService = $this->createJWTService();
+//        $this->mockJWTserviceLogin(
+//            $jwtService,
+//            $response,
+//            new JsonResponse([], 204),
+//            $credentials,
+//            false
+//        );
+//
+//        $usersController = $this->createUsersController();
+//        $this->mockUsersControllerValidate(
+//            $usersController,
+//            $credentials,
+//            new Request(),
+//            [
+//                'email'    => ['required'],
+//                'password' => ['required'],
+//            ]
+//        );
+//
+//        $this->assertEquals($response, $usersController->login(new Request()));
+//    }
+//
+//    /**
+//     * @return void
+//     */
+//    public function testLoginWithInvalidCredentialsFromRequest(): void
+//    {
+//        $jwtService = $this->createJWTService();
+//
+//        $authController = $this->createAuthController($jwtService);
+//        $this->addValidate($authController, Mockery::mock(ValidationException::class));
+//
+//        $this->expectException(ValidationException::class);
+//
+//        $authController->login(new Request());
+//    }
+//
+//    /**
+//     * @return void
+//     */
+//    public function testLoginWithRefreshToken(): void
+//    {
+//        $request = new Request();
+//        $request->offsetSet('remember', true);
+//        $response = new JsonResponse([], 204);
+//        $response->headers->set($this->getFaker()->uuid, $this->getFaker()->uuid);
+//        $credentials = [
+//            'email'    => $this->getFaker()->safeEmail,
+//            'password' => $this->getFaker()->password,
+//        ];
+//
+//        $jwtService = $this->createJWTService();
+//        $this->addLogin($jwtService, $response);
+//
+//        $authController = $this->createAuthController($jwtService);
+//        $this->addValidate($authController, $credentials);
+//
+//        $this->assertEquals($response, $authController->login($request));
+//
+//        $jwtService
+//            ->shouldHaveReceived('login')
+//            ->with(
+//                Mockery::on(function ($argument) {
+//                    return (
+//                        ($argument instanceof JsonResponse)
+//                        && $argument->getStatusCode() == 204
+//                        && empty($argument->getData())
+//                    );
+//                }),
+//                $credentials,
+//                true
+//            )
+//            ->once();
+//    }
+
     //endregion
 
     //region Mocks
@@ -324,6 +415,34 @@ class UsersControllerTest extends TestCase
             ->shouldAllowMockingProtectedMethods();
 
         return $usersController;
+    }
+
+    /**
+     * @param MockInterface    $usersController
+     * @param array|\Exception $inputArray
+     * @param Request          $request
+     * @param array            $rules
+     *
+     * @return UsersControllerTest
+     */
+    private function mockUsersControllerValidate(
+        MockInterface $usersController,
+        $inputArray,
+        Request $request,
+        array $rules
+    ): UsersControllerTest
+    {
+        $usersController
+            ->shouldReceive('validate')
+            ->with(
+                Mockery::on(function ($argument) use ($request) {
+
+                }),
+                $rules
+            )
+            ->andThrow($inputArray);
+
+        return $this;
     }
 
     /**
@@ -451,6 +570,37 @@ class UsersControllerTest extends TestCase
         }
 
         $expectation->andReturn($user);
+
+        return $this;
+    }
+
+    /**
+     * @param MockInterface $jwtService
+     * @param Response      $response
+     * @param Response      $inputResponse
+     * @param array         $credentials
+     * @param bool          $withRefreshToken
+     *
+     * @return UsersControllerTest
+     */
+    private function mockJWTserviceLogin(
+        MockInterface $jwtService,
+        Response $response,
+        Response $inputResponse,
+        array $credentials,
+        bool $withRefreshToken
+    ): UsersControllerTest
+    {
+        $jwtService
+            ->shouldReceive('login')
+            ->with(
+                Mockery::on(function ($argument) use ($inputResponse) {
+                    return $argument == $inputResponse;
+                }),
+                $credentials,
+                $withRefreshToken
+            )
+            ->andReturn($response);
 
         return $this;
     }

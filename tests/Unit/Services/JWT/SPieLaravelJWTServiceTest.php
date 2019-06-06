@@ -16,7 +16,7 @@ use Symfony\Component\HttpFoundation\Response;
 /**
  * Class SPieLaravelJWTServiceTest
  */
-class SPieLaravelJWTServiceTest extends TestCase
+class SPieLaravelJWTServiceTest extends IntegrationTestCase
 {
 
     //region Tests

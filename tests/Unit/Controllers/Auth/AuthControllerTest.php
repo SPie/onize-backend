@@ -14,7 +14,7 @@ use Symfony\Component\HttpFoundation\Response;
 /**
  * Class AuthControllerTest
  */
-class AuthControllerTest extends TestCase
+class AuthControllerTest extends IntegrationTestCase
 {
 
     //region Tests

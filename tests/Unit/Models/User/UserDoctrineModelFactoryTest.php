@@ -12,7 +12,7 @@ use Test\UserHelper;
 /**
  * Class UserDoctrineModelFactoryTest
  */
-class UserDoctrineModelFactoryTest extends TestCase
+class UserDoctrineModelFactoryTest extends IntegrationTestCase
 {
 
     use AuthHelper;

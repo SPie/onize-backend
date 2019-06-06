@@ -14,7 +14,7 @@ use Test\UserHelper;
 /**
  * Class UsersApiCallsTest
  */
-class RegisterApiCallTest extends TestCase
+class RegisterApiCallTest extends IntegrationTestCase
 {
 
     use ApiHelper;

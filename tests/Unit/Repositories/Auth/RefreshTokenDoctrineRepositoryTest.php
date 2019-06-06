@@ -9,7 +9,7 @@ use Test\UserHelper;
 /**
  * Class RefreshTokenDoctrineRepositoryTest
  */
-class RefreshTokenDoctrineRepositoryTest extends TestCase
+class RefreshTokenDoctrineRepositoryTest extends IntegrationTestCase
 {
 
     use AuthHelper;

@@ -5,13 +5,14 @@ use App\Exceptions\ModelNotFoundException;
 use App\Models\User\UserModelFactoryInterface;
 use App\Models\User\UserModelInterface;
 use App\Repositories\User\UserRepositoryInterface;
+use App\Services\JWT\JWTService;
 use App\Services\User\UsersService;
 use App\Services\User\UsersServiceInterface;
-use Illuminate\Auth\Access\AuthorizationException;
-use Illuminate\Support\Facades\Hash;
+use Laravel\Lumen\Testing\TestCase;
 use LaravelDoctrine\Migrations\Testing\DatabaseMigrations;
 use Mockery\MockInterface;
 use Test\ModelHelper;
+use Test\RepositoryHelper;
 use Test\UserHelper;
 
 /**
@@ -22,20 +23,23 @@ class UsersServiceTest extends TestCase
 
     use DatabaseMigrations;
     use ModelHelper;
+    use RepositoryHelper;
+    use TestCaseHelper;
     use UserHelper;
 
     //region Tests
 
     /**
      * @return void
-     *
-     * @throws ModelNotFoundException
      */
     public function testGetUser(): void
     {
-        $user = $this->createUsers()->first();
+        $userId = $this->getFaker()->numberBetween();
+        $user = $this->createUserModel();
+        $userRepository = $this->createUserRepository();
+        $this->mockRepositoryFind($userRepository, $user, $userId);
 
-        $this->assertEquals($user, $this->createUserService()->getUser($user->getId()));
+        $this->assertEquals($user, $this->createUserService($userRepository)->getUser($userId));
     }
 
     /**
@@ -43,13 +47,13 @@ class UsersServiceTest extends TestCase
      */
     public function testGetUserWithInvalidUserId(): void
     {
-        try {
-            $this->createUserService()->getUser($this->getFaker()->numberBetween());
+        $userId = $this->getFaker()->numberBetween();
+        $userRepository = $this->createUserRepository();
+        $this->mockRepositoryFind($userRepository, null, $userId);
 
-            $this->assertTrue(false);
-        } catch (ModelNotFoundException $e) {
-            $this->assertEquals(UserModelInterface::class, $e->getModelClass());
-        }
+        $this->expectException(ModelNotFoundException::class);
+
+        $this->createUserService($userRepository)->getUser($userId);
     }
 
     /**
@@ -58,78 +62,38 @@ class UsersServiceTest extends TestCase
     public function testCreateUser(): void
     {
         $userData = [
-            UserModelInterface::PROPERTY_EMAIL => $this->getFaker()->safeEmail,
+            UserModelInterface::PROPERTY_EMAIL    => $this->getFaker()->safeEmail,
             UserModelInterface::PROPERTY_PASSWORD => $this->getFaker()->password,
         ];
+        $user = $this->createUserModel();
+        $userModelFactory = $this->createUserModelFactory();
+        $this->mockModelFactoryCreate($userModelFactory, $user, $userData);
+        $userRepository = $this->createUserRepository();
+        $this->mockRepositorySave($userRepository, $user);
+        $userService = $this->createUserService($userRepository, $userModelFactory);
+        $this->mockUserServiceUserExists($userService, false, $user);
 
-        $user = $this->createUserService()->createUser($userData);
-
-        $this->assertEquals($userData[UserModelInterface::PROPERTY_EMAIL], $user->getEmail());
-        $this->assertTrue(Hash::check($userData[UserModelInterface::PROPERTY_PASSWORD], $user->getAuthPassword()));
+        $this->assertEquals($user, $userService->createUser($userData));
     }
 
     /**
      * @return void
      */
-    public function testCreateWithInvalidData(): void
+    public function testCreateUserWithExistingUser(): void
     {
-        //missing email
-        try {
-            $this->createUserService()->createUser([
-                UserModelInterface::PROPERTY_PASSWORD => $this->getFaker()->password,
-            ]);
+        $userData = [
+            UserModelInterface::PROPERTY_EMAIL    => $this->getFaker()->safeEmail,
+            UserModelInterface::PROPERTY_PASSWORD => $this->getFaker()->password,
+        ];
+        $user = $this->createUserModel();
+        $userModelFactory = $this->createUserModelFactory();
+        $this->mockModelFactoryCreate($userModelFactory, $user, $userData);
+        $userService = $this->createUserService(null, $userModelFactory);
+        $this->mockUserServiceUserExists($userService, true, $user);
 
-            $this->assertTrue(false);
-        } catch (InvalidParameterException $e) {
-            $this->assertTrue(true);
-        }
+        $this->expectException(InvalidParameterException::class);
 
-        //empty email
-        try {
-            $this->createUserService()->createUser([
-                UserModelInterface::PROPERTY_EMAIL    => '',
-                UserModelInterface::PROPERTY_PASSWORD => $this->getFaker()->password,
-            ]);
-
-            $this->assertTrue(false);
-        } catch (InvalidParameterException $e) {
-            $this->assertTrue(true);
-        }
-
-        //missing password
-        try {
-            $this->createUserService()->createUser([
-                UserModelInterface::PROPERTY_EMAIL    => $this->getFaker()->safeEmail,
-            ]);
-
-            $this->assertTrue(false);
-        } catch (InvalidParameterException $e) {
-            $this->assertTrue(true);
-        }
-
-        //empty password
-        try {
-            $this->createUserService()->createUser([
-                UserModelInterface::PROPERTY_EMAIL    => $this->getFaker()->safeEmail,
-                UserModelInterface::PROPERTY_PASSWORD => '',
-            ]);
-
-            $this->assertTrue(false);
-        } catch (InvalidParameterException $e) {
-            $this->assertTrue(true);
-        }
-
-        //duplicated email
-        try {
-            $this->createUserService()->createUser([
-                UserModelInterface::PROPERTY_EMAIL    => $this->createUsers()->first()->getEmail(),
-                UserModelInterface::PROPERTY_PASSWORD => $this->getFaker()->password,
-            ]);
-
-            $this->assertTrue(false);
-        } catch (InvalidParameterException $e) {
-            $this->assertTrue(true);
-        }
+        $userService->createUser($userData);
     }
 
     /**
@@ -142,96 +106,40 @@ class UsersServiceTest extends TestCase
             UserModelInterface::PROPERTY_PASSWORD => $this->getFaker()->password,
         ];
 
-        $user = $this->createUserDoctrineModel();
-        $editedUser = clone $user
-            ->setEmail($userData[UserModelInterface::PROPERTY_EMAIL])
-            ->setPassword($userData[UserModelInterface::PROPERTY_PASSWORD]);
-
-        $userRepository = $this->createUserRepository();
-        $userRepository
-            ->shouldReceive('save')
-            ->andReturn($editedUser);
-
+        $userId = $this->getFaker()->numberBetween();
+        $user = $this->createUserModel();
+        $this->mockUserModelGetId($user, $userId);
         $userFactory = $this->createUserModelFactory();
-        $userFactory
-            ->shouldReceive('fill')
-            ->andReturn($editedUser);
+        $this->mockModelFactoryFill($userFactory, $user, $userData, $user);
+        $userRepository = $this->createUserRepository();
+        $this->mockRepositorySave($userRepository, $user);
+        $userService = $this->createUserService($userRepository, $userFactory);
+        $this->mockUserServiceUserExists($userService, false, $user, $userId);
 
-        $user = $this->createUserService(
-            $userRepository,
-            $userFactory
-        )->editUser($user, $userData);
-
-        $this->assertEquals($userData[UserModelInterface::PROPERTY_EMAIL], $user->getEmail());
-        $this->assertTrue(Hash::check($userData[UserModelInterface::PROPERTY_PASSWORD], $user->getAuthPassword()));
+        $this->assertEquals($user, $userService->editUser($user, $userData));
     }
 
     /**
      * @return void
      */
-    public function testEditUserWithoutChanges(): void
+    public function testEditUserWithExistingUser(): void
     {
-        $user = $this->createUserDoctrineModel();
+        $userData = [
+            UserModelInterface::PROPERTY_EMAIL => $this->getFaker()->safeEmail,
+            UserModelInterface::PROPERTY_PASSWORD => $this->getFaker()->password,
+        ];
 
-        $userRepository = $this->createUserRepository();
-        $userRepository
-            ->shouldReceive('save')
-            ->andReturn($user);
-
+        $userId = $this->getFaker()->numberBetween();
+        $user = $this->createUserModel();
+        $this->mockUserModelGetId($user, $userId);
         $userFactory = $this->createUserModelFactory();
-        $userFactory
-            ->shouldReceive('fill')
-            ->andReturn($user);
-
-        $this->assertEquals($user, $this->createUserService()->editUser($user, []));
-    }
-
-    /**
-     * @return void
-     */
-    public function testEditUserWithInvalidData(): void
-    {
-        $user = $this->createUserDoctrineModel();
-
-        $userFactory = $this->createUserModelFactory();
-        $userFactory
-            ->shouldReceive('fill')
-            ->andThrow(new InvalidParameterException());
-
-        $this->expectException(InvalidParameterException::class);
-
-        $this->createUserService()->editUser(
-            $user,
-            [
-                UserModelInterface::PROPERTY_EMAIL    => '',
-                UserModelInterface::PROPERTY_PASSWORD => '',
-            ]
-        );
-    }
-
-    public function testEditUserWithExistingEmail(): void
-    {
-        $user = $this->createUserDoctrineModel();
-
-        $userFactory = $this->createUserModelFactory();
-        $userFactory
-            ->shouldReceive('fill')
-            ->andReturn($user);
-
+        $this->mockModelFactoryFill($userFactory, $user, $userData, $user);
         $userService = $this->createUserService(null, $userFactory);
-        $userService
-            ->shouldReceive('userExists')
-            ->andReturn(true);
+        $this->mockUserServiceUserExists($userService, true, $user, $userId);
 
         $this->expectException(InvalidParameterException::class);
 
-        $userService->editUser(
-            $user,
-            [
-                UserModelInterface::PROPERTY_EMAIL => $this->getFaker()->safeEmail,
-                UserModelInterface::PROPERTY_PASSWORD => $this->getFaker()->password,
-            ]
-        );
+        $userService->editUser($user, $userData);
     }
 
     //endregion
@@ -239,24 +147,56 @@ class UsersServiceTest extends TestCase
     /**
      * @param UserRepositoryInterface|null   $userRepository
      * @param UserModelFactoryInterface|null $userModelFactory
+     * @param JWTService|null                $jwtService
      *
      * @return UsersServiceInterface|MockInterface
      */
     private function createUserService(
         UserRepositoryInterface $userRepository = null,
-        UserModelFactoryInterface $userModelFactory = null
+        UserModelFactoryInterface $userModelFactory = null,
+        JWTService $jwtService = null
     ): UsersServiceInterface
     {
-        $userService = Mockery::spy(
+        return Mockery::spy(
             UsersService::class,
             [
-                $userRepository ?: $this->getUserRepository(),
-                $userModelFactory ?: $this->getUserModelFactory(),
+                $userRepository ?: $this->createUserRepository(),
+                $userModelFactory ?: $this->createUserModelFactory(),
+                $jwtService ?: $this->createJWTService(),
             ]
-        );
-
-        return $userService
+        )
             ->makePartial()
             ->shouldAllowMockingProtectedMethods();
+    }
+
+    /**
+     * @param MockInterface $userService
+     * @param bool          $response
+     * @param MockInterface $user
+     * @param int|null      $userId
+     *
+     * @return UsersServiceTest
+     */
+    private function mockUserServiceUserExists(
+        MockInterface $userService,
+        bool $response,
+        MockInterface $user,
+        int $userId = null
+    ): UsersServiceTest
+    {
+        $arguments = [
+            Mockery::on(function ($argument) use ($user) {
+                return $argument == $user;
+            })
+        ];
+        if ($userId !== null) {
+            $arguments[] = $userId;
+        }
+        $userService
+            ->shouldReceive('userExists')
+            ->withArgs($arguments)
+            ->andReturn($response);
+
+        return $this;
     }
 }

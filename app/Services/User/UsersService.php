@@ -9,6 +9,7 @@ use App\Models\User\UserModelInterface;
 use App\Repositories\User\UserRepositoryInterface;
 use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Support\Facades\Hash;
+use Symfony\Component\HttpFoundation\Response;
 
 /**
  * Class UsersService
@@ -120,5 +121,18 @@ class UsersService implements UsersServiceInterface
         $user = $this->getUserRepository()->findOneByEmail($user->getEmail());
 
         return ($user && $user->getId() != $userId);
+    }
+
+    /**
+     * @param Response $response
+     * @param string   $email
+     * @param string   $password
+     * @param bool     $withRefreshToken
+     *
+     * @return Response
+     */
+    public function login(Response $response, string $email, string $password, bool $withRefreshToken = false): Response
+    {
+        // TODO: Implement login() method.
     }
 }

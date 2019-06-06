@@ -100,6 +100,16 @@ class UsersController extends Controller
      * @param Request $request
      *
      * @return JsonResponse
+     */
+    public function login(Request $request): JsonResponse
+    {
+
+    }
+
+    /**
+     * @param Request $request
+     *
+     * @return JsonResponse
      *
      * @throws ValidationException
      */

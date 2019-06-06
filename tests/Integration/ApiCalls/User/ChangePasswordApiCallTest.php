@@ -15,7 +15,7 @@ use Test\UserHelper;
 /**
  * Class ChangePasswordApiCallTest
  */
-class ChangePasswordApiCallTest extends TestCase
+class ChangePasswordApiCallTest extends IntegrationTestCase
 {
 
     use ApiHelper;

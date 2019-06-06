@@ -13,7 +13,7 @@ use Test\UserHelper;
 /**
  * Class RefreshTokenDoctrineModelFactoryTest
  */
-class RefreshTokenDoctrineModelFactoryTest extends TestCase
+class RefreshTokenDoctrineModelFactoryTest extends IntegrationTestCase
 {
 
     use AuthHelper;

@@ -12,7 +12,7 @@ use Test\UserHelper;
 /**
  * Class PasswordResetTokenDoctrineModelFactoryTest
  */
-final class PasswordResetTokenDoctrineModelFactoryTest extends TestCase
+final class PasswordResetTokenDoctrineModelFactoryTest extends IntegrationTestCase
 {
 
     use AuthHelper;

@@ -13,7 +13,7 @@ use Test\UserHelper;
 /**
  * Class SPieJWTRefreshTokenRepositoryTest
  */
-class SPieJWTRefreshTokenRepositoryTest extends TestCase
+class SPieJWTRefreshTokenRepositoryTest extends IntegrationTestCase
 {
 
     use AuthHelper;
