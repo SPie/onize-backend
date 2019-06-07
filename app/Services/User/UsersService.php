@@ -7,6 +7,7 @@ use App\Exceptions\ModelNotFoundException;
 use App\Models\User\UserModelFactoryInterface;
 use App\Models\User\UserModelInterface;
 use App\Repositories\User\UserRepositoryInterface;
+use App\Services\JWT\JWTService;
 use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Support\Facades\Hash;
 use Symfony\Component\HttpFoundation\Response;
@@ -30,15 +31,26 @@ class UsersService implements UsersServiceInterface
     private $userModelFactory;
 
     /**
+     * @var JWTService
+     */
+    private $jwtService;
+
+    /**
      * UsersService constructor.
      *
      * @param UserRepositoryInterface   $userRepository
      * @param UserModelFactoryInterface $userModelFactory
+     * @param JWTService                $jwtService
      */
-    public function __construct(UserRepositoryInterface $userRepository, UserModelFactoryInterface $userModelFactory)
+    public function __construct(
+        UserRepositoryInterface $userRepository,
+        UserModelFactoryInterface $userModelFactory,
+        JWTService $jwtService
+    )
     {
         $this->userRepository = $userRepository;
         $this->userModelFactory = $userModelFactory;
+        $this->jwtService = $jwtService;
     }
 
     /**
@@ -55,6 +67,14 @@ class UsersService implements UsersServiceInterface
     protected function getUserModelFactory(): UserModelFactoryInterface
     {
         return $this->userModelFactory;
+    }
+
+    /**
+     * @return JWTService
+     */
+    protected function getJWTService(): JWTService
+    {
+        return $this->jwtService;
     }
 
     /**
@@ -133,6 +153,13 @@ class UsersService implements UsersServiceInterface
      */
     public function login(Response $response, string $email, string $password, bool $withRefreshToken = false): Response
     {
-        // TODO: Implement login() method.
+        return $this->getJWTService()->login(
+            $response,
+            [
+                UserModelInterface::PROPERTY_EMAIL    => $email,
+                UserModelInterface::PROPERTY_PASSWORD => $password,
+            ],
+            $withRefreshToken
+        );
     }
 }

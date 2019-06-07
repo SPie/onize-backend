@@ -1,5 +1,7 @@
 <?php
 
+use App\Exceptions\Auth\InvalidAuthConfigurationException;
+use App\Exceptions\Auth\NotAuthenticatedException;
 use App\Exceptions\InvalidParameterException;
 use App\Exceptions\ModelNotFoundException;
 use App\Models\User\UserModelFactoryInterface;
@@ -11,6 +13,7 @@ use App\Services\User\UsersServiceInterface;
 use Laravel\Lumen\Testing\TestCase;
 use LaravelDoctrine\Migrations\Testing\DatabaseMigrations;
 use Mockery\MockInterface;
+use Symfony\Component\HttpFoundation\Response;
 use Test\ModelHelper;
 use Test\RepositoryHelper;
 use Test\UserHelper;
@@ -142,6 +145,95 @@ class UsersServiceTest extends TestCase
         $userService->editUser($user, $userData);
     }
 
+    /**
+     * @return void
+     */
+    public function testLogin(): void
+    {
+        $inputResponse = $this->createResponse();
+        $response = $this->createResponse();
+        $credentials = [
+            'email'    => $this->getFaker()->safeEmail,
+            'password' => $this->getFaker()->password,
+        ];
+        $jwtService = $this->createJWTService();
+        $this->mockJWTServiceLogin($jwtService, $response, $inputResponse, $credentials, false);
+        $userService = $this->createUserService(null, null, $jwtService);
+
+        $this->assertEquals($response, $userService->login($inputResponse, $credentials['email'], $credentials['password']));
+    }
+
+    /**
+     * @return void
+     */
+    public function testLoginWithRefreshToken(): void
+    {
+        $inputResponse = $this->createResponse();
+        $response = $this->createResponse();
+        $credentials = [
+            'email'    => $this->getFaker()->safeEmail,
+            'password' => $this->getFaker()->password,
+        ];
+        $jwtService = $this->createJWTService();
+        $this->mockJWTServiceLogin($jwtService, $response, $inputResponse, $credentials, true);
+        $userService = $this->createUserService(null, null, $jwtService);
+
+        $this->assertEquals(
+            $response,
+            $userService->login($inputResponse, $credentials['email'], $credentials['password'], true)
+        );
+    }
+
+    /**
+     * @return void
+     */
+    public function testLoginWithNotAuthenticatedException(): void
+    {
+        $inputResponse = $this->createResponse();
+        $credentials = [
+            'email'    => $this->getFaker()->safeEmail,
+            'password' => $this->getFaker()->password,
+        ];
+        $jwtService = $this->createJWTService();
+        $this->mockJWTServiceLogin(
+            $jwtService,
+            new NotAuthenticatedException(),
+            $inputResponse,
+            $credentials,
+            false
+        );
+        $userService = $this->createUserService(null, null, $jwtService);
+
+        $this->expectException(NotAuthenticatedException::class);
+
+        $userService->login($inputResponse, $credentials['email'], $credentials['password']);
+    }
+
+    /**
+     * @return void
+     */
+    public function testLoginWithInvalidAuthConfigurationException(): void
+    {
+        $inputResponse = $this->createResponse();
+        $credentials = [
+            'email'    => $this->getFaker()->safeEmail,
+            'password' => $this->getFaker()->password,
+        ];
+        $jwtService = $this->createJWTService();
+        $this->mockJWTServiceLogin(
+            $jwtService,
+            new InvalidAuthConfigurationException(),
+            $inputResponse,
+            $credentials,
+            false
+        );
+        $userService = $this->createUserService(null, null, $jwtService);
+
+        $this->expectException(InvalidAuthConfigurationException::class);
+
+        $userService->login($inputResponse, $credentials['email'], $credentials['password']);
+    }
+
     //endregion
 
     /**
@@ -198,5 +290,13 @@ class UsersServiceTest extends TestCase
             ->andReturn($response);
 
         return $this;
+    }
+
+    /**
+     * @return Response
+     */
+    private function createResponse(): Response
+    {
+        return new Response();
     }
 }

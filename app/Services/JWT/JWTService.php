@@ -37,9 +37,9 @@ interface JWTService
     public function refreshAccessToken(Response $response): Response;
 
     /**
-     * @return UserModelInterface|null
+     * @return UserModelInterface
      */
-    public function getAuthenticatedUser(): ?UserModelInterface;
+    public function getAuthenticatedUser(): UserModelInterface;
 
     /**
      * @param UserModelInterface $user

@@ -109,10 +109,5 @@ class AuthController extends Controller
         );
     }
 
-    public function passwordResetRequest(Request $request): JsonResponse
-    {
-        // TODO
-    }
-
     //endregion
 }

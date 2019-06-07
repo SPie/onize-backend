@@ -11,6 +11,7 @@ use App\Services\User\UsersServiceInterface;
 use Illuminate\Support\Collection;
 use Mockery;
 use Mockery\MockInterface;
+use Symfony\Component\HttpFoundation\Response;
 
 /**
  * Trait UserHelper
@@ -94,11 +95,79 @@ trait UserHelper
     }
 
     /**
-     * @return JWTService
+     * @return JWTService|MockInterface
      */
     protected function createJWTService(): JWTService
     {
         return Mockery::spy(JWTService::class);
+    }
+
+    /**
+     * @param JWTService|MockInterface $jwtService
+     * @param Response|\Exception      $response
+     * @param Response                 $inputResponse
+     * @param array                    $credentials
+     * @param bool|null                $withRefreshToken
+     *
+     * @return $this
+     */
+    protected function mockJWTServiceLogin(
+        MockInterface $jwtService,
+        $response,
+        Response $inputResponse,
+        array $credentials,
+        bool $withRefreshToken = null
+    )
+    {
+        $arguments = [
+            Mockery::on(function ($argument) use ($inputResponse) {
+                return $argument == $inputResponse;
+            }),
+            $credentials
+        ];
+        if ($withRefreshToken !== null) {
+            $arguments[] = $withRefreshToken;
+        }
+
+        $jwtService
+            ->shouldReceive('login')
+            ->withArgs($arguments)
+            ->andThrow($response);
+
+        return $this;
+    }
+
+    /**
+     * @param JWTService|MockInterface $jwtService
+     * @param Response                 $response
+     *
+     * @return $this
+     */
+    protected function mockJWTServiceLogout(MockInterface $jwtService, Response $response)
+    {
+        $jwtService
+            ->shouldReceive('logout')
+            ->with(Mockery::on(function ($argument) use ($response) {
+                return $argument == $response;
+            }))
+            ->andReturn($response);
+
+        return $this;
+    }
+
+    /**
+     * @param JWTService|MockInterface      $jwtService
+     * @param UserModelInterface|\Exception $user
+     *
+     * @return $this
+     */
+    protected function mockJWTServiceGetAuthenticatedUser(MockInterface $jwtService, $user)
+    {
+        $jwtService
+            ->shouldReceive('getAuthenticatedUser')
+            ->andThrow($user);
+
+        return $this;
     }
 
     /**

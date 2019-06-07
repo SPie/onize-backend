@@ -105,11 +105,11 @@ class SPieLaravelJWTService implements JWTService
     }
 
     /**
-     * @return UserModelInterface|Authenticatable|null
+     * @return UserModelInterface|Authenticatable
      *
      * @throws \Exception
      */
-    public function getAuthenticatedUser(): ?UserModelInterface
+    public function getAuthenticatedUser(): UserModelInterface
     {
         $user = $this->getJwtGuard()->user();
         if (!$user) {
