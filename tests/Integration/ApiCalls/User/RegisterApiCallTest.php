@@ -8,7 +8,7 @@ use Illuminate\Support\Facades\URL;
 use LaravelDoctrine\Migrations\Testing\DatabaseMigrations;
 use Test\ApiHelper;
 use Test\ModelHelper;
-use Test\ResponseHelper;
+use Test\RequestResponseHelper;
 use Test\UserHelper;
 
 /**
@@ -20,7 +20,7 @@ class RegisterApiCallTest extends IntegrationTestCase
     use ApiHelper;
     use DatabaseMigrations;
     use ModelHelper;
-    use ResponseHelper;
+    use RequestResponseHelper;
     use UserHelper;
 
     //region Tests

@@ -142,24 +142,4 @@ class UsersService implements UsersServiceInterface
 
         return ($user && $user->getId() != $userId);
     }
-
-    /**
-     * @param Response $response
-     * @param string   $email
-     * @param string   $password
-     * @param bool     $withRefreshToken
-     *
-     * @return Response
-     */
-    public function login(Response $response, string $email, string $password, bool $withRefreshToken = false): Response
-    {
-        return $this->getJWTService()->login(
-            $response,
-            [
-                UserModelInterface::PROPERTY_EMAIL    => $email,
-                UserModelInterface::PROPERTY_PASSWORD => $password,
-            ],
-            $withRefreshToken
-        );
-    }
 }

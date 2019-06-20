@@ -1,6 +1,6 @@
 <?php
 
-use App\Http\Controllers\Auth\AuthController;
+use App\Http\Controllers\User\UsersController;
 use App\Models\Auth\RefreshTokenModel;
 use App\Models\User\UserModelInterface;
 use Illuminate\Http\Request;
@@ -12,7 +12,7 @@ use SPie\LaravelJWT\Contracts\TokenBlacklist;
 use Test\ApiHelper;
 use Test\AuthIntegrationHelper;
 use Test\ModelHelper;
-use Test\ResponseHelper;
+use Test\RequestResponseHelper;
 use Test\UserHelper;
 
 /**
@@ -25,7 +25,7 @@ class AuthApiCallsTest extends IntegrationTestCase
     use AuthIntegrationHelper;
     use DatabaseMigrations;
     use ModelHelper;
-    use ResponseHelper;
+    use RequestResponseHelper;
     use UserHelper;
 
     const BEARER_AUTHORIZATION = 'Authorization';
@@ -42,7 +42,7 @@ class AuthApiCallsTest extends IntegrationTestCase
         $password = $this->getFaker()->password();
 
         $response = $this->doApiCall(
-            URL::route(AuthController::ROUTE_NAME_LOGIN),
+            URL::route(UsersController::ROUTE_NAME_LOGIN),
             Request::METHOD_POST,
             [
                 UserModelInterface::PROPERTY_EMAIL    => $this->createUsers(
@@ -65,7 +65,7 @@ class AuthApiCallsTest extends IntegrationTestCase
     public function testLoginWithoutCredentials(): void
     {
         $response = $this->doApiCall(
-            URL::route(AuthController::ROUTE_NAME_LOGIN),
+            URL::route(UsersController::ROUTE_NAME_LOGIN),
             Request::METHOD_POST
         );
 
@@ -89,7 +89,7 @@ class AuthApiCallsTest extends IntegrationTestCase
     public function testLoginWithInvalidEmail(): void
     {
         $response = $this->doApiCall(
-            URL::route(AuthController::ROUTE_NAME_LOGIN),
+            URL::route(UsersController::ROUTE_NAME_LOGIN),
             Request::METHOD_POST,
             [
                 UserModelInterface::PROPERTY_EMAIL    => $this->getFaker()->safeEmail,
@@ -109,7 +109,7 @@ class AuthApiCallsTest extends IntegrationTestCase
     public function testLoginWithInvalidPassword(): void
     {
         $response = $this->doApiCall(
-            URL::route(AuthController::ROUTE_NAME_LOGIN),
+            URL::route(UsersController::ROUTE_NAME_LOGIN),
             Request::METHOD_POST,
             [
                 UserModelInterface::PROPERTY_EMAIL    => $this->createUsers()->first()->getEmail(),
@@ -129,7 +129,7 @@ class AuthApiCallsTest extends IntegrationTestCase
         $password = $this->getFaker()->password();
 
         $response = $this->doApiCall(
-            URL::route(AuthController::ROUTE_NAME_LOGIN),
+            URL::route(UsersController::ROUTE_NAME_LOGIN),
             Request::METHOD_POST,
             [
                 UserModelInterface::PROPERTY_EMAIL    => $this->createUsers(
@@ -155,7 +155,7 @@ class AuthApiCallsTest extends IntegrationTestCase
     public function testLogout(): void
     {
         $response = $this->doApiCall(
-            URL::route(AuthController::ROUTE_NAME_LOGOUT),
+            URL::route(UsersController::ROUTE_NAME_LOGOUT),
             Request::METHOD_POST,
             [],
             null,
@@ -174,7 +174,7 @@ class AuthApiCallsTest extends IntegrationTestCase
     public function testLogoutWithoutAuthenticatedUser(): void
     {
         $response = $this->doApiCall(
-            URL::route(AuthController::ROUTE_NAME_LOGOUT),
+            URL::route(UsersController::ROUTE_NAME_LOGOUT),
             Request::METHOD_POST
         );
 
@@ -192,7 +192,7 @@ class AuthApiCallsTest extends IntegrationTestCase
         $user = $this->createUsers()->first();
 
         $response = $this->doApiCall(
-            URL::route(AuthController::ROUTE_NAME_USER),
+            URL::route(UsersController::ROUTE_NAME_AUTHENTICATED),
             Request::METHOD_GET,
             [],
             null,
@@ -202,8 +202,8 @@ class AuthApiCallsTest extends IntegrationTestCase
         $this->assertResponseOk();
 
         $responseData = $response->getData(true);
-        $this->assertArrayHasKey(AuthController::RESPONSE_PARAMETER_USER, $responseData);
-        $this->assertEquals($user->toArray(), $responseData[AuthController::RESPONSE_PARAMETER_USER]);
+        $this->assertArrayHasKey(UsersController::RESPONSE_PARAMETER_USER, $responseData);
+        $this->assertEquals($user->toArray(), $responseData[UsersController::RESPONSE_PARAMETER_USER]);
     }
 
     /**
@@ -214,7 +214,7 @@ class AuthApiCallsTest extends IntegrationTestCase
     public function testAuthenticatedUserWithoutUser(): void
     {
         $this->doApiCall(
-            URL::route(AuthController::ROUTE_NAME_USER),
+            URL::route(UsersController::ROUTE_NAME_AUTHENTICATED),
             Request::METHOD_GET
         );
 
@@ -234,7 +234,7 @@ class AuthApiCallsTest extends IntegrationTestCase
         $this->app->get(TokenBlacklist::class)->revoke($jwt);
 
         $this->doApiCall(
-            URL::route(AuthController::ROUTE_NAME_USER),
+            URL::route(UsersController::ROUTE_NAME_AUTHENTICATED),
             Request::METHOD_GET,
             [],
             null,
@@ -256,7 +256,7 @@ class AuthApiCallsTest extends IntegrationTestCase
         $user = $this->createUsers()->first();
 
         $this->doApiCall(
-            URL::route(AuthController::ROUTE_NAME_USER),
+            URL::route(UsersController::ROUTE_NAME_AUTHENTICATED),
             Request::METHOD_GET,
             [],
             null,
@@ -294,7 +294,7 @@ class AuthApiCallsTest extends IntegrationTestCase
         $jwt = $this->createJWTToken($user, $refreshToken);
 
         $response = $this->doApiCall(
-            URL::route(AuthController::ROUTE_NAME_REFRESH),
+            URL::route(UsersController::ROUTE_NAME_REFRESH_ACCESS_TOKEN),
             Request::METHOD_GET,
             [],
             $this->createRefreshTokenCookie($jwt)
@@ -312,7 +312,7 @@ class AuthApiCallsTest extends IntegrationTestCase
     public function testRefreshWithoutRefreshToken(): void
     {
         $response = $this->doApiCall(
-            URL::route(AuthController::ROUTE_NAME_REFRESH),
+            URL::route(UsersController::ROUTE_NAME_REFRESH_ACCESS_TOKEN),
             Request::METHOD_GET
         );
 
@@ -337,7 +337,7 @@ class AuthApiCallsTest extends IntegrationTestCase
         $jwt = $this->createJWTToken($user, $refreshToken);
 
         $response = $this->doApiCall(
-            URL::route(AuthController::ROUTE_NAME_REFRESH),
+            URL::route(UsersController::ROUTE_NAME_REFRESH_ACCESS_TOKEN),
             Request::METHOD_GET,
             [],
             $this->createRefreshTokenCookie($jwt)

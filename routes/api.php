@@ -31,17 +31,15 @@ $router->group(
         //region Auth calls
 
         $router->group(['prefix' => 'auth'], function (Router $router) {
-            $router->post('login', ['as' => AuthController::ROUTE_NAME_LOGIN, 'uses' => 'Auth\AuthController@login']);
-
-            $router->get('password', ['as' => AuthController::ROUTE_NAME_PASSWORD_RESET_REQUEST, 'uses' => 'Auth\AuthController@passwordResetRequest']);
+            $router->post('login', ['as' => UsersController::ROUTE_NAME_LOGIN, 'uses' => 'User\UsersController@login']);
 
             $router->group(['middleware' => 'token'], function (Router $router) {
-                $router->get('user', ['as'    => AuthController::ROUTE_NAME_USER, 'uses' => 'Auth\AuthController@authenticatedUser']);
-                $router->get('refresh', ['as' => AuthController::ROUTE_NAME_REFRESH, 'uses' => 'Auth\AuthController@refreshAccessToken']);
+                $router->get('user', ['as'    => UsersController::ROUTE_NAME_AUTHENTICATED, 'uses' => 'User\UsersController@authenticatedUser']);
+                $router->get('refresh', ['as' => UsersController::ROUTE_NAME_REFRESH_ACCESS_TOKEN, 'uses' => 'User\UsersController@refreshAccessToken']);
             });
 
             $router->group(['middleware' => 'auth'], function (Router $router) {
-                $router->post('logout', ['as' => AuthController::ROUTE_NAME_LOGOUT, 'uses'  => 'Auth\AuthController@logout']);
+                $router->post('logout', ['as' => UsersController::ROUTE_NAME_LOGOUT, 'uses'  => 'User\UsersController@logout']);
             });
         });
 

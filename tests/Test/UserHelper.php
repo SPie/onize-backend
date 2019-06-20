@@ -7,6 +7,7 @@ use App\Models\User\UserModelFactoryInterface;
 use App\Models\User\UserModelInterface;
 use App\Repositories\User\UserRepositoryInterface;
 use App\Services\JWT\JWTService;
+use App\Services\User\UsersService;
 use App\Services\User\UsersServiceInterface;
 use Illuminate\Support\Collection;
 use Mockery;
@@ -59,6 +60,21 @@ trait UserHelper
     }
 
     /**
+     * @param UserModelInterface|MockInterface $user
+     * @param string                           $password
+     *
+     * @return $this
+     */
+    protected function mockUserModelGetAuthPassword(MockInterface $user, string $password)
+    {
+        $user
+            ->shouldReceive('getAuthPassword')
+            ->andReturn($password);
+
+        return $this;
+    }
+
+    /**
      * @return UserModelFactoryInterface|Mockery\MockInterface
      */
     protected function createUserModelFactory(): UserModelFactoryInterface
@@ -92,6 +108,93 @@ trait UserHelper
     protected function createUserRepository(): UserRepositoryInterface
     {
         return Mockery::spy(UserRepositoryInterface::class);
+    }
+
+    /**
+     * @return UsersServiceInterface|MockInterface
+     */
+    protected function createUsersService(): UsersServiceInterface
+    {
+        return Mockery::spy(UsersServiceInterface::class);
+    }
+
+    /**
+     * @param MockInterface       $usersService
+     * @param Response|\Exception $response
+     * @param Response            $inputResponse
+     * @param string              $email
+     * @param string              $password
+     * @param bool                $withRefreshToken
+     *
+     * @return $this
+     */
+    protected function mockUsersServiceLogin(
+        MockInterface $usersService,
+        $response,
+        Response $inputResponse,
+        string $email,
+        string $password,
+        bool $withRefreshToken
+    )
+    {
+        $usersService
+            ->shouldReceive('login')
+            ->with(
+                Mockery::on(function ($argument) use ($inputResponse) {
+                    return $argument == $inputResponse;
+                }),
+                $email,
+                $password,
+                $withRefreshToken
+            )
+            ->andThrow($response);
+
+        return $this;
+    }
+
+    /**
+     * @param UsersService|MockInterface    $usersService
+     * @param UserModelInterface|\Exception $user
+     * @param array                         $data
+     *
+     * @return $this
+     */
+    protected function mockUsersServiceCreateUser(MockInterface $usersService, $user, array $data)
+    {
+        $usersService
+            ->shouldReceive('createUser')
+            ->with($data)
+            ->andThrow($user);
+
+        return $this;
+    }
+
+    /**
+     * @param UsersService|MockInterface    $usersService
+     * @param UserModelInterface|\Exception $user
+     * @param UserModelInterface            $inputUser
+     * @param array                         $userData
+     *
+     * @return $this
+     */
+    protected function mockUsersServiceEditUser(
+        MockInterface $usersService,
+        $user,
+        UserModelInterface $inputUser,
+        array $userData
+    )
+    {
+        $usersService
+            ->shouldReceive('editUser')
+            ->with(
+                Mockery::on(function ($argument) use ($inputUser) {
+                    return $argument == $inputUser;
+                }),
+                $userData
+            )
+            ->andThrow($user);
+
+        return $this;
     }
 
     /**
@@ -166,6 +269,58 @@ trait UserHelper
         $jwtService
             ->shouldReceive('getAuthenticatedUser')
             ->andThrow($user);
+
+        return $this;
+    }
+
+    /**
+     * @param JWTService|MockInterface $jwtService
+     * @param Response|\Exception      $response
+     * @param UserModelInterface       $user
+     * @param Response                 $inputResponse
+     * @param bool                     $withRefreshToken
+     *
+     * @return $this
+     */
+    protected function mockJWTServiceIssueTokens(
+        MockInterface $jwtService,
+        $response,
+        UserModelInterface $user,
+        Response $inputResponse,
+        bool $withRefreshToken
+    )
+    {
+        $jwtService
+            ->shouldReceive('issueTokens')
+            ->with(
+                Mockery::on(function ($argument) use ($user) {
+                    return $argument == $user;
+                }),
+                Mockery::on(function ($argument) use ($inputResponse) {
+                    return $argument == $inputResponse;
+                }),
+                $withRefreshToken
+            )
+            ->andReturn($response);
+
+        return $this;
+    }
+
+    /**
+     * @param JWTService|MockInterface $jwtService
+     * @param Response|\Exception      $response
+     * @param Response                 $inputResponse
+     *
+     * @return $this
+     */
+    protected function mockJWTServiceRefreshAccessToken(MockInterface $jwtService, $response, Response $inputResponse)
+    {
+        $jwtService
+            ->shouldReceive('refreshAccessToken')
+            ->with(Mockery::on(function ($argument) use ($inputResponse) {
+                return $argument == $inputResponse;
+            }))
+            ->andThrow($response);
 
         return $this;
     }

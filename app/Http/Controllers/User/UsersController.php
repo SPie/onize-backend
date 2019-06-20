@@ -22,11 +22,17 @@ use Symfony\Component\HttpFoundation\Response;
 class UsersController extends Controller
 {
 
-    const ROUTE_NAME_REGISTER        = 'users.register';
-    const ROUTE_NAME_CHANGE_PASSWORD = 'users.changePassword';
+    const ROUTE_NAME_REGISTER             = 'users.register';
+    const ROUTE_NAME_CHANGE_PASSWORD      = 'users.changePassword';
+    const ROUTE_NAME_LOGIN                = 'users.login';
+    const ROUTE_NAME_LOGOUT               = 'users.logout';
+    const ROUTE_NAME_AUTHENTICATED        = 'users.authenticated';
+    const ROUTE_NAME_REFRESH_ACCESS_TOKEN = 'users.refreshAccessToken';
 
     const RESPONSE_PARAMETER_USERS = 'users';
     const RESPONSE_PARAMETER_USER  = 'user';
+
+    const REQUEST_PARAMETER_REMEMBER = 'remember';
 
     const USER_DATA_PASSWORD_CONFIRM = 'passwordConfirm';
     const USER_DATA_PASSWORD_CURRENT = 'currentPassword';
@@ -72,19 +78,20 @@ class UsersController extends Controller
     //region Controller actions
 
     /**
-     * @param Request $request
+     * @param Request    $request
+     * @param JWTService $jwtService
      *
      * @return JsonResponse|Response
      *
      * @throws ValidationException
      */
-    public function register(Request $request): JsonResponse
+    public function register(Request $request, JWTService $jwtService): JsonResponse
     {
         $user = $this->getUserService()->createUser(
             $this->validate($request, \array_merge($this->getEmailValidators(), $this->getPasswordValidators()))
         );
 
-        return $this->getJwtService()->issueTokens(
+        return $jwtService->issueTokens(
             $user,
             $this->createResponse(
                 [
@@ -92,35 +99,81 @@ class UsersController extends Controller
                 ],
                 Response::HTTP_CREATED
             ),
-            $request->get('stayLoggedIn', false)
+            $request->get(self::REQUEST_PARAMETER_REMEMBER, false)
         );
     }
 
     /**
-     * @param Request $request
+     * @param Request    $request
+     * @param JWTService $jwtService
      *
-     * @return JsonResponse
+     * @return JsonResponse|Response
+     *
+     * @throws ValidationException
      */
-    public function login(Request $request): JsonResponse
+    public function login(Request $request, JWTService $jwtService): JsonResponse
     {
-
+        return $jwtService->login(
+            $this->createResponse([], Response::HTTP_NO_CONTENT),
+            $this->validate(
+                $request,
+                [
+                    UserModelInterface::PROPERTY_EMAIL    => ['required'],
+                    UserModelInterface::PROPERTY_PASSWORD => ['required'],
+                ]
+            ),
+            $request->get(self::REQUEST_PARAMETER_REMEMBER, false)
+        );
     }
 
     /**
-     * @param Request $request
+     * @param JWTService $jwtService
+     *
+     * @return JsonResponse|Response
+     */
+    public function logout(JWTService $jwtService): JsonResponse
+    {
+        return $jwtService->logout($this->createResponse([], Response::HTTP_NO_CONTENT));
+    }
+
+    /**
+     * @param JWTService $jwtService
+     *
+     * @return JsonResponse
+     */
+    public function authenticatedUser(JWTService $jwtService): JsonResponse
+    {
+        return $this->createResponse([
+            self::RESPONSE_PARAMETER_USER => $jwtService->getAuthenticatedUser()
+        ]);
+    }
+
+    /**
+     * @param JWTService $jwtService
+     *
+     * @return JsonResponse|Response
+     */
+    public function refreshAccessToken(JWTService $jwtService): JsonResponse
+    {
+        return $jwtService->refreshAccessToken($this->createResponse([], Response::HTTP_NO_CONTENT));
+    }
+
+    /**
+     * @param Request    $request
+     * @param JWTService $jwtService
      *
      * @return JsonResponse
      *
      * @throws ValidationException
      */
-    public function changePassword(Request $request): JsonResponse
+    public function changePassword(Request $request, JWTService $jwtService): JsonResponse
     {
         return $this->createResponse([
             self::RESPONSE_PARAMETER_USER => $this->getUserService()->editUser(
-                $this->getJwtService()->getAuthenticatedUser(),
+                $jwtService->getAuthenticatedUser(),
                 $this->validate(
                     $request,
-                    $this->getPasswordValidators($this->getJwtService()->getAuthenticatedUser()->getAuthPassword())
+                    $this->getPasswordValidators($jwtService->getAuthenticatedUser()->getAuthPassword())
                 )
             ),
         ]);

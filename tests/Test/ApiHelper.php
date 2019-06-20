@@ -88,7 +88,7 @@ trait ApiHelper
      *
      * @return Request
      */
-    protected function createRequest(
+    protected function createApiRequest(
         string $method = Request::METHOD_GET,
         string $uri = '',
         array $parameters = [],
