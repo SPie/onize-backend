@@ -2,13 +2,13 @@
 
 namespace Test;
 
-use App\Models\Auth\PasswordResetTokenDoctrineModel;
-use App\Models\Auth\PasswordResetTokenModel;
-use App\Models\Auth\PasswordResetTokenModelFactory;
-use App\Models\Auth\RefreshTokenModel;
-use App\Models\Auth\RefreshTokenModelFactory;
+use App\Models\User\PasswordResetTokenDoctrineModel;
+use App\Models\User\PasswordResetTokenModel;
+use App\Models\User\PasswordResetTokenModelFactory;
+use App\Models\User\RefreshTokenModel;
+use App\Models\User\RefreshTokenModelFactory;
 use App\Models\User\UserModelInterface;
-use App\Repositories\Auth\RefreshTokenRepository;
+use App\Repositories\User\RefreshTokenRepository;
 use Mockery;
 use Mockery\MockInterface;
 use SPie\LaravelJWT\Contracts\JWT;

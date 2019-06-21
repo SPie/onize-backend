@@ -4,8 +4,6 @@ namespace App\Services\User;
 
 use App\Exceptions\ModelNotFoundException;
 use App\Models\User\UserModelInterface;
-use Illuminate\Auth\Access\AuthorizationException;
-use Symfony\Component\HttpFoundation\Response;
 
 /**
  * Interface UsersServiceInterface
@@ -38,4 +36,11 @@ interface UsersServiceInterface
      * @return UserModelInterface
      */
     public function editUser(UserModelInterface $user, array $userData): UserModelInterface;
+
+    /**
+     * @param string $email
+     *
+     * @return string
+     */
+    public function createPasswordResetToken(string $email): string;
 }

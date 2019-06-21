@@ -3,7 +3,7 @@
 namespace Test;
 
 
-use App\Models\Auth\RefreshTokenDoctrineModel;
+use App\Models\User\RefreshTokenDoctrineModel;
 use Illuminate\Support\Collection;
 
 /**

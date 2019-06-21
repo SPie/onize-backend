@@ -111,6 +111,27 @@ trait UserHelper
     }
 
     /**
+     * @param UserRepositoryInterface|MockInterface $userRepository
+     * @param UserModelInterface|null               $user
+     * @param string                                $email
+     *
+     * @return $this
+     */
+    protected function mockUserRepositoryFindOneByEmail(
+        MockInterface $userRepository,
+        ?UserModelInterface $user,
+        string $email
+    )
+    {
+        $userRepository
+            ->shouldReceive('findOneByEmail')
+            ->with($email)
+            ->andReturn($user);
+
+        return $this;
+    }
+
+    /**
      * @return UsersServiceInterface|MockInterface
      */
     protected function createUsersService(): UsersServiceInterface

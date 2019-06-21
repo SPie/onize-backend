@@ -1,15 +1,14 @@
 <?php
 
-namespace App\Models\Auth;
+namespace App\Models\User;
 
 use App\Models\ModelInterface;
 use App\Models\Timestampable;
-use App\Models\User\UserModelInterface;
 
 /**
  * Interface RefreshTokenModel
  *
- * @package App\Models\Auth
+ * @package App\Models\User
  */
 interface RefreshTokenModel extends ModelInterface, Timestampable
 {

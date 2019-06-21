@@ -2,8 +2,6 @@
 
 namespace App\Models\User;
 
-use App\Models\Auth\PasswordResetTokenModel;
-use App\Models\Auth\RefreshTokenModel;
 use App\Models\ModelInterface;
 use App\Models\SoftDeletable;
 use App\Models\Timestampable;

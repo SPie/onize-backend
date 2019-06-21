@@ -3,10 +3,6 @@
 namespace App\Models\User;
 
 use App\Exceptions\InvalidParameterException;
-use App\Models\Auth\PasswordResetTokenModel;
-use App\Models\Auth\PasswordResetTokenModelFactory;
-use App\Models\Auth\RefreshTokenModel;
-use App\Models\Auth\RefreshTokenModelFactory;
 use App\Models\ModelInterface;
 use App\Models\ModelParameterValidation;
 

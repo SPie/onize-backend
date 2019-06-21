@@ -3,8 +3,6 @@
 namespace App\Models\User;
 
 use App\Models\AbstractDoctrineModel;
-use App\Models\Auth\PasswordResetTokenModel;
-use App\Models\Auth\RefreshTokenModel;
 use App\Models\Authenticate;
 use App\Models\SoftDelete;
 use App\Models\Timestamps;
@@ -36,14 +34,14 @@ class UserDoctrineModel extends AbstractDoctrineModel implements UserModelInterf
     private $email;
 
     /**
-     * @ORM\OneToMany(targetEntity="App\Models\Auth\RefreshTokenDoctrineModel", mappedBy="user", cascade={"persist"})
+     * @ORM\OneToMany(targetEntity="App\Models\User\RefreshTokenDoctrineModel", mappedBy="user", cascade={"persist"})
      *
      * @var RefreshTokenModel[]|ArrayCollection
      */
     private $refreshTokens;
 
     /**
-     * @ORM\OneToMany(targetEntity="App\Models\Auth\PasswordResetTokenDoctrineModel", mappedBy="user", cascade={"persist"})
+     * @ORM\OneToMany(targetEntity="App\Models\User\PasswordResetTokenDoctrineModel", mappedBy="user", cascade={"persist"})
      *
      * @var PasswordResetTokenModel[]|ArrayCollection
      */

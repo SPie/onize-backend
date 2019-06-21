@@ -1,7 +1,7 @@
 <?php
 
 use App\Http\Controllers\User\UsersController;
-use App\Models\Auth\RefreshTokenModel;
+use App\Models\User\RefreshTokenModel;
 use App\Models\User\UserModelInterface;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;

@@ -1,13 +1,13 @@
 <?php
 
-namespace App\Repositories\Auth;
+namespace App\Repositories\User;
 
 use App\Repositories\RepositoryInterface;
 
 /**
  * Interface PasswordResetTokenRepository
  *
- * @package App\Repositories\Auth
+ * @package App\Repositories\User
  */
 interface PasswordResetTokenRepository extends RepositoryInterface
 {

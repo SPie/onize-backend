@@ -3,10 +3,10 @@
 namespace App\Services\JWT;
 
 use App\Exceptions\ModelNotFoundException;
-use App\Models\Auth\RefreshTokenModel;
-use App\Models\Auth\RefreshTokenModelFactory;
+use App\Models\User\RefreshTokenModel;
+use App\Models\User\RefreshTokenModelFactory;
 use App\Models\User\UserModelInterface;
-use App\Repositories\Auth\RefreshTokenRepository;
+use App\Repositories\User\RefreshTokenRepository;
 use App\Repositories\User\UserRepositoryInterface;
 use SPie\LaravelJWT\Contracts\JWT;
 use SPie\LaravelJWT\Contracts\RefreshTokenRepository as SPieRefreshTokenRepository;

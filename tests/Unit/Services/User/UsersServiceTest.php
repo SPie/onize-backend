@@ -1,7 +1,5 @@
 <?php
 
-use App\Exceptions\Auth\InvalidAuthConfigurationException;
-use App\Exceptions\Auth\NotAuthenticatedException;
 use App\Exceptions\InvalidParameterException;
 use App\Exceptions\ModelNotFoundException;
 use App\Models\User\UserModelFactoryInterface;
@@ -143,6 +141,18 @@ class UsersServiceTest extends TestCase
         $this->expectException(InvalidParameterException::class);
 
         $userService->editUser($user, $userData);
+    }
+
+    /**
+     * @return void
+     */
+    public function testCreatePasswordResetToken(): void
+    {
+        $email = $this->getFaker()->safeEmail;
+        $user = $this->createUserModel();
+        $userRepository = $this->createUserRepository();
+        $this->mockUserRepositoryFindOneByEmail($userRepository, $user, $email);
+        $usersService = $this->createUserService($userRepository);
     }
 
     //endregion

@@ -1,15 +1,15 @@
 <?php
 
-namespace App\Repositories\Auth;
+namespace App\Repositories\User;
 
-use App\Models\Auth\RefreshTokenModel;
+use App\Models\User\RefreshTokenModel;
 use App\Models\ModelInterface;
 use App\Repositories\AbstractDoctrineRepository;
 
 /**
  * Class RefreshTokenDoctrineRepository
  *
- * @package App\Repositories\Auth
+ * @package App\Repositories\User
  */
 class RefreshTokenDoctrineRepository extends AbstractDoctrineRepository implements RefreshTokenRepository
 {

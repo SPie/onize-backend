@@ -1,15 +1,14 @@
 <?php
 
-namespace App\Models\Auth;
+namespace App\Models\User;
 
 use App\Models\ModelFactoryInterface;
 use App\Models\ModelInterface;
-use App\Models\User\UserModelFactoryInterface;
 
 /**
  * Interface RefreshTokenModelFactory
  *
- * @package App\Models\Auth
+ * @package App\Models\User
  */
 interface RefreshTokenModelFactory extends ModelFactoryInterface
 {

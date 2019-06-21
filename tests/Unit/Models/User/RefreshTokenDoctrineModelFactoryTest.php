@@ -1,10 +1,10 @@
 <?php
 
 use App\Exceptions\InvalidParameterException;
-use App\Models\Auth\RefreshTokenDoctrineModel;
-use App\Models\Auth\RefreshTokenDoctrineModelFactory;
-use App\Models\Auth\RefreshTokenModel;
-use App\Models\Auth\RefreshTokenModelFactory;
+use App\Models\User\RefreshTokenDoctrineModel;
+use App\Models\User\RefreshTokenDoctrineModelFactory;
+use App\Models\User\RefreshTokenModel;
+use App\Models\User\RefreshTokenModelFactory;
 use App\Models\User\UserModelFactoryInterface;
 use App\Models\User\UserModelInterface;
 use Test\AuthHelper;

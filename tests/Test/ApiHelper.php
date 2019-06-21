@@ -3,7 +3,7 @@
 namespace Test;
 
 use App\Http\Middleware\ApiSignature;
-use App\Models\Auth\RefreshTokenModel;
+use App\Models\User\RefreshTokenModel;
 use App\Models\User\UserModelInterface;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;

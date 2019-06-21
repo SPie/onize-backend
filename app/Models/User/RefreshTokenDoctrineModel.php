@@ -1,19 +1,18 @@
 <?php
 
-namespace App\Models\Auth;
+namespace App\Models\User;
 
 use App\Models\AbstractDoctrineModel;
 use App\Models\Timestamps;
-use App\Models\User\UserModelInterface;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
  * Class RefreshTokenDoctrineModel
  *
  * @ORM\Table(name="refresh_tokens")
- * @ORM\Entity(repositoryClass="App\Repositories\Auth\RefreshTokenDoctrineRepository")
+ * @ORM\Entity(repositoryClass="App\Repositories\User\RefreshTokenDoctrineRepository")
  *
- * @package App\Models\Auth
+ * @package App\Models\User
  */
 class RefreshTokenDoctrineModel extends AbstractDoctrineModel implements RefreshTokenModel
 {

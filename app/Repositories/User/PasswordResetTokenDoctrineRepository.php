@@ -1,13 +1,13 @@
 <?php
 
-namespace App\Repositories\Auth;
+namespace App\Repositories\User;
 
 use App\Repositories\AbstractDoctrineRepository;
 
 /**
  * Class PasswordResetTokenDoctrineRepository
  *
- * @package App\Repositories\Auth
+ * @package App\Repositories\User
  */
 final class PasswordResetTokenDoctrineRepository extends AbstractDoctrineRepository implements PasswordResetTokenRepository
 {

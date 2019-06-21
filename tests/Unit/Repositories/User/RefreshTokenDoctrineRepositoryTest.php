@@ -1,7 +1,7 @@
 <?php
 
-use App\Models\Auth\RefreshTokenModel;
-use App\Repositories\Auth\RefreshTokenDoctrineRepository;
+use App\Models\User\RefreshTokenModel;
+use App\Repositories\User\RefreshTokenDoctrineRepository;
 use Mockery\MockInterface;
 use Test\AuthHelper;
 use Test\UserHelper;

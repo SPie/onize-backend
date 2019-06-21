@@ -2,8 +2,8 @@
 
 use App\Exceptions\InvalidParameterException;
 use App\Exceptions\ModelNotFoundException;
-use App\Models\Auth\RefreshTokenModelFactory;
-use App\Repositories\Auth\RefreshTokenRepository;
+use App\Models\User\RefreshTokenModelFactory;
+use App\Repositories\User\RefreshTokenRepository;
 use App\Repositories\User\UserRepositoryInterface;
 use App\Services\JWT\SPieJWTRefreshTokenRepository;
 use Mockery\MockInterface;

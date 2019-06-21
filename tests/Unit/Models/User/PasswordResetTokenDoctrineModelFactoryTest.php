@@ -1,10 +1,10 @@
 <?php
 
 use App\Exceptions\InvalidParameterException;
-use App\Models\Auth\PasswordResetTokenDoctrineModel;
-use App\Models\Auth\PasswordResetTokenDoctrineModelFactory;
-use App\Models\Auth\PasswordResetTokenModel;
-use App\Models\Auth\PasswordResetTokenModelFactory;
+use App\Models\User\PasswordResetTokenDoctrineModel;
+use App\Models\User\PasswordResetTokenDoctrineModelFactory;
+use App\Models\User\PasswordResetTokenModel;
+use App\Models\User\PasswordResetTokenModelFactory;
 use App\Models\User\UserModelFactoryInterface;
 use Test\AuthHelper;
 use Test\UserHelper;

@@ -1,17 +1,15 @@
 <?php
 
-namespace App\Models\Auth;
+namespace App\Models\User;
 
 use App\Exceptions\InvalidParameterException;
 use App\Models\ModelInterface;
 use App\Models\ModelParameterValidation;
-use App\Models\User\UserModelFactoryInterface;
-use App\Models\User\UserModelInterface;
 
 /**
  * Class PasswordResetTokenDoctrineModelFactory
  *
- * @package App\Models\Auth
+ * @package App\Models\User
  */
 final class PasswordResetTokenDoctrineModelFactory implements PasswordResetTokenModelFactory
 {

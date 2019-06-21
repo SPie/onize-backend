@@ -8,9 +8,6 @@ use App\Models\User\UserModelFactoryInterface;
 use App\Models\User\UserModelInterface;
 use App\Repositories\User\UserRepositoryInterface;
 use App\Services\JWT\JWTService;
-use Illuminate\Auth\Access\AuthorizationException;
-use Illuminate\Support\Facades\Hash;
-use Symfony\Component\HttpFoundation\Response;
 
 /**
  * Class UsersService
@@ -141,5 +138,15 @@ class UsersService implements UsersServiceInterface
         $user = $this->getUserRepository()->findOneByEmail($user->getEmail());
 
         return ($user && $user->getId() != $userId);
+    }
+
+    /**
+     * @param string $email
+     *
+     * @return string
+     */
+    public function createPasswordResetToken(string $email): string
+    {
+        // TODO: Implement createPasswordResetToken() method.
     }
 }

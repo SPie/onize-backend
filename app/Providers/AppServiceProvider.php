@@ -3,18 +3,18 @@
 namespace App\Providers;
 
 use App\Http\Middleware\ApiSignature;
-use App\Models\Auth\PasswordResetTokenDoctrineModelFactory;
-use App\Models\Auth\PasswordResetTokenModelFactory;
-use App\Models\Auth\RefreshTokenDoctrineModel;
-use App\Models\Auth\RefreshTokenDoctrineModelFactory;
-use App\Models\Auth\RefreshTokenModelFactory;
+use App\Models\User\PasswordResetTokenDoctrineModelFactory;
+use App\Models\User\PasswordResetTokenModelFactory;
+use App\Models\User\RefreshTokenDoctrineModel;
+use App\Models\User\RefreshTokenDoctrineModelFactory;
+use App\Models\User\RefreshTokenModelFactory;
 use App\Models\User\UserDoctrineModel;
 use App\Models\User\UserDoctrineModelFactory;
 use App\Models\User\UserModelFactoryInterface;
 use App\Models\User\UserModelInterface;
-use App\Repositories\Auth\PasswordResetTokenDoctrineRepository;
-use App\Repositories\Auth\PasswordResetTokenRepository;
-use App\Repositories\Auth\RefreshTokenRepository;
+use App\Repositories\User\PasswordResetTokenDoctrineRepository;
+use App\Repositories\User\PasswordResetTokenRepository;
+use App\Repositories\User\RefreshTokenRepository;
 use App\Repositories\User\UserRepositoryInterface;
 use App\Services\JWT\JWTRefreshTokenRepository;
 use App\Services\JWT\JWTService;

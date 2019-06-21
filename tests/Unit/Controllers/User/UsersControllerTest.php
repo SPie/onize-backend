@@ -7,8 +7,6 @@ use App\Models\User\UserDoctrineModel;
 use App\Models\User\UserModelInterface;
 use App\Services\JWT\JWTService;
 use App\Services\User\UsersServiceInterface;
-use Illuminate\Http\JsonResponse;
-use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
 use Illuminate\Validation\ValidationException;
 use Mockery\MockInterface;

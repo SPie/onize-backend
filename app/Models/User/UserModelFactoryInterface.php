@@ -2,8 +2,6 @@
 
 namespace App\Models\User;
 
-use App\Models\Auth\PasswordResetTokenModelFactory;
-use App\Models\Auth\RefreshTokenModelFactory;
 use App\Models\ModelFactoryInterface;
 use App\Models\ModelInterface;
 

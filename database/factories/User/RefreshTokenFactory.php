@@ -1,7 +1,7 @@
 <?php
 
-use App\Models\Auth\RefreshTokenDoctrineModel;
-use App\Models\Auth\RefreshTokenModel;
+use App\Models\User\RefreshTokenDoctrineModel;
+use App\Models\User\RefreshTokenModel;
 use App\Models\User\UserDoctrineModel;
 use Faker\Generator as Faker;
 use LaravelDoctrine\ORM\Testing\Factory;

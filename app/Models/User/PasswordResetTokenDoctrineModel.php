@@ -1,19 +1,18 @@
 <?php
 
-namespace App\Models\Auth;
+namespace App\Models\User;
 
 use App\Models\AbstractDoctrineModel;
 use App\Models\Timestamps;
-use App\Models\User\UserModelInterface;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
  * Class PasswordResetTokenDoctrineModel
  *
  * @ORM\Table(name="password_reset_tokens")
- * @ORM\Entity(repositoryClass="App\Repositories\Auth\PasswordResetTokenDoctrineRepository")
+ * @ORM\Entity(repositoryClass="App\Repositories\User\PasswordResetTokenDoctrineRepository")
  *
- * @package App\Models\Auth
+ * @package App\Models\User
  */
 class PasswordResetTokenDoctrineModel extends AbstractDoctrineModel implements PasswordResetTokenModel
 {
