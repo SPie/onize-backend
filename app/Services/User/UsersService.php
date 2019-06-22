@@ -35,9 +35,9 @@ class UsersService implements UsersServiceInterface
     /**
      * UsersService constructor.
      *
-     * @param UserRepositoryInterface   $userRepository
-     * @param UserModelFactoryInterface $userModelFactory
-     * @param JWTService                $jwtService
+     * @param UserRepositoryInterface        $userRepository
+     * @param UserModelFactoryInterface      $userModelFactory
+     * @param JWTService                     $jwtService
      */
     public function __construct(
         UserRepositoryInterface $userRepository,
@@ -138,15 +138,5 @@ class UsersService implements UsersServiceInterface
         $user = $this->getUserRepository()->findOneByEmail($user->getEmail());
 
         return ($user && $user->getId() != $userId);
-    }
-
-    /**
-     * @param string $email
-     *
-     * @return string
-     */
-    public function createPasswordResetToken(string $email): string
-    {
-        // TODO: Implement createPasswordResetToken() method.
     }
 }

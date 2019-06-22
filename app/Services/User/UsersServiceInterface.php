@@ -36,11 +36,4 @@ interface UsersServiceInterface
      * @return UserModelInterface
      */
     public function editUser(UserModelInterface $user, array $userData): UserModelInterface;
-
-    /**
-     * @param string $email
-     *
-     * @return string
-     */
-    public function createPasswordResetToken(string $email): string;
 }

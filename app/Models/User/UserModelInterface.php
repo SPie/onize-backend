@@ -19,7 +19,6 @@ interface UserModelInterface extends ModelInterface, Timestampable, SoftDeletabl
     const PROPERTY_EMAIL                 = 'email';
     const PROPERTY_PASSWORD              = 'password';
     const PROPERTY_REFRESH_TOKENS        = 'refreshTokens';
-    const PROPERTY_PASSWORD_RESET_TOKENS = 'passwordResetTokens';
 
     /**
      * @param string $email
@@ -63,23 +62,4 @@ interface UserModelInterface extends ModelInterface, Timestampable, SoftDeletabl
      * @return RefreshTokenModel[]|Collection
      */
     public function getRefreshTokens(): Collection;
-
-    /**
-     * @param array $passwordResetTokens
-     *
-     * @return UserModelInterface
-     */
-    public function setPasswordResetTokens(array $passwordResetTokens): UserModelInterface;
-
-    /**
-     * @param PasswordResetTokenModel $passwordResetToken
-     *
-     * @return UserModelInterface
-     */
-    public function addPasswordResetToken(PasswordResetTokenModel $passwordResetToken): UserModelInterface;
-
-    /**
-     * @return PasswordResetTokenModel[]|Collection
-     */
-    public function getPasswordResetTokens(): Collection;
 }

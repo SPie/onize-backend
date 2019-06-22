@@ -76,10 +76,6 @@ class AppServiceProvider extends ServiceProvider
             return $entityManager->getRepository(RefreshTokenDoctrineModel::class);
         });
 
-        $this->app->singleton(PasswordResetTokenRepository::class, function () use ($entityManager) {
-            return $entityManager->getRepository(PasswordResetTokenDoctrineRepository::class);
-        });
-
         return $this;
     }
 
@@ -90,7 +86,7 @@ class AppServiceProvider extends ServiceProvider
     {
         $this->app->singleton(UserModelFactoryInterface::class, UserDoctrineModelFactory::class);
         $this->app->singleton(RefreshTokenModelFactory::class, RefreshTokenDoctrineModelFactory::class);
-        $this->app->singleton(PasswordResetTokenModelFactory::class, PasswordResetTokenDoctrineModelFactory::class);
+
         return $this;
     }
 
@@ -138,12 +134,9 @@ class AppServiceProvider extends ServiceProvider
     {
         $userModelFactory = $this->app->get(UserModelFactoryInterface::class);
         $refreshTokenFactory = $this->app->get(RefreshTokenModelFactory::class);
-        $passwordResetTokenModelFactory = $this->app->get(PasswordResetTokenModelFactory::class);
 
         $userModelFactory->setRefreshTokenModelFactory($refreshTokenFactory);
         $refreshTokenFactory->setUserModelFactory($userModelFactory);
-        $userModelFactory->setPasswordResetTokenModelFactory($passwordResetTokenModelFactory);
-        $passwordResetTokenModelFactory->setUserModelFactory($userModelFactory);
 
         return $this;
     }

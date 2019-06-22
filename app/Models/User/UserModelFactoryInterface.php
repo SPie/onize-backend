@@ -21,15 +21,6 @@ interface UserModelFactoryInterface extends ModelFactoryInterface
     public function setRefreshTokenModelFactory(RefreshTokenModelFactory $refreshTokenModelFactory): UserModelFactoryInterface;
 
     /**
-     * @param PasswordResetTokenModelFactory $passwordResetTokenModelFactory
-     *
-     * @return UserModelFactoryInterface
-     */
-    public function setPasswordResetTokenModelFactory(
-        PasswordResetTokenModelFactory $passwordResetTokenModelFactory
-    ): UserModelFactoryInterface;
-
-    /**
      * @param array $data
      *
      * @return UserModelInterface|ModelInterface

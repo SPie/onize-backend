@@ -11,8 +11,8 @@ use App\Services\User\UsersServiceInterface;
 use Laravel\Lumen\Testing\TestCase;
 use LaravelDoctrine\Migrations\Testing\DatabaseMigrations;
 use Mockery\MockInterface;
-use Symfony\Component\HttpFoundation\Response;
 use Test\ModelHelper;
+use Test\ReflectionMethodHelper;
 use Test\RepositoryHelper;
 use Test\UserHelper;
 
@@ -25,6 +25,7 @@ class UsersServiceTest extends TestCase
     use DatabaseMigrations;
     use ModelHelper;
     use RepositoryHelper;
+    use ReflectionMethodHelper;
     use TestCaseHelper;
     use UserHelper;
 
@@ -143,24 +144,12 @@ class UsersServiceTest extends TestCase
         $userService->editUser($user, $userData);
     }
 
-    /**
-     * @return void
-     */
-    public function testCreatePasswordResetToken(): void
-    {
-        $email = $this->getFaker()->safeEmail;
-        $user = $this->createUserModel();
-        $userRepository = $this->createUserRepository();
-        $this->mockUserRepositoryFindOneByEmail($userRepository, $user, $email);
-        $usersService = $this->createUserService($userRepository);
-    }
-
     //endregion
 
     /**
-     * @param UserRepositoryInterface|null   $userRepository
-     * @param UserModelFactoryInterface|null $userModelFactory
-     * @param JWTService|null                $jwtService
+     * @param UserRepositoryInterface|null        $userRepository
+     * @param UserModelFactoryInterface|null      $userModelFactory
+     * @param JWTService|null                     $jwtService
      *
      * @return UsersServiceInterface|MockInterface
      */
@@ -175,7 +164,7 @@ class UsersServiceTest extends TestCase
             [
                 $userRepository ?: $this->createUserRepository(),
                 $userModelFactory ?: $this->createUserModelFactory(),
-                $jwtService ?: $this->createJWTService(),
+                $jwtService ?: $this->createJWTService()
             ]
         )
             ->makePartial()
@@ -211,13 +200,5 @@ class UsersServiceTest extends TestCase
             ->andReturn($response);
 
         return $this;
-    }
-
-    /**
-     * @return Response
-     */
-    private function createResponse(): Response
-    {
-        return new Response();
     }
 }

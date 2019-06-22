@@ -22,11 +22,6 @@ class UserDoctrineModelFactory implements UserModelFactoryInterface
     private $refreshTokenModelFactory;
 
     /**
-     * @var PasswordResetTokenModelFactory
-     */
-    private $passwordResetTokenModelFactory;
-
-    /**
      * @param RefreshTokenModelFactory $refreshTokenModelFactory
      *
      * @return UserModelFactoryInterface|UserDoctrineModelFactory
@@ -49,28 +44,6 @@ class UserDoctrineModelFactory implements UserModelFactoryInterface
     }
 
     /**
-     * @param PasswordResetTokenModelFactory $passwordResetTokenModelFactory
-     *
-     * @return UserModelFactoryInterface
-     */
-    public function setPasswordResetTokenModelFactory(
-        PasswordResetTokenModelFactory $passwordResetTokenModelFactory
-    ): UserModelFactoryInterface
-    {
-        $this->passwordResetTokenModelFactory = $passwordResetTokenModelFactory;
-
-        return $this;
-    }
-
-    /**
-     * @return PasswordResetTokenModelFactory
-     */
-    private function getPasswordResetTokenModelFactory(): PasswordResetTokenModelFactory
-    {
-        return $this->passwordResetTokenModelFactory;
-    }
-
-    /**
      * @param array $data
      *
      * @return UserModelInterface|ModelInterface
@@ -85,8 +58,7 @@ class UserDoctrineModelFactory implements UserModelFactoryInterface
             $this->validateRefreshTokens($data),
             $this->validateDateTimeParameter($data, UserModelInterface::PROPERTY_CREATED_AT, false),
             $this->validateDateTimeParameter($data, UserModelInterface::PROPERTY_UPDATED_AT, false),
-            $this->validateDateTimeParameter($data, UserModelInterface::PROPERTY_DELETED_AT, false),
-            $this->validatePasswordResetTokens($data)
+            $this->validateDateTimeParameter($data, UserModelInterface::PROPERTY_DELETED_AT, false)
         ))->setId($this->validateIntegerParameter($data, UserModelInterface::PROPERTY_ID, false));
     }
 
@@ -144,10 +116,6 @@ class UserDoctrineModelFactory implements UserModelFactoryInterface
         if (!empty($refreshTokens)) {
             $model->setRefreshTokens($refreshTokens);
         }
-        $passwordResetTokens = $this->validatePasswordResetTokens($data);
-        if (!empty($passwordResetTokens)) {
-            $model->setPasswordResetTokens($passwordResetTokens);
-        }
 
         return $model;
     }
@@ -181,38 +149,6 @@ class UserDoctrineModelFactory implements UserModelFactoryInterface
                     throw new InvalidParameterException();
                 },
                 $refreshTokens
-            )
-            : [];
-    }
-
-    /**
-     * @param array $data
-     *
-     * @return PasswordResetTokenModel[]
-     * @throws InvalidParameterException
-     */
-    protected function validatePasswordResetTokens(array $data): array
-    {
-        $passwordResetTokens = $this->validateArrayParameter(
-            $data,
-            UserModelInterface::PROPERTY_PASSWORD_RESET_TOKENS,
-            false
-        );
-
-        return \is_array($passwordResetTokens)
-            ? \array_map(
-                function ($passwordResetToken) {
-                    if ($passwordResetToken instanceof PasswordResetTokenModel) {
-                        return $passwordResetToken;
-                    }
-
-                    if (\is_array($passwordResetToken)) {
-                        return $this->getPasswordResetTokenModelFactory()->create($passwordResetToken);
-                    }
-
-                    throw new InvalidParameterException();
-                },
-                $passwordResetTokens
             )
             : [];
     }

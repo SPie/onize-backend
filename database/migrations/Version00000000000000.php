@@ -24,8 +24,7 @@ class Version00000000000000 extends AbstractMigration
     {
         $this
             ->createUsersTable($schema)
-            ->createRefreshTokensTable($schema)
-            ->createPasswordResetTokensTable($schema);
+            ->createRefreshTokensTable($schema);
     }
 
     /**
@@ -63,26 +62,6 @@ class Version00000000000000 extends AbstractMigration
             $table->foreign('users', 'user_id', 'id');
             $table->timestamps();
             $table->index('valid_until');
-        });
-
-        return $this;
-    }
-
-    /**
-     * @param Schema $schema
-     *
-     * @return $this
-     */
-    private function createPasswordResetTokensTable(Schema $schema)
-    {
-        (new Builder($schema))->create('password_reset_tokens', function (Table $table) {
-            $table->increments('id');
-            $table->string('token');
-            $table->unique('token');
-            $table->integer('user_id', false, true);
-            $table->foreign('users','user_id', 'id');
-            $table->dateTime('valid_until');
-            $table->timestamps();
         });
 
         return $this;
