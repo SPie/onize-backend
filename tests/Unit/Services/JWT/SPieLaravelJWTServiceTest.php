@@ -10,14 +10,18 @@ use SPie\LaravelJWT\Contracts\JWTGuard;
 use SPie\LaravelJWT\Exceptions\MissingRefreshTokenProviderException;
 use SPie\LaravelJWT\Exceptions\MissingRefreshTokenRepositoryException;
 use SPie\LaravelJWT\Exceptions\NotAuthenticatedException as JWTNotAuthenticatedException;
-use SPie\LaravelJWT\JWT;
+use SPie\LaravelJWT\Contracts\JWT;
+use SPie\LaravelJWT\Contracts\JWTHandler;
 use Symfony\Component\HttpFoundation\Response;
+use Test\UserHelper;
 
 /**
  * Class SPieLaravelJWTServiceTest
  */
-class SPieLaravelJWTServiceTest extends IntegrationTestCase
+class SPieLaravelJWTServiceTest extends TestCase
 {
+
+    use UserHelper;
 
     //region Tests
 
@@ -288,7 +292,7 @@ class SPieLaravelJWTServiceTest extends IntegrationTestCase
      */
     public function testGetAuthenticatedUser(): void
     {
-        $user = $this->createUser();
+        $user = $this->createUserModel();
 
         $jwtGuard = $this->createJWTGuard();
         $this->addUser($jwtGuard, $user);
@@ -318,7 +322,7 @@ class SPieLaravelJWTServiceTest extends IntegrationTestCase
      */
     public function testIssueTokens(): void
     {
-        $user = $this->createUser();
+        $user = $this->createUserModel();
         $response = new Response();
         $response->headers->set($this->getFaker()->uuid, $this->getFaker()->uuid);
 
@@ -351,7 +355,7 @@ class SPieLaravelJWTServiceTest extends IntegrationTestCase
         $refreshTokenKey = $this->getFaker()->uuid;
         $refreshToken = $this->getFaker()->uuid;
 
-        $user = $this->createUser();
+        $user = $this->createUserModel();
         $refreshTokenResponse = new Response();
         $refreshTokenResponse->headers->set($refreshTokenKey, $refreshToken);
         $accessTokenResponse = new Response();
@@ -397,21 +401,50 @@ class SPieLaravelJWTServiceTest extends IntegrationTestCase
             ->once();
     }
 
+    /**
+     * @return void
+     */
+    public function testCreateJWT(): void
+    {
+        $authIdentifier = $this->getFaker()->uuid;
+        $customClaims = [$this->getFaker()->uuid];
+        $user = $this->createUserModel();
+        $this
+            ->mockUserModelGetAuthIdentifier($user, $authIdentifier)
+            ->mockUserModelGetCustomClaims($user, $customClaims);
+        $ttl = $this->getFaker()->numberBetween();
+        $token = $this->getFaker()->uuid;
+        $jwt = $this->createJWT();
+        $this->mockJWTGetJWT($jwt, $token);
+        $jwtHandler = $this->createJWTHandler();
+        $this->mockJWTHandlerCreateJWT($jwtHandler, $jwt, $authIdentifier, $customClaims, $ttl);
+
+        $this->assertEquals(
+            $token,
+            $this->createSPieLaravelJWTService(null, $jwtHandler)->createJWT($user, $ttl)
+        );
+    }
+
     //endregion
 
     //region Mocks
 
     /**
-     * @param JWTGuard|null $jwtGuard
+     * @param JWTGuard|null   $jwtGuard
+     * @param JWTHandler|null $jwtHandler
      *
      * @return SPieLaravelJWTService|MockInterface
      */
-    private function createSPieLaravelJWTService(JWTGuard $jwtGuard = null): SPieLaravelJWTService
+    private function createSPieLaravelJWTService(
+        JWTGuard $jwtGuard = null,
+        JWTHandler $jwtHandler = null
+    ): SPieLaravelJWTService
     {
         $spieLaravelJwtService = Mockery::spy(
             SPieLaravelJWTService::class,
             [
                 $jwtGuard ?: $this->createJWTGuard(),
+                $jwtHandler ?: $this->createJWTHandler(),
             ]
         );
         $spieLaravelJwtService->makePartial();
@@ -425,6 +458,70 @@ class SPieLaravelJWTServiceTest extends IntegrationTestCase
     private function createJWTGuard(): JWTGuard
     {
         return Mockery::spy(JWTGuard::class);
+    }
+
+    /**
+     * @return JWTHandler
+     */
+    private function createJWTHandler(): JWTHandler
+    {
+        return Mockery::spy(JWTHandler::class);
+    }
+
+    /**
+     * @param JWTHandler|MockInterface $jwtHandler
+     * @param JWT                      $jwt
+     * @param string                   $subject
+     * @param array                    $payload
+     * @param int|null                 $ttl
+     *
+     * @return SPieLaravelJWTServiceTest
+     */
+    private function mockJWTHandlerCreateJWT(
+        MockInterface $jwtHandler,
+        JWT $jwt,
+        string $subject,
+        array $payload,
+        int $ttl = null
+    ): SPieLaravelJWTServiceTest
+    {
+        $arguments = [
+            $subject,
+            $payload,
+        ];
+        if ($ttl !== null) {
+            $arguments[] = $ttl;
+        }
+
+        $jwtHandler
+            ->shouldReceive('createJWT')
+            ->withArgs($arguments)
+            ->andReturn($jwt);
+
+        return $this;
+    }
+
+    /**
+     * @return JWT
+     */
+    private function createJWT(): JWT
+    {
+        return Mockery::spy(JWT::class);
+    }
+
+    /**
+     * @param JWT|MockInterface $jwt
+     * @param string            $token
+     *
+     * @return SPieLaravelJWTServiceTest
+     */
+    private function mockJWTGetJWT(MockInterface $jwt, string $token): SPieLaravelJWTServiceTest
+    {
+        $jwt
+            ->shouldReceive('getJWT')
+            ->andReturn($token);
+
+        return $this;
     }
 
     /**
@@ -547,14 +644,6 @@ class SPieLaravelJWTServiceTest extends IntegrationTestCase
         $expectation->andReturn($user);
 
         return $this;
-    }
-
-    /**
-     * @return UserModelInterface|MockInterface
-     */
-    private function createUser(): UserModelInterface
-    {
-        return Mockery::mock(UserModelInterface::class);
     }
 
     //endregion

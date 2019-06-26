@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Auth\AuthController;
+use App\Http\Controllers\User\PasswordResetController;
 use App\Http\Controllers\User\UsersController;
 use Laravel\Lumen\Routing\Router;
 
@@ -41,6 +42,10 @@ $router->group(
             $router->group(['middleware' => 'auth'], function (Router $router) {
                 $router->post('logout', ['as' => UsersController::ROUTE_NAME_LOGOUT, 'uses'  => 'User\UsersController@logout']);
             });
+        });
+
+        $router->group(['prefix' => 'password-reset'], function (Router $router) {
+            $router->post('start', ['as' => PasswordResetController::ROUTE_NAME_PASSWORD_RESET_START, 'uses' => 'User\PasswordResetController@start']);
         });
 
         //endregion

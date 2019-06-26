@@ -5,7 +5,7 @@ namespace Test;
 use App\Models\User\UserDoctrineModel;
 use App\Models\User\UserModelFactoryInterface;
 use App\Models\User\UserModelInterface;
-use App\Repositories\User\UserRepositoryInterface;
+use App\Repositories\User\UserRepository;
 use App\Services\JWT\JWTService;
 use App\Services\User\UsersService;
 use App\Services\User\UsersServiceInterface;
@@ -61,6 +61,36 @@ trait UserHelper
 
     /**
      * @param UserModelInterface|MockInterface $user
+     * @param string                           $authIdentifier
+     *
+     * @return $this
+     */
+    protected function mockUserModelGetAuthIdentifier(MockInterface $user, string $authIdentifier)
+    {
+        $user
+            ->shouldReceive('getAuthIdentifier')
+            ->andReturn($authIdentifier);
+
+        return $this;
+    }
+
+    /**
+     * @param UserModelInterface|MockInterface $user
+     * @param array                            $customClaims
+     *
+     * @return $this
+     */
+    protected function mockUserModelGetCustomClaims(MockInterface $user, array $customClaims)
+    {
+        $user
+            ->shouldReceive('getCustomClaims')
+            ->andReturn($customClaims);
+
+        return $this;
+    }
+
+    /**
+     * @param UserModelInterface|MockInterface $user
      * @param string                           $password
      *
      * @return $this
@@ -103,17 +133,17 @@ trait UserHelper
     }
 
     /**
-     * @return UserRepositoryInterface|Mockery\MockInterface
+     * @return UserRepository|Mockery\MockInterface
      */
-    protected function createUserRepository(): UserRepositoryInterface
+    protected function createUserRepository(): UserRepository
     {
-        return Mockery::spy(UserRepositoryInterface::class);
+        return Mockery::spy(UserRepository::class);
     }
 
     /**
-     * @param UserRepositoryInterface|MockInterface $userRepository
-     * @param UserModelInterface|null               $user
-     * @param string                                $email
+     * @param UserRepository|MockInterface $userRepository
+     * @param UserModelInterface|null      $user
+     * @param string                       $email
      *
      * @return $this
      */
@@ -213,6 +243,23 @@ trait UserHelper
                 }),
                 $userData
             )
+            ->andThrow($user);
+
+        return $this;
+    }
+
+    /**
+     * @param UsersServiceInterface|MockInterface $usersService
+     * @param UserModelInterface|\Exception       $user
+     * @param string                              $email
+     *
+     * @return $this
+     */
+    protected function mockUsersServiceGetUserByEmail(MockInterface $usersService, $user, string $email)
+    {
+        $usersService
+            ->shouldReceive('getuserByEmail')
+            ->with($email)
             ->andThrow($user);
 
         return $this;
@@ -347,6 +394,33 @@ trait UserHelper
     }
 
     /**
+     * @param JWTService|MockInterface $jwtService
+     * @param string                   $jwt
+     * @param UserModelInterface       $user
+     * @param int|null                 $ttl
+     *
+     * @return $this
+     */
+    protected function mockJWTServiceCreateJWT(
+        MockInterface $jwtService,
+        string $jwt,
+        UserModelInterface $user,
+        int $ttl = null
+    )
+    {
+        $arguments = [$user];
+        if ($ttl !== null) {
+            $arguments[] = $ttl;
+        }
+        $jwtService
+            ->shouldReceive('createJWT')
+            ->withArgs($arguments)
+            ->andReturn($jwt);
+
+        return $this;
+    }
+
+    /**
      * @param int    $times
      * @param array  $data
      *
@@ -358,11 +432,11 @@ trait UserHelper
     }
 
     /**
-     * @return UserRepositoryInterface
+     * @return UserRepository
      */
-    protected function getUserRepository(): UserRepositoryInterface
+    protected function getUserRepository(): UserRepository
     {
-        return $this->app->get(UserRepositoryInterface::class);
+        return $this->app->get(UserRepository::class);
     }
 
     /**

@@ -49,4 +49,12 @@ interface JWTService
      * @return Response
      */
     public function issueTokens(UserModelInterface $user, Response $response, bool $withRefreshToken = false): Response;
+
+    /**
+     * @param UserModelInterface $user
+     * @param int|null           $ttl
+     *
+     * @return string
+     */
+    public function createJWT(UserModelInterface $user, int $ttl = null): string;
 }

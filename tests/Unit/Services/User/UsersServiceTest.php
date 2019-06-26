@@ -4,7 +4,7 @@ use App\Exceptions\InvalidParameterException;
 use App\Exceptions\ModelNotFoundException;
 use App\Models\User\UserModelFactoryInterface;
 use App\Models\User\UserModelInterface;
-use App\Repositories\User\UserRepositoryInterface;
+use App\Repositories\User\UserRepository;
 use App\Services\JWT\JWTService;
 use App\Services\User\UsersService;
 use App\Services\User\UsersServiceInterface;
@@ -56,6 +56,33 @@ class UsersServiceTest extends TestCase
         $this->expectException(ModelNotFoundException::class);
 
         $this->createUserService($userRepository)->getUser($userId);
+    }
+
+    /**
+     * @return void
+     */
+    public function testGetUserByEmail(): void
+    {
+        $email = $this->getFaker()->safeEmail;
+        $user = $this->createUserModel();
+        $userRepository = $this->createUserRepository();
+        $this->mockUserRepositoryFindOneByEmail($userRepository, $user, $email);
+
+        $this->assertEquals($user, $this->createUserService($userRepository)->getUserByEmail($email));
+    }
+
+    /**
+     * @return void
+     */
+    public function testGetUserByEmailWithoutUser(): void
+    {
+        $email = $this->getFaker()->safeEmail;
+        $userRepository = $this->createUserRepository();
+        $this->mockUserRepositoryFindOneByEmail($userRepository, null, $email);
+
+        $this->expectException(ModelNotFoundException::class);
+
+        $this->createUserService($userRepository)->getUserByEmail($email);
     }
 
     /**
@@ -147,14 +174,14 @@ class UsersServiceTest extends TestCase
     //endregion
 
     /**
-     * @param UserRepositoryInterface|null        $userRepository
-     * @param UserModelFactoryInterface|null      $userModelFactory
-     * @param JWTService|null                     $jwtService
+     * @param UserRepository|null            $userRepository
+     * @param UserModelFactoryInterface|null $userModelFactory
+     * @param JWTService|null                $jwtService
      *
      * @return UsersServiceInterface|MockInterface
      */
     private function createUserService(
-        UserRepositoryInterface $userRepository = null,
+        UserRepository $userRepository = null,
         UserModelFactoryInterface $userModelFactory = null,
         JWTService $jwtService = null
     ): UsersServiceInterface

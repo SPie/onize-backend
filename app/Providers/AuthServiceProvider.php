@@ -2,7 +2,7 @@
 
 namespace App\Providers;
 
-use App\Repositories\User\UserRepositoryInterface;
+use App\Repositories\User\UserRepository;
 use Illuminate\Support\ServiceProvider;
 
 /**
@@ -28,7 +28,7 @@ class AuthServiceProvider extends ServiceProvider
     public function boot()
     {
         $this->app->get('auth')->provider('app_user_provider', function ($app, array $config) {
-            return $this->app->get(UserRepositoryInterface::class);
+            return $this->app->get(UserRepository::class);
         });
     }
 }

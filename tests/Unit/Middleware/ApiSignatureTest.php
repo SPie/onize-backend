@@ -9,7 +9,7 @@ use Symfony\Component\HttpFoundation\Request as SymfonyRequest;
 /**
  * Class ApiSignatureTest
  */
-class ApiSignatureTest extends IntegrationTestCase
+class ApiSignatureTest extends TestCase
 {
     //region Tests
 

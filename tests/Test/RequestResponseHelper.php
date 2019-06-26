@@ -83,6 +83,24 @@ trait RequestResponseHelper
      */
     protected function createJsonResponseData(array $data = []): JsonResponseData
     {
-        return new JsonResponseData();
+        return new JsonResponseData($data);
     }
+
+    //region Assertions
+
+    /**
+     * @param JsonResponse $expected
+     * @param JsonResponse $actual
+     *
+     * @return $this
+     */
+    protected function assertJsonResponse(JsonResponse $expected, JsonResponse $actual)
+    {
+        $this->assertEquals($expected->getData(), $actual->getData());
+        $this->assertEquals($expected->getStatusCode(), $actual->getStatusCode());
+
+        return $this;
+    }
+
+    //endregion
 }

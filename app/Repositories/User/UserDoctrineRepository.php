@@ -13,7 +13,7 @@ use Illuminate\Support\Facades\Hash;
  *
  * @package App\Repositories\User
  */
-class UserDoctrineRepository extends AbstractDoctrineRepository implements UserRepositoryInterface
+class UserDoctrineRepository extends AbstractDoctrineRepository implements UserRepository
 {
 
     /**

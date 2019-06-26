@@ -11,6 +11,7 @@ use Illuminate\Contracts\Auth\Guard;
 use SPie\LaravelJWT\Contracts\JWTGuard;
 use SPie\LaravelJWT\Exceptions\JWTException;
 use SPie\LaravelJWT\Exceptions\NotAuthenticatedException as JWTNotAuthenticatedException;
+use SPie\LaravelJWT\Contracts\JWTHandler;
 use Symfony\Component\HttpFoundation\Response;
 
 /**
@@ -27,13 +28,20 @@ class SPieLaravelJWTService implements JWTService
     private $jwtGuard;
 
     /**
+     * @var JWTHandler
+     */
+    private $jwtHandler;
+
+    /**
      * SPieLaravelJWTService constructor.
      *
      * @param JWTGuard|Guard $jwtGuard
+     * @param JWTHandler     $jwtHandler
      */
-    public function __construct(Guard $jwtGuard)
+    public function __construct(Guard $jwtGuard, JWTHandler $jwtHandler)
     {
         $this->jwtGuard = $jwtGuard;
+        $this->jwtHandler = $jwtHandler;
     }
 
     /**
@@ -42,6 +50,14 @@ class SPieLaravelJWTService implements JWTService
     protected function getJwtGuard(): JWTGuard
     {
         return $this->jwtGuard;
+    }
+
+    /**
+     * @return JWTHandler
+     */
+    public function getJwtHandler(): JWTHandler
+    {
+        return $this->jwtHandler;
     }
 
     /**
@@ -140,5 +156,17 @@ class SPieLaravelJWTService implements JWTService
         }
 
         return $this->getJwtGuard()->returnAccessToken($response);
+    }
+
+    /**
+     * @param UserModelInterface $user
+     * @param int|null           $ttl
+     *
+     * @return string
+     */
+    public function createJWT(UserModelInterface $user, int $ttl = null): string
+    {
+        return $this->getJwtHandler()->createJWT($user->getAuthIdentifier(), $user->getCustomClaims(), $ttl)
+            ->getJWT();
     }
 }

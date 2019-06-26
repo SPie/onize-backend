@@ -15,7 +15,7 @@ use App\Models\User\UserModelInterface;
 use App\Repositories\User\PasswordResetTokenDoctrineRepository;
 use App\Repositories\User\PasswordResetTokenRepository;
 use App\Repositories\User\RefreshTokenRepository;
-use App\Repositories\User\UserRepositoryInterface;
+use App\Repositories\User\UserRepository;
 use App\Services\JWT\JWTRefreshTokenRepository;
 use App\Services\JWT\JWTService;
 use App\Services\JWT\SPieJWTRefreshTokenRepository;
@@ -68,7 +68,7 @@ class AppServiceProvider extends ServiceProvider
         /** @var EntityManager $entityManager */
         $entityManager = $this->app->get(EntityManager::class);
 
-        $this->app->singleton(UserRepositoryInterface::class, function () use ($entityManager) {
+        $this->app->singleton(UserRepository::class, function () use ($entityManager) {
             return $entityManager->getRepository(UserDoctrineModel::class);
         });
 

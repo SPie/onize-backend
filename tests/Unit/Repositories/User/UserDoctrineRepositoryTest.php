@@ -8,7 +8,7 @@ use Test\UserHelper;
 /**
  * Class UserDoctrineRepositoryTest
  */
-class UserDoctrineRepositoryTest extends IntegrationTestCase
+class UserDoctrineRepositoryTest extends TestCase
 {
 
     use UserHelper;

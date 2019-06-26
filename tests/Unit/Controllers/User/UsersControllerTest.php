@@ -19,7 +19,7 @@ use Test\UserHelper;
 /**
  * Class UsersControllerTest
  */
-class UsersControllerTest extends IntegrationTestCase
+class UsersControllerTest extends TestCase
 {
 
     use AuthHelper;

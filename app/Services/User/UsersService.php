@@ -6,7 +6,7 @@ use App\Exceptions\InvalidParameterException;
 use App\Exceptions\ModelNotFoundException;
 use App\Models\User\UserModelFactoryInterface;
 use App\Models\User\UserModelInterface;
-use App\Repositories\User\UserRepositoryInterface;
+use App\Repositories\User\UserRepository;
 use App\Services\JWT\JWTService;
 
 /**
@@ -18,7 +18,7 @@ class UsersService implements UsersServiceInterface
 {
 
     /**
-     * @var UserRepositoryInterface
+     * @var UserRepository
      */
     private $userRepository;
 
@@ -35,12 +35,12 @@ class UsersService implements UsersServiceInterface
     /**
      * UsersService constructor.
      *
-     * @param UserRepositoryInterface        $userRepository
-     * @param UserModelFactoryInterface      $userModelFactory
-     * @param JWTService                     $jwtService
+     * @param UserRepository            $userRepository
+     * @param UserModelFactoryInterface $userModelFactory
+     * @param JWTService                $jwtService
      */
     public function __construct(
-        UserRepositoryInterface $userRepository,
+        UserRepository $userRepository,
         UserModelFactoryInterface $userModelFactory,
         JWTService $jwtService
     )
@@ -51,9 +51,9 @@ class UsersService implements UsersServiceInterface
     }
 
     /**
-     * @return UserRepositoryInterface
+     * @return UserRepository
      */
-    protected function getUserRepository(): UserRepositoryInterface
+    protected function getUserRepository(): UserRepository
     {
         return $this->userRepository;
     }
@@ -86,6 +86,23 @@ class UsersService implements UsersServiceInterface
         $user = $this->getUserRepository()->find($id);
         if (!$user) {
             throw new ModelNotFoundException(UserModelInterface::class, $id);
+        }
+
+        return $user;
+    }
+
+    /**
+     * @param string $email
+     *
+     * @return UserModelInterface
+     *
+     * @throws ModelNotFoundException
+     */
+    public function getUserByEmail(string $email): UserModelInterface
+    {
+        $user = $this->getUserRepository()->findOneByEmail($email);
+        if (!$user) {
+            throw new ModelNotFoundException(UserModelInterface::class, $email);
         }
 
         return $user;

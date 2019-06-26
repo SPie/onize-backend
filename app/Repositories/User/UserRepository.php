@@ -8,11 +8,11 @@ use App\Repositories\RepositoryInterface;
 use Illuminate\Contracts\Auth\UserProvider;
 
 /**
- * Interface UserRepositoryInterface
+ * Interface UserRepository
  *
  * @package App\Repositories\User
  */
-interface UserRepositoryInterface extends RepositoryInterface, UserProvider
+interface UserRepository extends RepositoryInterface, UserProvider
 {
 
     /**

@@ -7,7 +7,7 @@ use App\Models\User\RefreshTokenModel;
 use App\Models\User\RefreshTokenModelFactory;
 use App\Models\User\UserModelInterface;
 use App\Repositories\User\RefreshTokenRepository;
-use App\Repositories\User\UserRepositoryInterface;
+use App\Repositories\User\UserRepository;
 use SPie\LaravelJWT\Contracts\JWT;
 use SPie\LaravelJWT\Contracts\RefreshTokenRepository as SPieRefreshTokenRepository;
 
@@ -30,7 +30,7 @@ class SPieJWTRefreshTokenRepository implements JWTRefreshTokenRepository
     private $refreshTokenRepository;
 
     /**
-     * @var UserRepositoryInterface
+     * @var UserRepository
      */
     private $userRepository;
 
@@ -39,12 +39,12 @@ class SPieJWTRefreshTokenRepository implements JWTRefreshTokenRepository
      *
      * @param RefreshTokenModelFactory $refreshTokenModelFactory
      * @param RefreshTokenRepository   $refreshTokenRepository
-     * @param UserRepositoryInterface  $userRepository
+     * @param UserRepository           $userRepository
      */
     public function __construct(
         RefreshTokenModelFactory $refreshTokenModelFactory,
         RefreshTokenRepository $refreshTokenRepository,
-        UserRepositoryInterface $userRepository
+        UserRepository $userRepository
     )
     {
         $this->refreshTokenModelFactory = $refreshTokenModelFactory;
@@ -69,9 +69,9 @@ class SPieJWTRefreshTokenRepository implements JWTRefreshTokenRepository
     }
 
     /**
-     * @return UserRepositoryInterface
+     * @return UserRepository
      */
-    protected function getUserRepository(): UserRepositoryInterface
+    protected function getUserRepository(): UserRepository
     {
         return $this->userRepository;
     }

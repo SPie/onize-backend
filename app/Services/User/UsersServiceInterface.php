@@ -23,6 +23,15 @@ interface UsersServiceInterface
     public function getUser(int $id): UserModelInterface;
 
     /**
+     * @param string $email
+     *
+     * @return UserModelInterface
+     *
+     * @throws ModelNotFoundException
+     */
+    public function getUserByEmail(string $email): UserModelInterface;
+
+    /**
      * @param array $userData
      *
      * @return UserModelInterface

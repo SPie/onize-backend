@@ -4,7 +4,7 @@ use App\Exceptions\InvalidParameterException;
 use App\Exceptions\ModelNotFoundException;
 use App\Models\User\RefreshTokenModelFactory;
 use App\Repositories\User\RefreshTokenRepository;
-use App\Repositories\User\UserRepositoryInterface;
+use App\Repositories\User\UserRepository;
 use App\Services\JWT\SPieJWTRefreshTokenRepository;
 use Mockery\MockInterface;
 use Test\AuthHelper;
@@ -13,7 +13,7 @@ use Test\UserHelper;
 /**
  * Class SPieJWTRefreshTokenRepositoryTest
  */
-class SPieJWTRefreshTokenRepositoryTest extends IntegrationTestCase
+class SPieJWTRefreshTokenRepositoryTest extends TestCase
 {
 
     use AuthHelper;
@@ -284,14 +284,14 @@ class SPieJWTRefreshTokenRepositoryTest extends IntegrationTestCase
     /**
      * @param RefreshTokenModelFactory|null $refreshTokenModelFactory
      * @param RefreshTokenRepository|null   $refreshTokenRepository
-     * @param UserRepositoryInterface|null  $userRepository
+     * @param UserRepository|null           $userRepository
      *
      * @return SPieJWTRefreshTokenRepository|MockInterface
      */
     private function createSPieJWTRefreshTokenRepository(
         RefreshTokenModelFactory $refreshTokenModelFactory = null,
         RefreshTokenRepository $refreshTokenRepository = null,
-        UserRepositoryInterface $userRepository = null
+        UserRepository $userRepository = null
     ): SPieJWTRefreshTokenRepository
     {
         $spieJwtRefreshTokenRepository = Mockery::spy(

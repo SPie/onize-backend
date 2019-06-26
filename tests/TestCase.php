@@ -8,7 +8,7 @@ use LaravelDoctrine\Migrations\Testing\DatabaseMigrations;
 /**
  * Class TestCase
  */
-abstract class IntegrationTestCase extends Laravel\Lumen\Testing\TestCase
+abstract class TestCase extends Laravel\Lumen\Testing\TestCase
 {
 
     const BEARER_AUTHORIZATION = 'Authorization';
@@ -21,20 +21,6 @@ abstract class IntegrationTestCase extends Laravel\Lumen\Testing\TestCase
     public function createApplication()
     {
         return require __DIR__.'/../bootstrap/app.php';
-    }
-
-    /**
-     * @return void
-     */
-    public function setUpTraits()
-    {
-        parent::setUpTraits();
-
-        $uses = array_flip(class_uses_recursive(get_class($this)));
-
-        if (isset($uses[DatabaseMigrations::class]) && !isset($uses[EloquentDatabaseMigrations::class])) {
-            $this->runDatabaseMigrations();
-        }
     }
 
     /**
