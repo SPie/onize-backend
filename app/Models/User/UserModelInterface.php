@@ -23,9 +23,9 @@ interface UserModelInterface extends ModelInterface, Timestampable, SoftDeletabl
     /**
      * @param string $email
      *
-     * @return mixed
+     * @return UserModelInterface
      */
-    public function setEmail(string $email);
+    public function setEmail(string $email): UserModelInterface;
 
     /**
      * @return string

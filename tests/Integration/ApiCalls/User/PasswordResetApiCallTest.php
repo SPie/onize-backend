@@ -27,7 +27,7 @@ final class PasswordResetApiCallTest extends IntegrationTestCase
         $user = $this->createUsers()->first();
 
         $response = $this->doApiCall(
-            $this->getUrl(PasswordResetController::ROUTE_NAME_PASSWORD_RESET_START),
+            $this->getUrl(PasswordResetController::ROUTE_NAME_START),
             Request::METHOD_POST,
             ['email' => $user->getEmail()]
         );
@@ -43,7 +43,7 @@ final class PasswordResetApiCallTest extends IntegrationTestCase
     public function testStartWithoutEmail(): void
     {
         $response = $this->doApiCall(
-            $this->getUrl(PasswordResetController::ROUTE_NAME_PASSWORD_RESET_START),
+            $this->getUrl(PasswordResetController::ROUTE_NAME_START),
             Request::METHOD_POST
         );
 
@@ -59,7 +59,7 @@ final class PasswordResetApiCallTest extends IntegrationTestCase
     public function testStartWithInvalidEmail(): void
     {
         $response = $this->doApiCall(
-            $this->getUrl(PasswordResetController::ROUTE_NAME_PASSWORD_RESET_START),
+            $this->getUrl(PasswordResetController::ROUTE_NAME_START),
             Request::METHOD_POST,
             ['email' => $this->getFaker()->uuid]
         );
@@ -75,7 +75,7 @@ final class PasswordResetApiCallTest extends IntegrationTestCase
     public function testStartWithoutUser(): void
     {
         $response = $this->doApiCall(
-            $this->getUrl(PasswordResetController::ROUTE_NAME_PASSWORD_RESET_START),
+            $this->getUrl(PasswordResetController::ROUTE_NAME_START),
             Request::METHOD_POST,
             ['email' => $this->getFaker()->safeEmail]
         );

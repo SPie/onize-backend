@@ -170,35 +170,18 @@ trait UserHelper
     }
 
     /**
-     * @param MockInterface       $usersService
-     * @param Response|\Exception $response
-     * @param Response            $inputResponse
-     * @param string              $email
-     * @param string              $password
-     * @param bool                $withRefreshToken
+     * @param UsersServiceInterface|MockInterface $usersService
+     * @param UserModelInterface|\Exception       $user
+     * @param int                                 $userId
      *
      * @return $this
      */
-    protected function mockUsersServiceLogin(
-        MockInterface $usersService,
-        $response,
-        Response $inputResponse,
-        string $email,
-        string $password,
-        bool $withRefreshToken
-    )
+    protected function mockUsersServiceGetUser(MockInterface $usersService, $user, int $userId)
     {
         $usersService
-            ->shouldReceive('login')
-            ->with(
-                Mockery::on(function ($argument) use ($inputResponse) {
-                    return $argument == $inputResponse;
-                }),
-                $email,
-                $password,
-                $withRefreshToken
-            )
-            ->andThrow($response);
+            ->shouldReceive('getUser')
+            ->with($userId)
+            ->andThrow($user);
 
         return $this;
     }
@@ -421,6 +404,30 @@ trait UserHelper
     }
 
     /**
+     * @param JWTService|MockInterface $jwtService
+     * @param string|\Exception        $subject
+     * @param string                   $token
+     *
+     * @return $this
+     */
+    protected function mockJWTServiceVerifyJWT(MockInterface $jwtService, $subject, string $token)
+    {
+        $expectation = $jwtService
+            ->shouldReceive('verifyJWT')
+            ->with($token);
+
+        if ($subject instanceof \Exception) {
+            $expectation->andThrow($subject);
+
+            return $this;
+        }
+
+        $expectation->andReturn($subject);
+
+        return $this;
+    }
+
+    /**
      * @param int    $times
      * @param array  $data
      *
@@ -454,4 +461,24 @@ trait UserHelper
     {
         return $this->app->get(UserModelFactoryInterface::class);
     }
+
+    //region Assertions
+
+    /**
+     * @param UsersServiceInterface|MockInterface $usersService
+     * @param string                              $email
+     *
+     * @return $this
+     */
+    protected function assertUsersServiceGetUserByEmail(MockInterface $usersService, string $email)
+    {
+        $usersService
+            ->shouldHaveReceived('getUserByEmail')
+            ->with($email)
+            ->once();
+
+        return $this;
+    }
+
+    //endregion
 }

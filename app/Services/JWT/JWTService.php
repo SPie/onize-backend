@@ -57,4 +57,11 @@ interface JWTService
      * @return string
      */
     public function createJWT(UserModelInterface $user, int $ttl = null): string;
+
+    /**
+     * @param string $token
+     *
+     * @return string
+     */
+    public function verifyJWT(string $token): string;
 }

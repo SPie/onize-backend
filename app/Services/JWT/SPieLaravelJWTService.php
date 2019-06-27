@@ -169,4 +169,20 @@ class SPieLaravelJWTService implements JWTService
         return $this->getJwtHandler()->createJWT($user->getAuthIdentifier(), $user->getCustomClaims(), $ttl)
             ->getJWT();
     }
+
+    /**
+     * @param string $token
+     *
+     * @return string
+     *
+     * @throws NotAuthenticatedException
+     */
+    public function verifyJWT(string $token): string
+    {
+        try {
+            return $this->getJwtHandler()->getValidJWT($token)->getSubject();
+        } catch (JWTException $e) {
+            throw new NotAuthenticatedException();
+        }
+    }
 }

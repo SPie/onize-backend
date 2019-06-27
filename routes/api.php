@@ -45,7 +45,7 @@ $router->group(
         });
 
         $router->group(['prefix' => 'password-reset'], function (Router $router) {
-            $router->post('start', ['as' => PasswordResetController::ROUTE_NAME_PASSWORD_RESET_START, 'uses' => 'User\PasswordResetController@start']);
+            $router->post('start', ['as' => PasswordResetController::ROUTE_NAME_START, 'uses' => 'User\PasswordResetController@start']);
         });
 
         //endregion

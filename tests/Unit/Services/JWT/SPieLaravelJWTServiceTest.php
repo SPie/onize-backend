@@ -7,6 +7,8 @@ use App\Services\JWT\SPieLaravelJWTService;
 use Illuminate\Auth\Access\AuthorizationException;
 use Mockery\MockInterface;
 use SPie\LaravelJWT\Contracts\JWTGuard;
+use SPie\LaravelJWT\Exceptions\InvalidTokenException;
+use SPie\LaravelJWT\Exceptions\JWTException;
 use SPie\LaravelJWT\Exceptions\MissingRefreshTokenProviderException;
 use SPie\LaravelJWT\Exceptions\MissingRefreshTokenRepositoryException;
 use SPie\LaravelJWT\Exceptions\NotAuthenticatedException as JWTNotAuthenticatedException;
@@ -425,6 +427,38 @@ class SPieLaravelJWTServiceTest extends TestCase
         );
     }
 
+    /**
+     * @return void
+     */
+    public function testVerifyJWT(): void
+    {
+        $email = $this->getFaker()->safeEmail;
+        $token = $this->getFaker()->uuid;
+        $jwt = $this->createJWT();
+        $this->mockJWTGetSubject($jwt, $email);
+        $jwtHandler = $this->createJWTHandler();
+        $this->mockJWTHandlerGetValidJWT($jwtHandler, $jwt, $token);
+
+        $this->assertEquals(
+            $email,
+            $this->createSPieLaravelJWTService(null, $jwtHandler)->verifyJWT($token)
+        );
+    }
+
+    /**
+     * @return void
+     */
+    public function testVerifyJWTWithInvalidJWT(): void
+    {
+        $token = $this->getFaker()->uuid;
+        $jwtHandler = $this->createJWTHandler();
+        $this->mockJWTHandlerGetValidJWT($jwtHandler, new InvalidTokenException(), $token);
+
+        $this->expectException(NotAuthenticatedException::class);
+
+        $this->createSPieLaravelJWTService(null, $jwtHandler)->verifyJWT($token);
+    }
+
     //endregion
 
     //region Mocks
@@ -502,6 +536,23 @@ class SPieLaravelJWTServiceTest extends TestCase
     }
 
     /**
+     * @param JWTHandler|MockInterface $jwtHandler
+     * @param JWT|\Exception           $jwt
+     * @param string                   $token
+     *
+     * @return SPieLaravelJWTServiceTest
+     */
+    private function mockJWTHandlerGetValidJWT(MockInterface $jwtHandler, $jwt, string $token): SPieLaravelJWTServiceTest
+    {
+        $jwtHandler
+            ->shouldReceive('getValidJWT')
+            ->with($token)
+            ->andThrow($jwt);
+
+        return $this;
+    }
+
+    /**
      * @return JWT
      */
     private function createJWT(): JWT
@@ -520,6 +571,21 @@ class SPieLaravelJWTServiceTest extends TestCase
         $jwt
             ->shouldReceive('getJWT')
             ->andReturn($token);
+
+        return $this;
+    }
+
+    /**
+     * @param JWT|MockInterface $jwt
+     * @param string            $subject
+     *
+     * @return SPieLaravelJWTServiceTest
+     */
+    private function mockJWTGetSubject(MockInterface $jwt, string $subject): SPieLaravelJWTServiceTest
+    {
+        $jwt
+            ->shouldReceive('getSubject')
+            ->andReturn($subject);
 
         return $this;
     }

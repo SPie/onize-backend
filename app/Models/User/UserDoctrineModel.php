@@ -70,9 +70,9 @@ class UserDoctrineModel extends AbstractDoctrineModel implements UserModelInterf
     /**
      * @param string $email
      *
-     * @return $this
+     * @return UserModelInterface
      */
-    public function setEmail(string $email)
+    public function setEmail(string $email): UserModelInterface
     {
         $this->email = $email;
 
