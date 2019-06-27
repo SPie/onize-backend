@@ -1,7 +1,9 @@
 language: php
 
 php:
-- '7.1'
+  - '7.1'
+  - '7.2'
+  - '7.3'
 
 notifications:
   email:
@@ -11,10 +13,14 @@ notifications:
 branches:
   only:
     - master
+    - develop
 
 before_script:
-- cp .env.travis .env
-- composer self-update
-- composer install --no-interaction
+  - cp .env.travis .env
+  - composer self-update
+  - composer install --no-interaction
 
-script: vendor/bin/phpunit
+script: vendor/bin/phpunit --coverage-clover build/logs/clover.xml
+
+after_success:
+  - travis_retry php vendor/bin/php-coveralls -v
