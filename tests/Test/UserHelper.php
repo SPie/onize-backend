@@ -480,5 +480,22 @@ trait UserHelper
         return $this;
     }
 
+    /**
+     * @param UsersServiceInterface|MockInterface $usersService
+     * @param UserModelInterface                  $user
+     * @param array                               $data
+     *
+     * @return $this
+     */
+    protected function assertUsersServiceEditUser(MockInterface $usersService, UserModelInterface $user, array $data)
+    {
+        $usersService
+            ->shouldHaveReceived('editUser')
+            ->with($user, $data)
+            ->once();
+
+        return $this;
+    }
+
     //endregion
 }

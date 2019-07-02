@@ -258,29 +258,199 @@ final class PasswordResetControllerTest extends TestCase
     /**
      * @return void
      */
-    public function testValidateUserEmail(): void
+    public function testResetPassword(): void
     {
+        $password = $this->createValidPassword();
+        $token = $this->getFaker()->uuid;
+        $request = $this->createRequest();
+        $request->offsetSet('password', $password);
+        $request->offsetSet('passwordConfirm', $password);
+        $request->offsetSet('resetToken', $token);
         $email = $this->getFaker()->safeEmail;
+        $user = $this->createUserModel();
         $usersService = $this->createUsersService();
-        $passwordResetController = $this->createPasswordResetController();
+        $this->mockUsersServiceGetUserByEmail($usersService, $user, $email);
+        $jwtService = $this->createJWTService();
+        $this->mockJWTServiceVerifyJWT($jwtService, $email, $token);
 
         $this->assertEquals(
-            $passwordResetController,
-            $this->runReflectionMethod(
-                $passwordResetController,
-                'validateUserEmail',
-                [$usersService, $email]
-            )
+            $this->createJsonResponse($this->createJsonResponseData(), 204),
+            $this->createPasswordResetController()->resetPassword($request, $usersService, $jwtService)
         );
-        $this->assertUsersServiceGetUserByEmail($usersService, $email);
+        $this->assertUsersServiceEditUser($usersService, $user, ['password' => $password]);
     }
 
     /**
      * @return void
      */
-    public function testValidateUserEmailWithoutUser(): void
+    public function testResetPasswordWithoutToken(): void
     {
+        $password = $this->createValidPassword();
+        $request = $this->createRequest();
+        $request->offsetSet('password', $password);
+        $request->offsetSet('passwordConfirm', $password);
+
+        $this->expectException(ValidationException::class);
+
+        $this->createPasswordResetController()
+            ->resetPassword($request, $this->createUsersService(), $this->createJWTService());
+    }
+
+    /**
+     * @return void
+     */
+    public function testResetPasswordWithoutPassword(): void
+    {
+        $request = $this->createRequest();
+        $request->offsetSet('resetToken', $this->getFaker()->uuid);
+        $request->offsetSet('passwordConfirm', $this->getFaker()->password);
+
+        $this->expectException(ValidationException::class);
+
+        $this->createPasswordResetController()
+            ->resetPassword($request, $this->createUsersService(), $this->createJWTService());
+    }
+
+    /**
+     * @return void
+     */
+    public function testResetPasswordWithoutPasswordConfirm(): void
+    {
+        $request = $this->createRequest();
+        $request->offsetSet('resetToken', $this->getFaker()->uuid);
+        $request->offsetSet('password', $this->createValidPassword());
+
+        $this->expectException(ValidationException::class);
+
+        $this->createPasswordResetController()
+            ->resetPassword($request, $this->createUsersService(), $this->createJWTService());
+    }
+
+    /**
+     * @return void
+     */
+    public function testResetPasswordWithoutMatchingPasswords(): void
+    {
+        $password = $this->createValidPassword();
+        $request = $this->createRequest();
+        $request->offsetSet('resetToken', $this->getFaker()->uuid);
+        $request->offsetSet('password', $password);
+        $request->offsetSet('passwordConfirm', $password . $this->getFaker()->word);
+
+        $this->expectException(ValidationException::class);
+
+        $this->createPasswordResetController()
+            ->resetPassword($request, $this->createUsersService(), $this->createJWTService());
+    }
+
+    /**
+     * @return void
+     */
+    public function testResetPasswordWithInvalidPasswordLength(): void
+    {
+        $password = $this->getFaker()->password(1, 7);
+        $request = $this->createRequest();
+        $request->offsetSet('resetToken', $this->getFaker()->uuid);
+        $request->offsetSet('password', $password);
+        $request->offsetSet('passwordConfirm', $password);
+
+        $this->expectException(ValidationException::class);
+
+        $this->createPasswordResetController()
+            ->resetPassword($request, $this->createUsersService(), $this->createJWTService());
+    }
+
+    /**
+     * @return void
+     */
+    public function testResetPasswordWithInvalidToken(): void
+    {
+        $password = $this->createValidPassword();
+        $resetToken = $this->getFaker()->uuid;
+        $request = $this->createRequest();
+        $request->offsetSet('resetToken', $resetToken);
+        $request->offsetSet('password', $password);
+        $request->offsetSet('passwordConfirm', $password);
+        $jwtService = $this->createJWTService();
+        $this->mockJWTServiceVerifyJWT($jwtService, new NotAuthenticatedException(), $resetToken);
+
+        $this->expectException(NotAuthenticatedException::class);
+
+        $this->createPasswordResetController()->resetPassword($request, $this->createUsersService(), $jwtService);
+    }
+
+    /**
+     * @return void
+     */
+    public function testResetPasswordWithoutUser(): void
+    {
+        $password = $this->createValidPassword();
+        $resetToken = $this->getFaker()->uuid;
         $email = $this->getFaker()->safeEmail;
+        $request = $this->createRequest();
+        $request->offsetSet('resetToken', $resetToken);
+        $request->offsetSet('password', $password);
+        $request->offsetSet('passwordConfirm', $password);
+        $jwtService = $this->createJWTService();
+        $this->mockJWTServiceVerifyJWT($jwtService, $email, $resetToken);
+        $usersService = $this->createUsersService();
+        $this->mockUsersServiceGetUserByEmail($usersService, new ModelNotFoundException(UserModelInterface::class), $email);
+
+        $this->expectException(NotAuthenticatedException::class);
+
+        $this->createPasswordResetController()->resetPassword($request, $usersService, $jwtService);
+    }
+
+    /**
+     * @return void
+     */
+    public function testGetUserFromToken(): void
+    {
+        $token = $this->getFaker()->uuid;
+        $user = $this->createUserModel();
+        $email = $this->getFaker()->safeEmail;
+        $jwtService = $this->createJWTService();
+        $this->mockJWTServiceVerifyJWT($jwtService, $email, $token);
+        $usersService = $this->createUsersService();
+        $this->mockUsersServiceGetUserByEmail($usersService, $user, $email);
+
+        $this->assertEquals(
+            $user,
+            $this->runReflectionMethod(
+                $this->createPasswordResetController(),
+                'getUserFromToken',
+                [$usersService, $jwtService, $token]
+            )
+        );
+    }
+
+    /**
+     * @return void
+     */
+    public function testGetUserFromTokenWithInvalidToken(): void
+    {
+        $token = $this->getFaker()->uuid;
+        $jwtService = $this->createJWTService();
+        $this->mockJWTServiceVerifyJWT($jwtService, new NotAuthenticatedException(), $token);
+
+        $this->expectException(NotAuthenticatedException::class);
+
+        $this->runReflectionMethod(
+            $this->createPasswordResetController(),
+            'getUserFromToken',
+            [$this->createUsersService(), $jwtService, $token]
+        );
+    }
+
+    /**
+     * @return void
+     */
+    public function testGetUserFromTokenWithoutUser(): void
+    {
+        $token = $this->getFaker()->uuid;
+        $email = $this->getFaker()->safeEmail;
+        $jwtService = $this->createJWTService();
+        $this->mockJWTServiceVerifyJWT($jwtService, $email, $token);
         $usersService = $this->createUsersService();
         $this->mockUsersServiceGetUserByEmail($usersService, new ModelNotFoundException(UserModelInterface::class), $email);
 
@@ -288,8 +458,124 @@ final class PasswordResetControllerTest extends TestCase
 
         $this->runReflectionMethod(
             $this->createPasswordResetController(),
-            'validateUserEmail',
-            [$usersService, $email]
+            'getUserFromToken',
+            [$usersService, $jwtService, $token]
+        );
+    }
+
+    /**
+     * @return void
+     */
+    public function testGetRequestParametersForPasswordReset(): void
+    {
+        $resetToken = $this->getFaker()->uuid;
+        $password = $this->createValidPassword();
+        $request = $this->createRequest();
+        $request->offsetSet('resetToken', $resetToken);
+        $request->offsetSet('password', $password);
+        $request->offsetSet('passwordConfirm', $password);
+
+        $this->assertEquals(
+            [$resetToken, $password],
+            $this->runReflectionMethod(
+                $this->createPasswordResetController(),
+                'getRequestParametersForPasswordReset',
+                [$request]
+            )
+        );
+    }
+
+    /**
+     * @return void
+     */
+    public function testGetRequestParametersForPasswordResetWithoutResetToken(): void
+    {
+        $password = $this->createValidPassword();
+        $request = $this->createRequest();
+        $request->offsetSet('password', $password);
+        $request->offsetSet('passwordConfirm', $password);
+
+        $this->expectException(ValidationException::class);
+
+        $this->runReflectionMethod(
+            $this->createPasswordResetController(),
+            'getRequestParametersForPasswordReset',
+            [$request]
+        );
+    }
+
+    /**
+     * @return void
+     */
+    public function testGetRequestParametersForPasswordResetWithoutPassword(): void
+    {
+        $request = $this->createRequest();
+        $request->offsetSet('resetToken', $this->getFaker()->uuid);
+        $request->offsetSet('passwordConfirm', $this->createValidPassword());
+
+        $this->expectException(ValidationException::class);
+
+        $this->runReflectionMethod(
+            $this->createPasswordResetController(),
+            'getRequestParametersForPasswordReset',
+            [$request]
+        );
+    }
+
+    /**
+     * @return void
+     */
+    public function testGetRequestParametersForPasswordResetWithInvalidPasswordLength(): void
+    {
+        $password = $this->getFaker()->password(1, 7);
+        $request = $this->createRequest();
+        $request->offsetSet('resetToken', $this->getFaker()->uuid);
+        $request->offsetSet('password', $password);
+        $request->offsetSet('passwordConfirm', $password);
+
+        $this->expectException(ValidationException::class);
+
+        $this->runReflectionMethod(
+            $this->createPasswordResetController(),
+            'getRequestParametersForPasswordReset',
+            [$request]
+        );
+    }
+
+    /**
+     * @return void
+     */
+    public function testGetRequestParametersForPasswordResetWithoutPasswordConfirm(): void
+    {
+        $request = $this->createRequest();
+        $request->offsetSet('resetToken', $this->getFaker()->uuid);
+        $request->offsetSet('password', $this->createValidPassword());
+
+        $this->expectException(ValidationException::class);
+
+        $this->runReflectionMethod(
+            $this->createPasswordResetController(),
+            'getRequestParametersForPasswordReset',
+            [$request]
+        );
+    }
+
+    /**
+     * @return void
+     */
+    public function testGetRequestParametersForPasswordResetWithoutMatchingPasswordConfirm(): void
+    {
+        $request = $this->createRequest();
+        $request->offsetSet('resetToken', $this->getFaker()->uuid);
+        $request->offsetSet('password', $this->createValidPassword());
+        $request->offsetSet('passwordConfirm', $this->createValidPassword());
+
+        $this->expectException(ValidationException::class);
+
+        $this->runReflectionMethod(
+            $this->createPasswordResetController(),
+            'getRequestParametersForPasswordReset',
+            [$request]
         );
     }
 
@@ -303,6 +589,14 @@ final class PasswordResetControllerTest extends TestCase
     private function createPasswordResetController(): PasswordResetController
     {
         return new PasswordResetController();
+    }
+
+    /**
+     * @return string
+     */
+    private function createValidPassword(): string
+    {
+        return $this->getFaker()->password(8);
     }
 
     //endregion
