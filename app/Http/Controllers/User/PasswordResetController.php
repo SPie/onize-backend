@@ -22,8 +22,9 @@ use Illuminate\Validation\ValidationException;
 final class PasswordResetController extends Controller
 {
 
-    const ROUTE_NAME_START        = 'passwordReset.start';
-    const ROUTE_NAME_VERIFY_TOKEN = 'passwordReset.verifyToken';
+    const ROUTE_NAME_START          = 'passwordReset.start';
+    const ROUTE_NAME_VERIFY_TOKEN   = 'passwordReset.verifyToken';
+    const ROUTE_NAME_RESET_PASSWORD = 'passwordReset.resetPassword';
 
     const REQUEST_PARAMETER_EMAIL            = 'email';
     const REQUEST_PARAMETER_RESET_TOKEN      = 'resetToken';

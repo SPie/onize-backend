@@ -462,6 +462,11 @@ trait UserHelper
         return $this->app->get(UserModelFactoryInterface::class);
     }
 
+    protected function createValidPassword(): string
+    {
+        return $this->getFaker()->password(8);
+    }
+
     //region Assertions
 
     /**

@@ -591,13 +591,5 @@ final class PasswordResetControllerTest extends TestCase
         return new PasswordResetController();
     }
 
-    /**
-     * @return string
-     */
-    private function createValidPassword(): string
-    {
-        return $this->getFaker()->password(8);
-    }
-
     //endregion
 }
