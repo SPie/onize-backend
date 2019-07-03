@@ -51,5 +51,26 @@ trait EmailHelper
         return $this;
     }
 
+    /**
+     * @param EmailService|MockInterface $emailService
+     * @param string                     $recipient
+     * @param string                     $resetToken
+     *
+     * @return $this
+     */
+    protected function assertEmailServicePasswordResetEmail(
+        MockInterface $emailService,
+        string $recipient,
+        string $resetToken
+    )
+    {
+        $emailService
+            ->shouldHaveReceived('passwordResetEmail')
+            ->with($recipient, $resetToken)
+            ->once();
+
+        return $this;
+    }
+
     //endregion
 }

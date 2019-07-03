@@ -43,7 +43,7 @@ final class PasswordResetControllerTest extends TestCase
             $this->createJsonResponse($this->createJsonResponseData(), 204),
             $this->createPasswordResetController()->start($request, $usersService, $jwtService, $emailService)
         );
-        $this->assertEmailServiceQueueEmail($emailService, 'password-reset', $email, ['resetToken' => $token]);
+        $this->assertEmailServicePasswordResetEmail($emailService, $email, $token);
     }
 
     /**

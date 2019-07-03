@@ -53,10 +53,9 @@ final class PasswordResetController extends Controller
         $email = $this->getEmailFromRequest($request);
 
         try {
-            $emailService->queueEmail(
-                EmailService::IDENTIFIER_PASSWORD_RESET,
+            $emailService->passwordResetEmail(
                 $email,
-                [self::CONTEXT_RESET_TOKEN => $jwtService->createJWT($usersService->getUserByEmail($email), 15)]
+                $jwtService->createJWT($usersService->getUserByEmail($email), 15)
             );
         } catch (ModelNotFoundException $e) {}
 

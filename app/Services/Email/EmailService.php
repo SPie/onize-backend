@@ -13,11 +13,10 @@ interface EmailService
     const IDENTIFIER_PASSWORD_RESET = 'password-reset';
 
     /**
-     * @param string $identifier
      * @param string $recipient
-     * @param array  $context
+     * @param string $resetToken
      *
      * @return EmailService
      */
-    public function queueEmail(string $identifier, string $recipient, array $context = []): EmailService;
+    public function passwordResetEmail(string $recipient, string $resetToken): EmailService;
 }

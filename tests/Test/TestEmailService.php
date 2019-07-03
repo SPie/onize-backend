@@ -50,7 +50,7 @@ final class TestEmailService implements EmailService
      *
      * @return EmailService
      */
-    public function queueEmail(string $identifier, string $recipient, array $context = []): EmailService
+    private function queueEmail(string $identifier, string $recipient, array $context = []): EmailService
     {
         if (!isset($this->queuedEmails[$identifier])) {
             $this->queuedEmails[$identifier] = [];
@@ -62,5 +62,16 @@ final class TestEmailService implements EmailService
         ];
 
         return $this;
+    }
+
+    /**
+     * @param string $recipient
+     * @param string $resetToken
+     *
+     * @return EmailService
+     */
+    public function passwordResetEmail(string $recipient, string $resetToken): EmailService
+    {
+        return $this->queueEmail(self::IDENTIFIER_PASSWORD_RESET, $recipient, ['resetToken' => $resetToken]);
     }
 }
