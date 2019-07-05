@@ -10,7 +10,6 @@ namespace App\Services\Email;
 interface EmailService
 {
 
-    const IDENTIFIER_PASSWORD_RESET = 'password-reset';
 
     /**
      * @param string $recipient

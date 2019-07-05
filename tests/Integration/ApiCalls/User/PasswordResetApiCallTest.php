@@ -314,7 +314,7 @@ final class PasswordResetApiCallTest extends IntegrationTestCase
 
     private function assertQueuedEmail(string $email): PasswordResetApiCallTest
     {
-        $queuedEmails = $this->getEmailService()->getQueuedEmailsByIdentifier('password-reset');
+        $queuedEmails = $this->getEmailService()->getQueuedEmailsByIdentifier('passwordReset');
         $this->assertEquals($email, $queuedEmails[0]['recipient']);
         $this->assertNotEmpty($queuedEmails[0]['context']['resetToken']);
 

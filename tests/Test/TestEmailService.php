@@ -72,6 +72,6 @@ final class TestEmailService implements EmailService
      */
     public function passwordResetEmail(string $recipient, string $resetToken): EmailService
     {
-        return $this->queueEmail(self::IDENTIFIER_PASSWORD_RESET, $recipient, ['resetToken' => $resetToken]);
+        return $this->queueEmail('passwordReset', $recipient, ['resetToken' => $resetToken]);
     }
 }

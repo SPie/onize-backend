@@ -16,6 +16,8 @@ use App\Repositories\User\PasswordResetTokenDoctrineRepository;
 use App\Repositories\User\PasswordResetTokenRepository;
 use App\Repositories\User\RefreshTokenRepository;
 use App\Repositories\User\UserRepository;
+use App\Services\Email\EmailService;
+use App\Services\Email\QueuedEmailService;
 use App\Services\JWT\JWTRefreshTokenRepository;
 use App\Services\JWT\JWTService;
 use App\Services\JWT\SPieJWTRefreshTokenRepository;
@@ -98,6 +100,8 @@ class AppServiceProvider extends ServiceProvider
         $this->app->singleton(UsersServiceInterface::class, UsersService::class);
         $this->app->singleton(JWTService::class, SPieLaravelJWTService::class);
         $this->app->singleton(JWTRefreshTokenRepository::class, SPieJWTRefreshTokenRepository::class);
+        $this->app->singleton(EmailService::class, QueuedEmailService::class);
+        // TODO MessageQueueService
 
         return $this;
     }

@@ -2,8 +2,6 @@
 
 use Faker\Factory;
 use Faker\Generator;
-use Laravel\Lumen\Testing\DatabaseMigrations as EloquentDatabaseMigrations;
-use LaravelDoctrine\Migrations\Testing\DatabaseMigrations;
 
 /**
  * Class TestCase
