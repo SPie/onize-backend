@@ -12,7 +12,9 @@ use App\Services\MessageQueue\MessageQueueService;
 final class QueuedEmailService implements EmailService
 {
 
-    const QUEUE_IDENTIFIER_PASSWORD_RESET = 'passwordReset';
+    const JOB_IDENTIFIER_PASSWORD_RESET = 'passwordReset';
+
+    const QUEUE_NAME_EMAIL = 'email';
 
     const CONTEXT_PARAMETER_RECIPIENT   = 'recipient';
     const CONTEXT_PARAMETER_RESET_TOKEN = 'resetToken';
@@ -49,7 +51,8 @@ final class QueuedEmailService implements EmailService
     public function passwordResetEmail(string $recipient, string $resetToken): EmailService
     {
         $this->getMessageQueueService()->queueMessage(
-            self::QUEUE_IDENTIFIER_PASSWORD_RESET,
+            self::JOB_IDENTIFIER_PASSWORD_RESET,
+            self::QUEUE_NAME_EMAIL,
             [
                 self::CONTEXT_PARAMETER_RECIPIENT   => $recipient,
                 self::CONTEXT_PARAMETER_RESET_TOKEN => $resetToken,

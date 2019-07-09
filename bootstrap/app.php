@@ -95,6 +95,7 @@ $app->register(LaravelDoctrine\Extensions\GedmoExtensionsServiceProvider::class)
 $app->register(LaravelDoctrine\Migrations\MigrationsServiceProvider::class);
 $app->register(Barryvdh\Cors\ServiceProvider::class);
 $app->register(SPie\LaravelJWT\Providers\LumenServiceProvider::class);
+$app->register(VladimirYuldashev\LaravelQueueRabbitMQ\LaravelQueueRabbitMQServiceProvider::class);
 
 /*
  * App service providers

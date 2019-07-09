@@ -29,6 +29,7 @@ final class QueuedEmailServiceTest extends \PHPUnit\Framework\TestCase
         $this->assertMessageQueueServiceQueueMessage(
             $messageQueueService,
             'passwordReset',
+            'email',
             [
                 'recipient'  => $recipient,
                 'resetToken' => $resetToken,

@@ -11,10 +11,11 @@ interface MessageQueueService
 {
 
     /**
-     * @param string $queueIdentifier
+     * @param string $jobIdentifier
+     * @param string $queue
      * @param array  $context
      *
      * @return MessageQueueService
      */
-    public function queueMessage(string $queueIdentifier, array $context = []): MessageQueueService;
+    public function queueMessage(string $jobIdentifier, string $queue, array $context = []): MessageQueueService;
 }
