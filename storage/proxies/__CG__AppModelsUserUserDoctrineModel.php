@@ -64,10 +64,10 @@ class UserDoctrineModel extends \App\Models\User\UserDoctrineModel implements \D
     public function __sleep()
     {
         if ($this->__isInitialized__) {
-            return ['__isInitialized__', '' . "\0" . 'App\\Models\\User\\UserDoctrineModel' . "\0" . 'email', '' . "\0" . 'App\\Models\\User\\UserDoctrineModel' . "\0" . 'refreshTokens', '' . "\0" . 'App\\Models\\User\\UserDoctrineModel' . "\0" . 'passwordResetTokens', 'id', 'password', 'createdAt', 'updatedAt', 'deletedAt'];
+            return ['__isInitialized__', '' . "\0" . 'App\\Models\\User\\UserDoctrineModel' . "\0" . 'email', '' . "\0" . 'App\\Models\\User\\UserDoctrineModel' . "\0" . 'refreshTokens', 'id', 'password', 'createdAt', 'updatedAt', 'deletedAt'];
         }
 
-        return ['__isInitialized__', '' . "\0" . 'App\\Models\\User\\UserDoctrineModel' . "\0" . 'email', '' . "\0" . 'App\\Models\\User\\UserDoctrineModel' . "\0" . 'refreshTokens', '' . "\0" . 'App\\Models\\User\\UserDoctrineModel' . "\0" . 'passwordResetTokens', 'id', 'password', 'createdAt', 'updatedAt', 'deletedAt'];
+        return ['__isInitialized__', '' . "\0" . 'App\\Models\\User\\UserDoctrineModel' . "\0" . 'email', '' . "\0" . 'App\\Models\\User\\UserDoctrineModel' . "\0" . 'refreshTokens', 'id', 'password', 'createdAt', 'updatedAt', 'deletedAt'];
     }
 
     /**
@@ -176,7 +176,7 @@ class UserDoctrineModel extends \App\Models\User\UserDoctrineModel implements \D
     /**
      * {@inheritDoc}
      */
-    public function setEmail(string $email)
+    public function setEmail(string $email): \App\Models\User\UserModelInterface
     {
 
         $this->__initializer__ && $this->__initializer__->__invoke($this, 'setEmail', [$email]);
@@ -209,7 +209,7 @@ class UserDoctrineModel extends \App\Models\User\UserDoctrineModel implements \D
     /**
      * {@inheritDoc}
      */
-    public function addRefreshToken(\App\Models\Auth\RefreshTokenModel $refreshToken): \App\Models\User\UserModelInterface
+    public function addRefreshToken(\App\Models\User\RefreshTokenModel $refreshToken): \App\Models\User\UserModelInterface
     {
 
         $this->__initializer__ && $this->__initializer__->__invoke($this, 'addRefreshToken', [$refreshToken]);
@@ -226,39 +226,6 @@ class UserDoctrineModel extends \App\Models\User\UserDoctrineModel implements \D
         $this->__initializer__ && $this->__initializer__->__invoke($this, 'getRefreshTokens', []);
 
         return parent::getRefreshTokens();
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public function setPasswordResetTokens(array $passwordResetTokens): \App\Models\User\UserModelInterface
-    {
-
-        $this->__initializer__ && $this->__initializer__->__invoke($this, 'setPasswordResetTokens', [$passwordResetTokens]);
-
-        return parent::setPasswordResetTokens($passwordResetTokens);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public function addPasswordResetToken(\App\Models\Auth\PasswordResetTokenModel $passwordResetToken): \App\Models\User\UserModelInterface
-    {
-
-        $this->__initializer__ && $this->__initializer__->__invoke($this, 'addPasswordResetToken', [$passwordResetToken]);
-
-        return parent::addPasswordResetToken($passwordResetToken);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public function getPasswordResetTokens(): \Illuminate\Support\Collection
-    {
-
-        $this->__initializer__ && $this->__initializer__->__invoke($this, 'getPasswordResetTokens', []);
-
-        return parent::getPasswordResetTokens();
     }
 
     /**
