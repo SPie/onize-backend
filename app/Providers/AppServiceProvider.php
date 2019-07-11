@@ -3,8 +3,6 @@
 namespace App\Providers;
 
 use App\Http\Middleware\ApiSignature;
-use App\Models\User\PasswordResetTokenDoctrineModelFactory;
-use App\Models\User\PasswordResetTokenModelFactory;
 use App\Models\User\RefreshTokenDoctrineModel;
 use App\Models\User\RefreshTokenDoctrineModelFactory;
 use App\Models\User\RefreshTokenModelFactory;
@@ -12,8 +10,6 @@ use App\Models\User\UserDoctrineModel;
 use App\Models\User\UserDoctrineModelFactory;
 use App\Models\User\UserModelFactoryInterface;
 use App\Models\User\UserModelInterface;
-use App\Repositories\User\PasswordResetTokenDoctrineRepository;
-use App\Repositories\User\PasswordResetTokenRepository;
 use App\Repositories\User\RefreshTokenRepository;
 use App\Repositories\User\UserRepository;
 use App\Services\Email\EmailService;
@@ -22,9 +18,12 @@ use App\Services\JWT\JWTRefreshTokenRepository;
 use App\Services\JWT\JWTService;
 use App\Services\JWT\SPieJWTRefreshTokenRepository;
 use App\Services\JWT\SPieLaravelJWTService;
+use App\Services\MessageQueue\MessageQueueService;
+use App\Services\MessageQueue\RabbitMQService;
 use App\Services\User\UsersService;
 use App\Services\User\UsersServiceInterface;
 use Doctrine\ORM\EntityManager;
+use Illuminate\Queue\QueueManager;
 use Illuminate\Support\ServiceProvider;
 
 /**
@@ -101,7 +100,9 @@ class AppServiceProvider extends ServiceProvider
         $this->app->singleton(JWTService::class, SPieLaravelJWTService::class);
         $this->app->singleton(JWTRefreshTokenRepository::class, SPieJWTRefreshTokenRepository::class);
         $this->app->singleton(EmailService::class, QueuedEmailService::class);
-        // TODO MessageQueueService
+        $this->app->singleton(MessageQueueService::class, function ($app) {
+            return new RabbitMQService($this->getQueueManager()->connection('rabbitmq'));
+        });
 
         return $this;
     }
@@ -146,4 +147,12 @@ class AppServiceProvider extends ServiceProvider
     }
 
     //endregion
+
+    /**
+     * @return QueueManager
+     */
+    private function getQueueManager(): QueueManager
+    {
+        return  $this->app->get('queue');
+    }
 }

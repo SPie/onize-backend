@@ -37,6 +37,7 @@ $app->configure('doctrine');
 $app->configure('services');
 $app->configure('cors');
 $app->configure('middlewares');
+$app->configure('queue');
 
 /*
 |--------------------------------------------------------------------------

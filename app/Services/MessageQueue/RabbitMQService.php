@@ -3,6 +3,7 @@
 namespace App\Services\MessageQueue;
 
 use App\Exceptions\Service\MessageQueue\QueuePushException;
+use Illuminate\Contracts\Queue\Queue;
 use VladimirYuldashev\LaravelQueueRabbitMQ\Queue\RabbitMQQueue;
 
 /**
@@ -14,24 +15,24 @@ final class RabbitMQService implements MessageQueueService
 {
 
     /**
-     * @var RabbitMQQueue
+     * @var RabbitMQQueue|Queue
      */
     private $rabbitMQQueue;
 
     /**
      * RabbitMQService constructor.
      *
-     * @param RabbitMQQueue $rabbitMQQueue
+     * @param RabbitMQQueue|Queue $rabbitMQQueue
      */
-    public function __construct(RabbitMQQueue $rabbitMQQueue)
+    public function __construct(Queue $rabbitMQQueue)
     {
         $this->rabbitMQQueue = $rabbitMQQueue;
     }
 
     /**
-     * @return RabbitMQQueue
+     * @return RabbitMQQueue|Queue
      */
-    private function getRabbitMQQueue(): RabbitMQQueue
+    private function getRabbitMQQueue(): Queue
     {
         return $this->rabbitMQQueue;
     }
