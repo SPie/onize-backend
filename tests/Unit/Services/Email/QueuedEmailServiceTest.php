@@ -1,7 +1,7 @@
 <?php
 
 use App\Services\Email\QueuedEmailService;
-use App\Services\MessageQueue\MessageQueueService;
+use Illuminate\Contracts\Queue\Queue;
 use Test\MessageQueueHelper;
 
 /**
@@ -22,18 +22,18 @@ final class QueuedEmailServiceTest extends \PHPUnit\Framework\TestCase
     {
         $recipient = $this->getFaker()->safeEmail;
         $resetToken = $this->getFaker()->uuid;
-        $messageQueueService = $this->createMessageQueueService();
+        $messageQueueService = $this->createQueueService();
         $queuedEmailService = $this->createQueuedEmailService($messageQueueService);
 
         $this->assertEquals($queuedEmailService, $queuedEmailService->passwordResetEmail($recipient, $resetToken));
-        $this->assertMessageQueueServiceQueueMessage(
+        $this->assertQueuePush(
             $messageQueueService,
             'passwordReset',
-            'email',
             [
                 'recipient'  => $recipient,
                 'resetToken' => $resetToken,
-            ]
+            ],
+            'email'
         );
     }
 
@@ -42,13 +42,13 @@ final class QueuedEmailServiceTest extends \PHPUnit\Framework\TestCase
     //region Mocks
 
     /**
-     * @param MessageQueueService|null $messageQueueService
+     * @param Queue $queue
      *
      * @return QueuedEmailService
      */
-    private function createQueuedEmailService(MessageQueueService $messageQueueService = null): QueuedEmailService
+    private function createQueuedEmailService(Queue $queue = null): QueuedEmailService
     {
-        return new QueuedEmailService($messageQueueService ?: $this->createMessageQueueService());
+        return new QueuedEmailService($queue ?: $this->createQueueService());
     }
 
     //endregion

@@ -18,8 +18,6 @@ use App\Services\JWT\JWTRefreshTokenRepository;
 use App\Services\JWT\JWTService;
 use App\Services\JWT\SPieJWTRefreshTokenRepository;
 use App\Services\JWT\SPieLaravelJWTService;
-use App\Services\MessageQueue\MessageQueueService;
-use App\Services\MessageQueue\RabbitMQService;
 use App\Services\User\UsersService;
 use App\Services\User\UsersServiceInterface;
 use Doctrine\ORM\EntityManager;
@@ -99,9 +97,8 @@ class AppServiceProvider extends ServiceProvider
         $this->app->singleton(UsersServiceInterface::class, UsersService::class);
         $this->app->singleton(JWTService::class, SPieLaravelJWTService::class);
         $this->app->singleton(JWTRefreshTokenRepository::class, SPieJWTRefreshTokenRepository::class);
-        $this->app->singleton(EmailService::class, QueuedEmailService::class);
-        $this->app->singleton(MessageQueueService::class, function ($app) {
-            return new RabbitMQService($this->getQueueManager()->connection('rabbitmq'));
+        $this->app->singleton(EmailService::class, function ($app) {
+            return new QueuedEmailService($this->getQueueManager()->connection('rabbitmq'));
         });
 
         return $this;

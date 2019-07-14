@@ -2,7 +2,7 @@
 
 namespace App\Services\Email;
 
-use App\Services\MessageQueue\MessageQueueService;
+use Illuminate\Contracts\Queue\Queue;
 
 /**
  * Class QueuedEmailService
@@ -20,26 +20,26 @@ final class QueuedEmailService implements EmailService
     const CONTEXT_PARAMETER_RESET_TOKEN = 'resetToken';
 
     /**
-     * @var MessageQueueService
+     * @var Queue
      */
-    private $messageQueueService;
+    private $queue;
 
     /**
      * QueuedEmailService constructor.
      *
-     * @param MessageQueueService $messageQueueService
+     * @param Queue $queue
      */
-    public function __construct(MessageQueueService $messageQueueService)
+    public function __construct(Queue $queue)
     {
-        $this->messageQueueService = $messageQueueService;
+        $this->queue = $queue;
     }
 
     /**
-     * @return MessageQueueService
+     * @return Queue
      */
-    private function getMessageQueueService(): MessageQueueService
+    private function getQueue(): Queue
     {
-        return $this->messageQueueService;
+        return $this->queue;
     }
 
     /**
@@ -50,13 +50,13 @@ final class QueuedEmailService implements EmailService
      */
     public function passwordResetEmail(string $recipient, string $resetToken): EmailService
     {
-        $this->getMessageQueueService()->queueMessage(
+        $this->getQueue()->push(
             self::JOB_IDENTIFIER_PASSWORD_RESET,
-            self::QUEUE_NAME_EMAIL,
             [
                 self::CONTEXT_PARAMETER_RECIPIENT   => $recipient,
                 self::CONTEXT_PARAMETER_RESET_TOKEN => $resetToken,
-            ]
+            ],
+            self::QUEUE_NAME_EMAIL
         );
 
         return $this;

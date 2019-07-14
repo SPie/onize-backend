@@ -2,10 +2,9 @@
 
 namespace Test;
 
-use App\Services\MessageQueue\MessageQueueService;
+use Illuminate\Contracts\Queue\Queue;
 use Mockery as m;
 use Mockery\MockInterface;
-use VladimirYuldashev\LaravelQueueRabbitMQ\Queue\RabbitMQQueue;
 
 /**
  * Trait MessageQueueHelper
@@ -18,51 +17,11 @@ trait MessageQueueHelper
     //region Mocks
 
     /**
-     * @return MessageQueueService|MockInterface
+     * @return Queue|MockInterface
      */
-    protected function createMessageQueueService(): MessageQueueService
+    protected function createQueueService(): Queue
     {
-        return m::spy(MessageQueueService::class);
-    }
-
-    /**
-     * @return RabbitMQQueue
-     */
-    protected function createRabbitMQQueue(): RabbitMQQueue
-    {
-        return m::spy(RabbitMQQueue::class);
-    }
-
-    /**
-     * @param RabbitMQQueue|MockInterface $rabbitMQQueue
-     * @param string|\Exception|null      $correlationId
-     * @param string                      $job
-     * @param array                       $data
-     * @param string                      $queue
-     *
-     * @return $this
-     */
-    protected function mockRabbitMQQueuePush(
-        MockInterface $rabbitMQQueue,
-        $correlationId,
-        string $job,
-        array $data,
-        string $queue
-    )
-    {
-        $expectation = $rabbitMQQueue
-            ->shouldReceive('push')
-            ->with($job, $data, $queue);
-
-        if ($correlationId instanceof \Exception) {
-            $expectation->andThrow($correlationId);
-
-            return $this;
-        }
-
-        $expectation->andReturn($correlationId);
-
-        return $this;
+        return m::spy(Queue::class);
     }
 
     //endregion
@@ -70,41 +29,23 @@ trait MessageQueueHelper
     //region Assertions
 
     /**
-     * @param MessageQueueService|MockInterface $messageQueueService
-     * @param string                            $jobIdentifier
-     * @param string                            $queue
-     * @param array                             $context
+     * @param Queue|MockInterface $messageQueueService
+     * @param string              $jobIdentifier
+     * @param array               $context
+     * @param string              $queue
      *
      * @return $this
      */
-    protected function assertMessageQueueServiceQueueMessage(
+    protected function assertQueuePush(
         MockInterface $messageQueueService,
         string $jobIdentifier,
-        string $queue,
-        array $context
+        array $context,
+        string $queue
     )
     {
         $messageQueueService
-            ->shouldHaveReceived('queueMessage')
-            ->with($jobIdentifier, $queue, $context)
-            ->once();
-
-        return $this;
-    }
-
-    /**
-     * @param RabbitMQQueue|MockInterface $rabbitMQQueue
-     * @param string                      $job
-     * @param array                       $data
-     * @param string                      $queue
-     *
-     * @return $this
-     */
-    protected function assertRabbitMQQueuePush(MockInterface $rabbitMQQueue, string $job, array $data, string $queue)
-    {
-        $rabbitMQQueue
             ->shouldHaveReceived('push')
-            ->with($job, $data, $queue)
+            ->with($jobIdentifier, $context, $queue)
             ->once();
 
         return $this;

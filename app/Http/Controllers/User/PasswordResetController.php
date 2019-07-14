@@ -76,6 +76,7 @@ final class PasswordResetController extends Controller
     ): JsonResponse
     {
         $this->getUserFromToken($usersService, $jwtService, $this->getResetTokenFromRequest($request));
+
         return $this->createResponse([], Response::HTTP_NO_CONTENT);
     }
 
