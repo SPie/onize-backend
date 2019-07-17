@@ -9,7 +9,6 @@ use Test\MessageQueueHelper;
  */
 final class QueuedEmailServiceTest extends \PHPUnit\Framework\TestCase
 {
-
     use MessageQueueHelper;
     use TestCaseHelper;
 

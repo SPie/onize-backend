@@ -22,7 +22,6 @@ use Test\UserHelper;
  */
 class SPieLaravelJWTServiceTest extends TestCase
 {
-
     use UserHelper;
 
     //region Tests
@@ -472,8 +471,7 @@ class SPieLaravelJWTServiceTest extends TestCase
     private function createSPieLaravelJWTService(
         JWTGuard $jwtGuard = null,
         JWTHandler $jwtHandler = null
-    ): SPieLaravelJWTService
-    {
+    ): SPieLaravelJWTService {
         $spieLaravelJwtService = Mockery::spy(
             SPieLaravelJWTService::class,
             [
@@ -517,8 +515,7 @@ class SPieLaravelJWTServiceTest extends TestCase
         string $subject,
         array $payload,
         int $ttl = null
-    ): SPieLaravelJWTServiceTest
-    {
+    ): SPieLaravelJWTServiceTest {
         $arguments = [
             $subject,
             $payload,

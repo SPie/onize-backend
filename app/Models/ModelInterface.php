@@ -11,7 +11,6 @@ use Illuminate\Contracts\Support\Arrayable;
  */
 interface ModelInterface extends Arrayable
 {
-
     const PROPERTY_ID = 'id';
 
     /**

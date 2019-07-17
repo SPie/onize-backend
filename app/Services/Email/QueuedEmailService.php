@@ -11,7 +11,6 @@ use Illuminate\Contracts\Queue\Queue;
  */
 final class QueuedEmailService implements EmailService
 {
-
     const JOB_IDENTIFIER_PASSWORD_RESET = 'passwordReset';
 
     const QUEUE_NAME_EMAIL = 'email';

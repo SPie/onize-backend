@@ -11,5 +11,4 @@ use SPie\LaravelJWT\Contracts\RefreshTokenRepository;
  */
 interface JWTRefreshTokenRepository extends RefreshTokenRepository
 {
-
 }

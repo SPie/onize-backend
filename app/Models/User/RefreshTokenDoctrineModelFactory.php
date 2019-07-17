@@ -13,7 +13,6 @@ use App\Models\ModelParameterValidation;
  */
 final class RefreshTokenDoctrineModelFactory implements RefreshTokenModelFactory
 {
-
     use ModelParameterValidation;
 
     /**

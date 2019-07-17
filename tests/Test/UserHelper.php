@@ -123,8 +123,7 @@ trait UserHelper
         MockInterface $userModelFactory,
         $user = null,
         array $userData = []
-    )
-    {
+    ) {
         $expectation = $userModelFactory
             ->shouldReceive('create')
             ->andThrow($user);
@@ -151,8 +150,7 @@ trait UserHelper
         MockInterface $userRepository,
         ?UserModelInterface $user,
         string $email
-    )
-    {
+    ) {
         $userRepository
             ->shouldReceive('findOneByEmail')
             ->with($email)
@@ -216,8 +214,7 @@ trait UserHelper
         $user,
         UserModelInterface $inputUser,
         array $userData
-    )
-    {
+    ) {
         $usersService
             ->shouldReceive('editUser')
             ->with(
@@ -271,8 +268,7 @@ trait UserHelper
         Response $inputResponse,
         array $credentials,
         bool $withRefreshToken = null
-    )
-    {
+    ) {
         $arguments = [
             Mockery::on(function ($argument) use ($inputResponse) {
                 return $argument == $inputResponse;
@@ -339,8 +335,7 @@ trait UserHelper
         UserModelInterface $user,
         Response $inputResponse,
         bool $withRefreshToken
-    )
-    {
+    ) {
         $jwtService
             ->shouldReceive('issueTokens')
             ->with(
@@ -389,8 +384,7 @@ trait UserHelper
         string $jwt,
         UserModelInterface $user,
         int $ttl = null
-    )
-    {
+    ) {
         $arguments = [$user];
         if ($ttl !== null) {
             $arguments[] = $ttl;

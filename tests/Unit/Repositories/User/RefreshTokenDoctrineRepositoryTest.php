@@ -11,7 +11,6 @@ use Test\UserHelper;
  */
 class RefreshTokenDoctrineRepositoryTest extends TestCase
 {
-
     use AuthHelper;
     use UserHelper;
 

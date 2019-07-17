@@ -21,7 +21,6 @@ use Illuminate\Support\Facades\Hash;
  */
 class UserDoctrineModel extends AbstractDoctrineModel implements UserModelInterface
 {
-
     use Authenticate;
     use Timestamps;
     use SoftDelete;
@@ -57,8 +56,7 @@ class UserDoctrineModel extends AbstractDoctrineModel implements UserModelInterf
         \DateTime $createdAt = null,
         \DateTime $updatedAt = null,
         \DateTime $deletedAt = null
-    )
-    {
+    ) {
         $this->email = $email;
         $this->password = Hash::make($password);
         $this->createdAt = $createdAt;

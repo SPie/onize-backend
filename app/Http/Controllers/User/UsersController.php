@@ -21,7 +21,6 @@ use Symfony\Component\HttpFoundation\Response;
  */
 class UsersController extends Controller
 {
-
     const ROUTE_NAME_REGISTER             = 'users.register';
     const ROUTE_NAME_CHANGE_PASSWORD      = 'users.changePassword';
     const ROUTE_NAME_LOGIN                = 'users.login';

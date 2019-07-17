@@ -14,7 +14,6 @@ use Test\UserHelper;
  */
 class UserDoctrineModelFactoryTest extends TestCase
 {
-
     use AuthHelper;
     use ModelHelper;
     use UserHelper;
@@ -377,5 +376,4 @@ class UserDoctrineModelFactoryTest extends TestCase
     }
 
     //endregion
-
 }

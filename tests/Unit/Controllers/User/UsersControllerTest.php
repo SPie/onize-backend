@@ -21,7 +21,6 @@ use Test\UserHelper;
  */
 class UsersControllerTest extends TestCase
 {
-
     use AuthHelper;
     use ControllerHelper;
     use RequestResponseHelper;
@@ -96,7 +95,8 @@ class UsersControllerTest extends TestCase
                 ],
                 'currentPassword' => [
                     'required',
-                    function () {}
+                    function () {
+                    }
                 ],
             ],
             $this->getReflectionMethod($usersController, 'getPasswordValidators')
@@ -446,8 +446,7 @@ class UsersControllerTest extends TestCase
     private function createUsersController(
         UsersServiceInterface $usersService = null,
         JWTService $jwtService = null
-    ): UsersController
-    {
+    ): UsersController {
         $usersController = Mockery::spy(
             UsersController::class,
             [
@@ -501,8 +500,7 @@ class UsersControllerTest extends TestCase
         Response $inputResponse,
         array $credentials,
         bool $withRefreshToken
-    ): UsersControllerTest
-    {
+    ): UsersControllerTest {
         $jwtService
             ->shouldReceive('login')
             ->with(
@@ -526,8 +524,7 @@ class UsersControllerTest extends TestCase
     private function mockUsersControllerGetEmailValidators(
         MockInterface $usersController,
         array $emailValidators
-    ): UsersControllerTest
-    {
+    ): UsersControllerTest {
         $usersController
             ->shouldReceive('getEmailValidators')
             ->andReturn($emailValidators);
@@ -546,8 +543,7 @@ class UsersControllerTest extends TestCase
         MockInterface $usersController,
         array $passwordValidators,
         string $currentPassword = null
-    ): UsersControllerTest
-    {
+    ): UsersControllerTest {
         $expectation = $usersController
             ->shouldReceive('getPasswordValidators')
             ->andReturn($passwordValidators);

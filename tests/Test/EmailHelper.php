@@ -41,8 +41,7 @@ trait EmailHelper
         string $identifier,
         string $recipient,
         array $context
-    )
-    {
+    ) {
         $emailService
             ->shouldHaveReceived('queueEmail')
             ->with($identifier, $recipient, $context)
@@ -62,8 +61,7 @@ trait EmailHelper
         MockInterface $emailService,
         string $recipient,
         string $resetToken
-    )
-    {
+    ) {
         $emailService
             ->shouldHaveReceived('passwordResetEmail')
             ->with($recipient, $resetToken)

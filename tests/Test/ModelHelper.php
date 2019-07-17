@@ -28,8 +28,7 @@ trait ModelHelper
         int $times = 1,
         array $data = [],
         string $state = null
-    ): Collection
-    {
+    ): Collection {
         if ($times == 1) {
             return new Collection([
                 $state

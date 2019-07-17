@@ -20,7 +20,6 @@ use Test\UserHelper;
  */
 class AuthApiCallsTest extends IntegrationTestCase
 {
-
     use ApiHelper;
     use AuthIntegrationHelper;
     use DatabaseMigrations;
@@ -78,7 +77,6 @@ class AuthApiCallsTest extends IntegrationTestCase
         $this->assertEquals('validation.required', \reset($responseData[UserModelInterface::PROPERTY_EMAIL]));
         $this->assertArrayHasKey(UserModelInterface::PROPERTY_PASSWORD, $responseData);
         $this->assertEquals('validation.required', \reset($responseData[UserModelInterface::PROPERTY_PASSWORD]));
-
     }
 
     /**
@@ -144,7 +142,6 @@ class AuthApiCallsTest extends IntegrationTestCase
         $this->assertResponseStatus(Response::HTTP_NO_CONTENT);
         $this->assertNotEmpty($this->getAuthorizationHeader($response));
         $this->assertNotEmpty($this->getRefreshTokenCookie($response));
-
     }
 
     /**
