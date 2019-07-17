@@ -37,8 +37,7 @@ trait ApiHelper
         array $parameters = [],
         Cookie $authToken = null,
         array $headers = []
-    ): JsonResponse
-    {
+    ): JsonResponse {
         $cookies = [];
         if (!empty($authToken)) {
             $cookies[$authToken->getName()] = $authToken->getValue();
@@ -94,8 +93,7 @@ trait ApiHelper
         array $parameters = [],
         array $cookies = [],
         array $headers = []
-    ): Request
-    {
+    ): Request {
         return Request::createFromBase(SymfonyRequest::create(
             $this->prepareUrlForRequest($uri),
             $method,

@@ -17,7 +17,6 @@ use Test\UserHelper;
  */
 class ChangePasswordApiCallTest extends IntegrationTestCase
 {
-
     use ApiHelper;
     use DatabaseMigrations;
     use ModelHelper;

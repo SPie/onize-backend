@@ -9,7 +9,6 @@ namespace App\Models;
  */
 interface Timestampable
 {
-
     const PROPERTY_CREATED_AT = 'createdAt';
     const PROPERTY_UPDATED_AT = 'updatedAt';
 

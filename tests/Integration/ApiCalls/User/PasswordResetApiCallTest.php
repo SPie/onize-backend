@@ -14,7 +14,6 @@ use Test\UserHelper;
  */
 final class PasswordResetApiCallTest extends IntegrationTestCase
 {
-
     use ApiHelper;
     use ModelHelper;
     use UserHelper;

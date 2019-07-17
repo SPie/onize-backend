@@ -9,5 +9,4 @@ namespace App\Exceptions\Api;
  */
 interface NotReportable
 {
-
 }

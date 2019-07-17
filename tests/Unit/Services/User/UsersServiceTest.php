@@ -21,7 +21,6 @@ use Test\UserHelper;
  */
 class UsersServiceTest extends TestCase
 {
-
     use DatabaseMigrations;
     use ModelHelper;
     use RepositoryHelper;
@@ -184,8 +183,7 @@ class UsersServiceTest extends TestCase
         UserRepository $userRepository = null,
         UserModelFactoryInterface $userModelFactory = null,
         JWTService $jwtService = null
-    ): UsersServiceInterface
-    {
+    ): UsersServiceInterface {
         return Mockery::spy(
             UsersService::class,
             [
@@ -211,8 +209,7 @@ class UsersServiceTest extends TestCase
         bool $response,
         MockInterface $user,
         int $userId = null
-    ): UsersServiceTest
-    {
+    ): UsersServiceTest {
         $arguments = [
             Mockery::on(function ($argument) use ($user) {
                 return $argument == $user;

@@ -88,8 +88,7 @@ abstract class AbstractDoctrineRepository implements RepositoryInterface
         array $orderBy = null,
         $limit = null,
         $offset = null
-    ): Collection
-    {
+    ): Collection {
         return new Collection(
             $this->getEntityPersister()->loadAll(
                 $criteria,

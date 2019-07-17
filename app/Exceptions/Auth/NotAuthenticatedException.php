@@ -11,5 +11,4 @@ use Illuminate\Auth\Access\AuthorizationException;
  */
 class NotAuthenticatedException extends AuthorizationException
 {
-
 }

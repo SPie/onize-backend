@@ -43,8 +43,7 @@ class UsersService implements UsersServiceInterface
         UserRepository $userRepository,
         UserModelFactoryInterface $userModelFactory,
         JWTService $jwtService
-    )
-    {
+    ) {
         $this->userRepository = $userRepository;
         $this->userModelFactory = $userModelFactory;
         $this->jwtService = $jwtService;

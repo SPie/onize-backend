@@ -45,8 +45,7 @@ class SPieJWTRefreshTokenRepository implements JWTRefreshTokenRepository
         RefreshTokenModelFactory $refreshTokenModelFactory,
         RefreshTokenRepository $refreshTokenRepository,
         UserRepository $userRepository
-    )
-    {
+    ) {
         $this->refreshTokenModelFactory = $refreshTokenModelFactory;
         $this->refreshTokenRepository = $refreshTokenRepository;
         $this->userRepository = $userRepository;

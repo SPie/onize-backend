@@ -16,7 +16,6 @@ use Test\UserHelper;
  */
 class RegisterApiCallTest extends IntegrationTestCase
 {
-
     use ApiHelper;
     use DatabaseMigrations;
     use ModelHelper;

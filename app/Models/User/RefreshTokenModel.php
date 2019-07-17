@@ -12,7 +12,6 @@ use App\Models\Timestampable;
  */
 interface RefreshTokenModel extends ModelInterface, Timestampable
 {
-
     const PROPERTY_IDENTIFIER  = 'identifier';
     const PROPERTY_VALID_UNTIL = 'validUntil';
     const PROPERTY_USER        = 'user';

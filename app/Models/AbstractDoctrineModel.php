@@ -26,7 +26,8 @@ class AbstractDoctrineModel implements ModelInterface
      *
      * @return $this
      */
-    public function setId(?int $id) {
+    public function setId(?int $id)
+    {
         $this->id = $id;
 
         return $this;
@@ -35,7 +36,8 @@ class AbstractDoctrineModel implements ModelInterface
     /**
      * @return int|null
      */
-    public function getId() : ?int {
+    public function getId() : ?int
+    {
         return $this->id;
     }
 

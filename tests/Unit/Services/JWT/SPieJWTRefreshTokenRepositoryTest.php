@@ -15,7 +15,6 @@ use Test\UserHelper;
  */
 class SPieJWTRefreshTokenRepositoryTest extends TestCase
 {
-
     use AuthHelper;
     use UserHelper;
 
@@ -292,8 +291,7 @@ class SPieJWTRefreshTokenRepositoryTest extends TestCase
         RefreshTokenModelFactory $refreshTokenModelFactory = null,
         RefreshTokenRepository $refreshTokenRepository = null,
         UserRepository $userRepository = null
-    ): SPieJWTRefreshTokenRepository
-    {
+    ): SPieJWTRefreshTokenRepository {
         $spieJwtRefreshTokenRepository = Mockery::spy(
             SPieJWTRefreshTokenRepository::class,
             [

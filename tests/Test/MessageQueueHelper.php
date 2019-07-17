@@ -41,8 +41,7 @@ trait MessageQueueHelper
         string $jobIdentifier,
         array $context,
         string $queue
-    )
-    {
+    ) {
         $messageQueueService
             ->shouldHaveReceived('push')
             ->with($jobIdentifier, $context, $queue)

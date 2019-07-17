@@ -16,7 +16,6 @@ use Doctrine\ORM\Mapping as ORM;
  */
 class RefreshTokenDoctrineModel extends AbstractDoctrineModel implements RefreshTokenModel
 {
-
     use Timestamps;
 
     /**
@@ -55,8 +54,7 @@ class RefreshTokenDoctrineModel extends AbstractDoctrineModel implements Refresh
         \DateTime $validUntil = null,
         \DateTime $createdAt = null,
         \DateTime $updatedAt = null
-    )
-    {
+    ) {
         $this->identifier = $identifier;
         $this->validUntil = $validUntil;
         $this->user = $user;

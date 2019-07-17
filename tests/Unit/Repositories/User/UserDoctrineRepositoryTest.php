@@ -10,7 +10,6 @@ use Test\UserHelper;
  */
 class UserDoctrineRepositoryTest extends TestCase
 {
-
     use UserHelper;
 
     //region Tests
