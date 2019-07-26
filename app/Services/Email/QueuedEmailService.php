@@ -16,6 +16,7 @@ final class QueuedEmailService implements EmailService
     const QUEUE_NAME_EMAIL = 'email';
 
     const CONTEXT_PARAMETER_RECIPIENT   = 'recipient';
+    const CONTEXT_PARAMETER_DATA        = 'data';
     const CONTEXT_PARAMETER_RESET_TOKEN = 'resetToken';
 
     /**
@@ -53,7 +54,9 @@ final class QueuedEmailService implements EmailService
             self::JOB_IDENTIFIER_PASSWORD_RESET,
             [
                 self::CONTEXT_PARAMETER_RECIPIENT   => $recipient,
-                self::CONTEXT_PARAMETER_RESET_TOKEN => $resetToken,
+                self::CONTEXT_PARAMETER_DATA => [
+                    self::CONTEXT_PARAMETER_RESET_TOKEN => $resetToken,
+                ]
             ],
             self::QUEUE_NAME_EMAIL
         );

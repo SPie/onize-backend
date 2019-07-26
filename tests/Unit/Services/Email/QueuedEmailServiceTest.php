@@ -30,7 +30,7 @@ final class QueuedEmailServiceTest extends \PHPUnit\Framework\TestCase
             'passwordReset',
             [
                 'recipient'  => $recipient,
-                'resetToken' => $resetToken,
+                'data' => ['resetToken' => $resetToken],
             ],
             'email'
         );
