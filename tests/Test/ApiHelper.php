@@ -10,7 +10,6 @@ use Illuminate\Http\Request;
 use SPie\LaravelJWT\Contracts\JWT;
 use SPie\LaravelJWT\Contracts\JWTHandler;
 use Symfony\Component\HttpFoundation\Cookie;
-use Symfony\Component\HttpFoundation\Request as SymfonyRequest;
 
 /**
  * Trait ApiHelper
@@ -79,32 +78,6 @@ trait ApiHelper
     }
 
     /**
-     * @param string $method
-     * @param string $uri
-     * @param array  $parameters
-     * @param array  $cookies
-     * @param array  $headers
-     *
-     * @return Request
-     */
-    protected function createApiRequest(
-        string $method = Request::METHOD_GET,
-        string $uri = '',
-        array $parameters = [],
-        array $cookies = [],
-        array $headers = []
-    ): Request {
-        return Request::createFromBase(SymfonyRequest::create(
-            $this->prepareUrlForRequest($uri),
-            $method,
-            $parameters,
-            $cookies,
-            [],
-            $this->transformHeadersToServerVars($headers)
-        ));
-    }
-
-    /**
      * @param UserModelInterface $user
      *
      * @return array
@@ -152,30 +125,6 @@ trait ApiHelper
         }
 
         return $jwtService->createJWT($user->getAuthIdentifier(), $claims);
-    }
-
-    /**
-     * @param string $routeName
-     *
-     * @param array  $parameters
-     *
-     * @return string
-     *
-     * @throws \Exception
-     */
-    protected function getRouteUrl(string $routeName, array $parameters = []): string
-    {
-        if (!isset($this->app->router->namedRoutes[$routeName])) {
-            throw new \Exception();
-        }
-
-        return \preg_replace_callback(
-            '/\{(.*?)(:.*?)?(\{[0-9,]+\})?\}/',
-            function ($m) use (&$parameters) {
-                return isset($parameters[$m[1]]) ? array_pull($parameters, $m[1]) : $m[0];
-            },
-            $this->app->router->namedRoutes[$routeName]
-        );
     }
 
     /**

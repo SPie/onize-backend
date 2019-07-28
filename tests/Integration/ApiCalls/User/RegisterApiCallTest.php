@@ -30,7 +30,7 @@ class RegisterApiCallTest extends IntegrationTestCase
     public function testRegister(): void
     {
         $email = $this->getFaker()->email;
-        $password = $this->getFaker()->password;
+        $password = $this->createValidPassword();
 
         $response = $this->doApiCall(
             URL::route(UsersController::ROUTE_NAME_REGISTER),
@@ -150,4 +150,12 @@ class RegisterApiCallTest extends IntegrationTestCase
     }
 
     //endregion
+
+    /**
+     * @return string
+     */
+    private function createValidPassword()
+    {
+        return $this->getFaker()->password(8);
+    }
 }
