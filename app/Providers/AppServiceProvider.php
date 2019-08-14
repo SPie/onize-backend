@@ -21,6 +21,7 @@ use App\Services\JWT\SPieLaravelJWTService;
 use App\Services\User\UsersService;
 use App\Services\User\UsersServiceInterface;
 use Doctrine\ORM\EntityManager;
+use Illuminate\Contracts\View\Factory;
 use Illuminate\Queue\QueueManager;
 use Illuminate\Support\ServiceProvider;
 
@@ -98,7 +99,10 @@ class AppServiceProvider extends ServiceProvider
         $this->app->singleton(JWTService::class, SPieLaravelJWTService::class);
         $this->app->singleton(JWTRefreshTokenRepository::class, SPieJWTRefreshTokenRepository::class);
         $this->app->singleton(EmailService::class, function ($app) {
-            return new QueuedEmailService($this->getQueueManager()->connection('rabbitmq'));
+            return new QueuedEmailService(
+                $this->getQueueManager()->connection('rabbitmq'),
+                $this->app->make(Factory::class)
+            );
         });
 
         return $this;

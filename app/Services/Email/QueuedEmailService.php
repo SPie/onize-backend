@@ -3,6 +3,7 @@
 namespace App\Services\Email;
 
 use Illuminate\Contracts\Queue\Queue;
+use Illuminate\Contracts\View\Factory;
 
 /**
  * Class QueuedEmailService
@@ -12,12 +13,14 @@ use Illuminate\Contracts\Queue\Queue;
 final class QueuedEmailService implements EmailService
 {
 
-    const JOB_IDENTIFIER_PASSWORD_RESET = 'passwordReset';
+    const EMAIL_IDENTIFIER_PASSWORD_RESET = 'passwordReset';
 
     const QUEUE_NAME_EMAIL = 'email';
 
-    const CONTEXT_PARAMETER_RECIPIENT   = 'recipient';
-    const CONTEXT_PARAMETER_RESET_TOKEN = 'resetToken';
+    const CONTEXT_PARAMETER_RECIPIENT = 'recipient';
+    const CONTEXT_PARAMETER_CONTENT   = 'content';
+
+    const VIEW_DATA_RESET_TOKEN = 'resetToken';
 
     /**
      * @var Queue
@@ -25,13 +28,20 @@ final class QueuedEmailService implements EmailService
     private $queue;
 
     /**
+     * @var Factory
+     */
+    private $viewFactory;
+
+    /**
      * QueuedEmailService constructor.
      *
-     * @param Queue $queue
+     * @param Queue   $queue
+     * @param Factory $viewFactory
      */
-    public function __construct(Queue $queue)
+    public function __construct(Queue $queue, Factory $viewFactory)
     {
         $this->queue = $queue;
+        $this->viewFactory = $viewFactory;
     }
 
     /**
@@ -43,6 +53,14 @@ final class QueuedEmailService implements EmailService
     }
 
     /**
+     * @return Factory
+     */
+    private function getViewFactory():Factory
+    {
+        return $this->viewFactory;
+    }
+
+    /**
      * @param string $recipient
      * @param string $resetToken
      *
@@ -51,10 +69,13 @@ final class QueuedEmailService implements EmailService
     public function passwordResetEmail(string $recipient, string $resetToken): EmailService
     {
         $this->getQueue()->push(
-            self::JOB_IDENTIFIER_PASSWORD_RESET,
+            self::EMAIL_IDENTIFIER_PASSWORD_RESET,
             [
-                self::CONTEXT_PARAMETER_RECIPIENT   => $recipient,
-                self::CONTEXT_PARAMETER_RESET_TOKEN => $resetToken,
+                self::CONTEXT_PARAMETER_RECIPIENT => $recipient,
+                self::CONTEXT_PARAMETER_CONTENT   => $this->getViewFactory()->make(
+                    self::EMAIL_IDENTIFIER_PASSWORD_RESET, // TODO email views path
+                    [self::VIEW_DATA_RESET_TOKEN => $resetToken] // TODO frontend URL from config
+                )->render(),
             ],
             self::QUEUE_NAME_EMAIL
         );

@@ -3,6 +3,8 @@
 namespace Test;
 
 use App\Services\Email\EmailService;
+use Illuminate\Contracts\View\Factory;
+use Illuminate\Contracts\View\View;
 use Mockery as m;
 use Mockery\MockInterface;
 
@@ -24,32 +26,58 @@ trait EmailHelper
         return m::spy(EmailService::class);
     }
 
-    //endregion
-
-    //region Assertions
+    /**
+     * @return Factory|MockInterface
+     */
+    private function createViewFactory(): Factory
+    {
+        return m::spy(Factory::class);
+    }
 
     /**
-     * @param EmailService|MockInterface $emailService
-     * @param string                     $identifier
-     * @param string                     $recipient
-     * @param array                      $context
+     * @param MockInterface $viewFactory
+     * @param View          $view
+     * @param string        $viewName
+     * @param array         $data
      *
      * @return $this
      */
-    protected function assertEmailServiceQueueEmail(
-        MockInterface $emailService,
-        string $identifier,
-        string $recipient,
-        array $context
-    )
+    private function mockViewFactoryMake(MockInterface $viewFactory, View $view, string $viewName, array $data)
     {
-        $emailService
-            ->shouldHaveReceived('queueEmail')
-            ->with($identifier, $recipient, $context)
-            ->once();
+        $viewFactory
+            ->shouldReceive('make')
+            ->with($viewName, $data)
+            ->andReturn($view);
 
         return $this;
     }
+
+    /**
+     * @return View|MockInterface
+     */
+    private function createView(): View
+    {
+        return m::spy(View::class);
+    }
+
+    /**
+     * @param MockInterface $view
+     * @param string        $content
+     *
+     * @return $this
+     */
+    private function mockViewRender(MockInterface $view, string $content)
+    {
+        $view
+            ->shouldReceive('render')
+            ->andReturn($content);
+
+        return $this;
+    }
+
+    //endregion
+
+    //region Assertions
 
     /**
      * @param EmailService|MockInterface $emailService
