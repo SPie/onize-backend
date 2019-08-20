@@ -2,6 +2,7 @@
 
 namespace App\Providers;
 
+use App\Http\Controllers\User\PasswordResetController;
 use App\Http\Middleware\ApiSignature;
 use App\Models\User\RefreshTokenDoctrineModel;
 use App\Models\User\RefreshTokenDoctrineModelFactory;
@@ -46,6 +47,7 @@ class AppServiceProvider extends ServiceProvider
             ->registerModels()
             ->registerRepositories()
             ->registerModelFactories()
+            ->registerControllers()
             ->registerServices()
             ->registerMiddlewares();
     }
@@ -93,6 +95,18 @@ class AppServiceProvider extends ServiceProvider
     /**
      * @return $this
      */
+    private function registerControllers()
+    {
+        $this->app->bind(PasswordResetController::class, function () {
+            return new PasswordResetController($this->app['config']['app.tokenPlaceHolder']);
+        });
+
+        return $this;
+    }
+
+    /**
+     * @return $this
+     */
     private function registerServices()
     {
         $this->app->singleton(UsersServiceInterface::class, UsersService::class);
@@ -101,7 +115,8 @@ class AppServiceProvider extends ServiceProvider
         $this->app->singleton(EmailService::class, function ($app) {
             return new QueuedEmailService(
                 $this->getQueueManager()->connection('rabbitmq'),
-                $this->app->make(Factory::class)
+                $this->app->make(Factory::class),
+                $this->app['config']['email.templatesDir']
             );
         });
 

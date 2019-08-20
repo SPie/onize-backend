@@ -66,12 +66,12 @@ final class TestEmailService implements EmailService
 
     /**
      * @param string $recipient
-     * @param string $resetToken
+     * @param string $finishUrl
      *
      * @return EmailService
      */
-    public function passwordResetEmail(string $recipient, string $resetToken): EmailService
+    public function passwordResetEmail(string $recipient, string $finishUrl): EmailService
     {
-        return $this->queueEmail('passwordReset', $recipient, ['resetToken' => $resetToken]);
+        return $this->queueEmail('passwordReset', $recipient, ['resetToken' => $finishUrl]);
     }
 }

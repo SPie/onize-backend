@@ -20,7 +20,7 @@ final class QueuedEmailService implements EmailService
     const CONTEXT_PARAMETER_RECIPIENT = 'recipient';
     const CONTEXT_PARAMETER_CONTENT   = 'content';
 
-    const VIEW_DATA_RESET_TOKEN = 'resetToken';
+    const VIEW_DATA_FINISH_URL = 'finishUrl';
 
     /**
      * @var Queue
@@ -32,16 +32,20 @@ final class QueuedEmailService implements EmailService
      */
     private $viewFactory;
 
+    private $templatesDir;
+
     /**
      * QueuedEmailService constructor.
      *
      * @param Queue   $queue
      * @param Factory $viewFactory
+     * @param string  $templatesDir
      */
-    public function __construct(Queue $queue, Factory $viewFactory)
+    public function __construct(Queue $queue, Factory $viewFactory, string $templatesDir)
     {
         $this->queue = $queue;
         $this->viewFactory = $viewFactory;
+        $this->templatesDir = $templatesDir;
     }
 
     /**
@@ -55,26 +59,34 @@ final class QueuedEmailService implements EmailService
     /**
      * @return Factory
      */
-    private function getViewFactory():Factory
+    private function getViewFactory(): Factory
     {
         return $this->viewFactory;
     }
 
     /**
+     * @return string
+     */
+    private function getTemplatesDir(): string
+    {
+        return $this->templatesDir;
+    }
+
+    /**
      * @param string $recipient
-     * @param string $resetToken
+     * @param string $finishUrl
      *
      * @return EmailService
      */
-    public function passwordResetEmail(string $recipient, string $resetToken): EmailService
+    public function passwordResetEmail(string $recipient, string $finishUrl): EmailService
     {
         $this->getQueue()->push(
             self::EMAIL_IDENTIFIER_PASSWORD_RESET,
             [
                 self::CONTEXT_PARAMETER_RECIPIENT => $recipient,
                 self::CONTEXT_PARAMETER_CONTENT   => $this->getViewFactory()->make(
-                    self::EMAIL_IDENTIFIER_PASSWORD_RESET, // TODO email views path
-                    [self::VIEW_DATA_RESET_TOKEN => $resetToken] // TODO frontend URL from config
+                    $this->getTemplatesDir() . '/' . self::EMAIL_IDENTIFIER_PASSWORD_RESET,
+                    [self::VIEW_DATA_FINISH_URL => $finishUrl]
                 )->render(),
             ],
             self::QUEUE_NAME_EMAIL

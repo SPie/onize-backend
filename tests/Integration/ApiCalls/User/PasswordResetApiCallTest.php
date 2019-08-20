@@ -31,7 +31,10 @@ final class PasswordResetApiCallTest extends IntegrationTestCase
         $response = $this->doApiCall(
             $this->getUrl(PasswordResetController::ROUTE_NAME_START),
             Request::METHOD_POST,
-            ['email' => $user->getEmail()]
+            [
+                'email'     => $user->getEmail(),
+                'finishUrl' => $this->getFaker()->url,
+            ]
         );
 
         $this->assertResponseStatus(Response::HTTP_NO_CONTENT);
@@ -79,11 +82,35 @@ final class PasswordResetApiCallTest extends IntegrationTestCase
         $response = $this->doApiCall(
             $this->getUrl(PasswordResetController::ROUTE_NAME_START),
             Request::METHOD_POST,
-            ['email' => $this->getFaker()->safeEmail]
+            [
+                'email'     => $this->getFaker()->safeEmail,
+                'finishUrl' => $this->getFaker()->url,
+            ]
         );
 
         $this->assertResponseStatus(Response::HTTP_NO_CONTENT);
         $this->assertEmpty($response->getData(true));
+        $this->assertEmpty($this->getEmailService()->getQueuedEmailsByIdentifier('password-reset'));
+    }
+
+    /**
+     * @return void
+     */
+    public function testStarWithoutFinishUrl(): void
+    {
+        $user = $this->createUsers()->first();
+
+        $response = $this->doApiCall(
+            $this->getUrl(PasswordResetController::ROUTE_NAME_START),
+            Request::METHOD_POST,
+            [
+                'email' => $user->getEmail(),
+            ]
+        );
+
+        $this->assertResponseStatus(Response::HTTP_UNPROCESSABLE_ENTITY);
+        $data = $response->getData(true);
+        $this->assertEquals('validation.required', \reset($data['finishUrl']));
         $this->assertEmpty($this->getEmailService()->getQueuedEmailsByIdentifier('password-reset'));
     }
 

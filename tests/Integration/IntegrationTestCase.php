@@ -31,6 +31,7 @@ abstract class IntegrationTestCase extends TestCase
 
         $uses = array_flip(class_uses_recursive(get_class($this)));
 
+        // TODO mock queue service instead of email
         if (isset($uses[DatabaseMigrations::class]) && !isset($uses[EloquentDatabaseMigrations::class])) {
             $this->runDatabaseMigrations();
         }

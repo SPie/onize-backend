@@ -23,17 +23,22 @@ final class QueuedEmailServiceTest extends \PHPUnit\Framework\TestCase
     public function testPasswordResetEmail(): void
     {
         $recipient = $this->getFaker()->safeEmail;
-        $resetToken = $this->getFaker()->uuid;
+        $finishUrl = $this->getFaker()->url;
         $messageQueueService = $this->createQueueService();
+        $templatesDir = $this->getFaker()->uuid;
         $content = $this->getFaker()->text;
         $view = $this->createView();
         $this->mockViewRender($view, $content);
-        $viewPath = 'passwordReset';
         $viewFactory = $this->createViewFactory();
-        $this->mockViewFactoryMake($viewFactory, $view, $viewPath, ['resetToken' => $resetToken]);
-        $queuedEmailService = $this->createQueuedEmailService($messageQueueService, $viewFactory);
+        $this->mockViewFactoryMake(
+            $viewFactory,
+            $view,
+            $templatesDir . '/passwordReset',
+            ['finishUrl' => $finishUrl]
+        );
+        $queuedEmailService = $this->createQueuedEmailService($messageQueueService, $viewFactory, $templatesDir);
 
-        $this->assertEquals($queuedEmailService, $queuedEmailService->passwordResetEmail($recipient, $resetToken));
+        $this->assertEquals($queuedEmailService, $queuedEmailService->passwordResetEmail($recipient, $finishUrl));
         $this->assertQueuePush(
             $messageQueueService,
             'passwordReset',
@@ -52,14 +57,19 @@ final class QueuedEmailServiceTest extends \PHPUnit\Framework\TestCase
     /**
      * @param Queue|null   $queue
      * @param Factory|null $viewFactory
+     * @param string|null  $templatesDir
      *
      * @return QueuedEmailService
      */
-    private function createQueuedEmailService(Queue $queue = null, Factory $viewFactory = null): QueuedEmailService
-    {
+    private function createQueuedEmailService(
+        Queue $queue = null,
+        Factory $viewFactory = null,
+        string $templatesDir = null
+    ): QueuedEmailService {
         return new QueuedEmailService(
             $queue ?: $this->createQueueService(),
-            $viewFactory ?: $this->createViewFactory()
+            $viewFactory ?: $this->createViewFactory(),
+            $templatesDir ?: $this->getFaker()->uuid
         );
     }
 

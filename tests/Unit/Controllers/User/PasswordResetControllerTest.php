@@ -30,8 +30,11 @@ final class PasswordResetControllerTest extends TestCase
     {
         $token = $this->getFaker()->uuid;
         $email = $this->getFaker()->safeEmail;
+        $tokenPlaceholder = $this->getFaker()->uuid;
+        $finishUrl = $this->getFaker()->url;
         $request = $this->createRequest();
         $request->offsetSet('email', $email);
+        $request->offsetSet('finishUrl', $finishUrl . $tokenPlaceholder);
         $user = $this->createUserModel();
         $usersService = $this->createUsersService();
         $this->mockUsersServiceGetUserByEmail($usersService, $user, $email);
@@ -41,9 +44,10 @@ final class PasswordResetControllerTest extends TestCase
 
         $this->assertJsonResponse(
             $this->createJsonResponse($this->createJsonResponseData(), 204),
-            $this->createPasswordResetController()->start($request, $usersService, $jwtService, $emailService)
+            $this->createPasswordResetController($tokenPlaceholder)
+                ->start($request, $usersService, $jwtService, $emailService)
         );
-        $this->assertEmailServicePasswordResetEmail($emailService, $email, $token);
+        $this->assertEmailServicePasswordResetEmail($emailService, $email, $finishUrl . $token);
     }
 
     /**
@@ -86,6 +90,7 @@ final class PasswordResetControllerTest extends TestCase
         $email = $this->getFaker()->safeEmail;
         $request = $this->createRequest();
         $request->offsetSet('email', $email);
+        $request->offsetSet('finishUrl', $this->getFaker()->url);
         $usersService = $this->createUsersService();
         $this->mockUsersServiceGetUserByEmail(
             $usersService,
@@ -104,6 +109,24 @@ final class PasswordResetControllerTest extends TestCase
             )
         );
         $emailService->shouldNotHaveReceived('queueEmail');
+    }
+
+    /**
+     * @return void
+     */
+    public function testStartWithoutFinishUrl(): void
+    {
+        $request = $this->createRequest();
+        $request->offsetSet('email', $this->getFaker()->email);
+
+        $this->expectException(ValidationException::class);
+
+        $this->createPasswordResetController()->start(
+            $request,
+            $this->createUsersService(),
+            $this->createJWTService(),
+            $this->createEmailService()
+        );
     }
 
     /**
@@ -584,11 +607,13 @@ final class PasswordResetControllerTest extends TestCase
     //region Mocks
 
     /**
+     * @param string|null $tokenPlaceHolder
+     *
      * @return PasswordResetController
      */
-    private function createPasswordResetController(): PasswordResetController
+    private function createPasswordResetController(string $tokenPlaceHolder = null): PasswordResetController
     {
-        return new PasswordResetController();
+        return new PasswordResetController($tokenPlaceHolder ?: $this->getFaker()->uuid);
     }
 
     //endregion

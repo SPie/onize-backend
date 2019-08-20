@@ -40,4 +40,6 @@ return [
     */
 
     'fallback_locale' => null,
+
+    'tokenPlaceHolder' => env('APP_TOKEN_PLACE_HOLDER')
 ];

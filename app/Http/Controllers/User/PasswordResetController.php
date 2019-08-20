@@ -27,11 +27,35 @@ final class PasswordResetController extends Controller
     const ROUTE_NAME_RESET_PASSWORD = 'passwordReset.resetPassword';
 
     const REQUEST_PARAMETER_EMAIL            = 'email';
+    const REQUEST_PARAMETER_FINISH_URL       = 'finishUrl';
     const REQUEST_PARAMETER_RESET_TOKEN      = 'resetToken';
     const REQUEST_PARAMETER_PASSWORD         = 'password';
     const REQUEST_PARAMETER_PASSWORD_CONFIRM = 'passwordConfirm';
 
     const CONTEXT_RESET_TOKEN = 'resetToken';
+
+    /**
+     * @var string
+     */
+    private $tokenPlaceHolder;
+
+    /**
+     * PasswordResetController constructor.
+     *
+     * @param string $tokenPlaceHolder
+     */
+    public function __construct(string $tokenPlaceHolder)
+    {
+        $this->tokenPlaceHolder = $tokenPlaceHolder;
+    }
+
+    /**
+     * @return string
+     */
+    private function getTokenPlaceHolder(): string
+    {
+        return $this->tokenPlaceHolder;
+    }
 
     //region Controller actions
 
@@ -55,7 +79,10 @@ final class PasswordResetController extends Controller
         try {
             $emailService->passwordResetEmail(
                 $email,
-                $jwtService->createJWT($usersService->getUserByEmail($email), 15)
+                $this->parseFinishUrlWithToken(
+                    $this->getFinishUrlFromRequest($request),
+                    $jwtService->createJWT($usersService->getUserByEmail($email), 15)
+                )
             );
         } catch (ModelNotFoundException $e) {}
 
@@ -129,6 +156,19 @@ final class PasswordResetController extends Controller
      * @param Request $request
      *
      * @return string
+     */
+    private function getFinishUrlFromRequest(Request $request): string
+    {
+        return $this->validate(
+            $request,
+            [self::REQUEST_PARAMETER_FINISH_URL => ['required']]
+        )[self::REQUEST_PARAMETER_FINISH_URL];
+    }
+
+    /**
+     * @param Request $request
+     *
+     * @return string
      *
      * @throws ValidationException
      */
@@ -182,5 +222,16 @@ final class PasswordResetController extends Controller
             $requestParameters[self::REQUEST_PARAMETER_RESET_TOKEN],
             $requestParameters[self::REQUEST_PARAMETER_PASSWORD]
         ];
+    }
+
+    /**
+     * @param string $finishUrl
+     * @param string $token
+     *
+     * @return string
+     */
+    private function parseFinishUrlWithToken(string $finishUrl, string $token): string
+    {
+        return \str_replace($this->getTokenPlaceHolder(), $token, $finishUrl);
     }
 }
