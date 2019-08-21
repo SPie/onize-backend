@@ -9,5 +9,4 @@ namespace App\Exceptions\Service\MessageQueue;
  */
 final class QueuePushException extends \Exception
 {
-
 }

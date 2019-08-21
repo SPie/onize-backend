@@ -75,6 +75,28 @@ trait EmailHelper
         return $this;
     }
 
+    /**
+     * @param EmailService|MockInterface $emailService
+     * @param string                     $identifier
+     * @param string                     $recipient
+     * @param array                      $context
+     *
+     * @return $this
+     */
+    protected function assertEmailServiceQueueEmail(
+        MockInterface $emailService,
+        string $identifier,
+        string $recipient,
+        array $context
+    ) {
+        $emailService
+            ->shouldHaveReceived('queueEmail')
+            ->with($identifier, $recipient, $context)
+            ->once();
+
+        return $this;
+    }
+
     //endregion
 
     //region Assertions
@@ -90,8 +112,7 @@ trait EmailHelper
         MockInterface $emailService,
         string $recipient,
         string $resetToken
-    )
-    {
+    ) {
         $emailService
             ->shouldHaveReceived('passwordResetEmail')
             ->with($recipient, $resetToken)

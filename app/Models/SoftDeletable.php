@@ -9,7 +9,6 @@ namespace App\Models;
  */
 interface SoftDeletable
 {
-
     const PROPERTY_DELETED_AT = 'deletedAt';
 
     /**

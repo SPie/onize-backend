@@ -51,8 +51,7 @@ trait ModelParameterValidation
         string $parameterName,
         bool $required = true,
         bool $allowEmptyString = false
-    ): ?string
-    {
+    ): ?string {
         $parameter = $this->validateEmptyParameter($data, $parameterName, $required);
 
         if (\is_null($parameter)) {
@@ -133,8 +132,7 @@ trait ModelParameterValidation
         string $parameterName,
         bool $required = true,
         bool $allowEmpty = false
-    ): ?array
-    {
+    ): ?array {
         $parameter = $this->validateEmptyParameter($data, $parameterName, $required);
 
         if (\is_null($parameter)) {
@@ -169,8 +167,7 @@ trait ModelParameterValidation
         ModelFactoryInterface $modelFactory,
         string $modelClassName,
         bool $required = true
-    ): ?ModelInterface
-    {
+    ): ?ModelInterface {
         $parameter = $this->validateEmptyParameter($data, $parameterName, $required);
 
         if (\is_null($parameter) || ($parameter instanceof $modelClassName)) {

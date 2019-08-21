@@ -29,8 +29,7 @@ class Controller extends BaseController
         int $statusCode = Response::HTTP_OK,
         array $headers = [],
         int $options = 0
-    ): JsonResponse
-    {
+    ): JsonResponse {
         return (new ResponseFactory())->json(
             new JsonResponseData($data),
             $statusCode,

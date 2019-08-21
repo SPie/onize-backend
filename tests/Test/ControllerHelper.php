@@ -29,8 +29,7 @@ trait ControllerHelper
         $validatedParameters,
         Request $request,
         array $rules
-    )
-    {
+    ) {
         $expectation = $controller
             ->shouldReceive('validate')
             ->with(
@@ -76,8 +75,7 @@ trait ControllerHelper
         int $statusCode = null,
         array $headers = null,
         int $options = null
-    )
-    {
+    ) {
         $arguments = [];
         if ($data !== null) {
             $arguments[] = Mockery::on(function ($argument) use ($data) {

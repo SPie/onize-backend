@@ -15,7 +15,6 @@ use Test\UserHelper;
  */
 class RefreshTokenDoctrineModelFactoryTest extends TestCase
 {
-
     use AuthHelper;
     use UserHelper;
 
@@ -291,8 +290,7 @@ class RefreshTokenDoctrineModelFactoryTest extends TestCase
      */
     private function createRefreshTokenDoctrineModelFactory(
         UserModelFactoryInterface $userModelFactory = null
-    ): RefreshTokenDoctrineModelFactory
-    {
+    ): RefreshTokenDoctrineModelFactory {
         return (new RefreshTokenDoctrineModelFactory())->setUserModelFactory(
             $userModelFactory ?: $this->createUserModelFactory()
         );
@@ -309,8 +307,7 @@ class RefreshTokenDoctrineModelFactoryTest extends TestCase
         string $identifier = null,
         UserModelInterface $user = null,
         \DateTime $validUntil = null
-    ): RefreshTokenDoctrineModel
-    {
+    ): RefreshTokenDoctrineModel {
         return new RefreshTokenDoctrineModel(
             $identifier ?: $this->getFaker()->uuid,
             $user ?: $this->createUserDoctrineModel(),

@@ -15,7 +15,6 @@ use Test\UserHelper;
  */
 final class PasswordResetControllerTest extends TestCase
 {
-
     use EmailHelper;
     use RequestResponseHelper;
     use ReflectionMethodHelper;

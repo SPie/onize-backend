@@ -13,7 +13,6 @@ use App\Models\ModelParameterValidation;
  */
 class UserDoctrineModelFactory implements UserModelFactoryInterface
 {
-
     use ModelParameterValidation;
 
     /**
@@ -28,8 +27,7 @@ class UserDoctrineModelFactory implements UserModelFactoryInterface
      */
     public function setRefreshTokenModelFactory(
         RefreshTokenModelFactory $refreshTokenModelFactory
-    ): UserModelFactoryInterface
-    {
+    ): UserModelFactoryInterface {
         $this->refreshTokenModelFactory = $refreshTokenModelFactory;
 
         return $this;
@@ -54,7 +52,7 @@ class UserDoctrineModelFactory implements UserModelFactoryInterface
     {
         return (new UserDoctrineModel(
             $this->validateStringParameter($data, UserModelInterface::PROPERTY_EMAIL),
-            $this->validateStringParameter($data,UserModelInterface::PROPERTY_PASSWORD),
+            $this->validateStringParameter($data, UserModelInterface::PROPERTY_PASSWORD),
             $this->validateRefreshTokens($data),
             $this->validateDateTimeParameter($data, UserModelInterface::PROPERTY_CREATED_AT, false),
             $this->validateDateTimeParameter($data, UserModelInterface::PROPERTY_UPDATED_AT, false),

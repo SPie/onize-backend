@@ -13,7 +13,6 @@ use Illuminate\Http\Request;
  */
 class ApiSignature
 {
-
     const ALGORITHM_SHA_512 = 'sha512';
 
     const HEADER_SIGNATURE = 'x-signature';

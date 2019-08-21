@@ -8,7 +8,6 @@ use Faker\Generator;
  */
 abstract class TestCase extends Laravel\Lumen\Testing\TestCase
 {
-
     const BEARER_AUTHORIZATION = 'Authorization';
 
     /**

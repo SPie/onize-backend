@@ -21,7 +21,6 @@ use Illuminate\Validation\ValidationException;
  */
 final class PasswordResetController extends Controller
 {
-
     const ROUTE_NAME_START          = 'passwordReset.start';
     const ROUTE_NAME_VERIFY_TOKEN   = 'passwordReset.verifyToken';
     const ROUTE_NAME_RESET_PASSWORD = 'passwordReset.resetPassword';
@@ -72,8 +71,7 @@ final class PasswordResetController extends Controller
         UsersServiceInterface $usersService,
         JWTService $jwtService,
         EmailService $emailService
-    ): JsonResponse
-    {
+    ): JsonResponse {
         $email = $this->getEmailFromRequest($request);
 
         try {
@@ -84,7 +82,8 @@ final class PasswordResetController extends Controller
                     $jwtService->createJWT($usersService->getUserByEmail($email), 15)
                 )
             );
-        } catch (ModelNotFoundException $e) {}
+        } catch (ModelNotFoundException $e) {
+        }
 
         return $this->createResponse([], Response::HTTP_NO_CONTENT);
     }
@@ -100,8 +99,7 @@ final class PasswordResetController extends Controller
         Request $request,
         UsersServiceInterface $usersService,
         JWTService $jwtService
-    ): JsonResponse
-    {
+    ): JsonResponse {
         $this->getUserFromToken($usersService, $jwtService, $this->getResetTokenFromRequest($request));
 
         return $this->createResponse([], Response::HTTP_NO_CONTENT);
@@ -118,8 +116,7 @@ final class PasswordResetController extends Controller
         Request $request,
         UsersServiceInterface $usersService,
         JWTService $jwtService
-    ): JsonResponse
-    {
+    ): JsonResponse {
         list($resetToken, $password) = $this->getRequestParametersForPasswordReset($request);
 
         $usersService->editUser(
@@ -193,8 +190,7 @@ final class PasswordResetController extends Controller
         UsersServiceInterface $usersService,
         JWTService $jwtService,
         string $token
-    ): UserModelInterface
-    {
+    ): UserModelInterface {
         try {
             return $usersService->getUserByEmail($jwtService->verifyJWT($token));
         } catch (ModelNotFoundException $e) {
