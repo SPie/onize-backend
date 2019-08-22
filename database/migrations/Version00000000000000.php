@@ -67,6 +67,17 @@ class Version00000000000000 extends AbstractMigration
         return $this;
     }
 
+    private function createLoginAttemptsTable(Schema $schema)
+    {
+        (new Builder($schema))->create('login_attempts', function (Table $table) {
+            $table->increments('id');
+            $table->string('ip_address');
+            $table->string('identifier');
+            $table->dateTime('attempted_at');
+            $table->boolean('success');
+        });
+    }
+
     //endregion
 
     /**

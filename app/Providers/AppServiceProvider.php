@@ -4,13 +4,17 @@ namespace App\Providers;
 
 use App\Http\Controllers\User\PasswordResetController;
 use App\Http\Middleware\ApiSignature;
+use App\Models\User\LoginAttemptDoctrineModel;
+use App\Models\User\LoginAttemptModel;
 use App\Models\User\RefreshTokenDoctrineModel;
 use App\Models\User\RefreshTokenDoctrineModelFactory;
+use App\Models\User\RefreshTokenModel;
 use App\Models\User\RefreshTokenModelFactory;
 use App\Models\User\UserDoctrineModel;
 use App\Models\User\UserDoctrineModelFactory;
 use App\Models\User\UserModelFactoryInterface;
 use App\Models\User\UserModelInterface;
+use App\Repositories\User\LoginAttemptRepository;
 use App\Repositories\User\RefreshTokenRepository;
 use App\Repositories\User\UserRepository;
 use App\Services\Email\EmailService;
@@ -58,6 +62,8 @@ class AppServiceProvider extends ServiceProvider
     private function registerModels()
     {
         $this->app->bind(UserModelInterface::class, UserDoctrineModel::class);
+        $this->app->bind(RefreshTokenModel::class, RefreshTokenDoctrineModel::class);
+        $this->app->bind(LoginAttemptModel::class, LoginAttemptDoctrineModel::class);
 
         return $this;
     }
@@ -67,8 +73,7 @@ class AppServiceProvider extends ServiceProvider
      */
     private function registerRepositories()
     {
-        /** @var EntityManager $entityManager */
-        $entityManager = $this->app->get(EntityManager::class);
+        $entityManager = $this->getEntityManager();
 
         $this->app->singleton(UserRepository::class, function () use ($entityManager) {
             return $entityManager->getRepository(UserDoctrineModel::class);
@@ -76,6 +81,10 @@ class AppServiceProvider extends ServiceProvider
 
         $this->app->singleton(RefreshTokenRepository::class, function () use ($entityManager) {
             return $entityManager->getRepository(RefreshTokenDoctrineModel::class);
+        });
+
+        $this->app->singleton(LoginAttemptRepository::class, function () use ($entityManager) {
+            return $entityManager->getRepository(LoginAttemptDoctrineModel::class);
         });
 
         return $this;
@@ -170,5 +179,13 @@ class AppServiceProvider extends ServiceProvider
     private function getQueueManager(): QueueManager
     {
         return  $this->app->get('queue');
+    }
+
+    /**
+     * @return EntityManager
+     */
+    private function getEntityManager(): EntityManager
+    {
+        return $this->app->get(EntityManager::class);
     }
 }
