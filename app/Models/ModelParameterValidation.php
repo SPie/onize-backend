@@ -11,7 +11,6 @@ use App\Exceptions\InvalidParameterException;
  */
 trait ModelParameterValidation
 {
-
     /**
      * @param array  $data
      * @param string $parameterName
@@ -179,6 +178,26 @@ trait ModelParameterValidation
         }
 
         return $modelFactory->create($parameter);
+    }
+
+    /**
+     * @param array  $data
+     * @param string $parameterName
+     * @param bool   $required
+     *
+     * @return bool|null
+     *
+     * @throws InvalidParameterException
+     */
+    private function validateBooleanParameter(array $data, string $parameterName, bool $required = true): ?bool
+    {
+        $parameter = $this->validateEmptyParameter($data, $parameterName, $required);
+
+        if (\is_null($parameter) || \is_bool($parameter)) {
+            return $parameter;
+        }
+
+        throw new InvalidParameterException('Parameter ' . $parameterName . ' has to be boolean');
     }
 
     /**

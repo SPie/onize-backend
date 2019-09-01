@@ -2,10 +2,12 @@
 
 namespace App\Http\Controllers\User;
 
+use App\Exceptions\Auth\NotAuthenticatedException;
 use App\Http\Controllers\Controller;
 use App\Models\User\UserDoctrineModel;
 use App\Models\User\UserModelInterface;
 use App\Services\JWT\JWTService;
+use App\Services\Security\LoginThrottlingServiceInterface;
 use App\Services\User\UsersServiceInterface;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -28,10 +30,10 @@ class UsersController extends Controller
     const ROUTE_NAME_AUTHENTICATED        = 'users.authenticated';
     const ROUTE_NAME_REFRESH_ACCESS_TOKEN = 'users.refreshAccessToken';
 
-    const RESPONSE_PARAMETER_USERS = 'users';
     const RESPONSE_PARAMETER_USER  = 'user';
 
-    const REQUEST_PARAMETER_REMEMBER = 'remember';
+    const REQUEST_PARAMETER_REMEMBER   = 'remember';
+    const REQUEST_PARAMETER_IP_ADDRESS = 'ipAddress';
 
     const USER_DATA_PASSWORD_CONFIRM = 'passwordConfirm';
     const USER_DATA_PASSWORD_CURRENT = 'currentPassword';
@@ -66,14 +68,6 @@ class UsersController extends Controller
         return $this->usersService;
     }
 
-    /**
-     * @return JWTService
-     */
-    protected function getJwtService(): JWTService
-    {
-        return $this->jwtService;
-    }
-
     //region Controller actions
 
     /**
@@ -103,24 +97,40 @@ class UsersController extends Controller
     }
 
     /**
-     * @param Request    $request
-     * @param JWTService $jwtService
+     * @param Request                         $request
+     * @param JWTService                      $jwtService
+     * @param LoginThrottlingServiceInterface $loginThrottlingService
      *
      * @return JsonResponse|Response
      *
      * @throws ValidationException
      */
-    public function login(Request $request, JWTService $jwtService): JsonResponse
-    {
+    public function login(
+        Request $request,
+        JWTService $jwtService,
+        LoginThrottlingServiceInterface $loginThrottlingService
+    ): JsonResponse {
+        $requestParameters = $this->validate(
+            $request,
+            [
+                UserModelInterface::PROPERTY_EMAIL    => ['required'],
+                UserModelInterface::PROPERTY_PASSWORD => ['required'],
+                self::REQUEST_PARAMETER_IP_ADDRESS    => ['required'],
+            ]
+        );
+
+        if (
+            $loginThrottlingService->isLoginBlocked(
+                $requestParameters[self::REQUEST_PARAMETER_IP_ADDRESS],
+                $requestParameters[UserModelInterface::PROPERTY_EMAIL]
+            )
+        ) {
+            throw new NotAuthenticatedException();
+        }
+
         return $jwtService->login(
             $this->createResponse([], Response::HTTP_NO_CONTENT),
-            $this->validate(
-                $request,
-                [
-                    UserModelInterface::PROPERTY_EMAIL    => ['required'],
-                    UserModelInterface::PROPERTY_PASSWORD => ['required'],
-                ]
-            ),
+            $requestParameters,
             $request->get(self::REQUEST_PARAMETER_REMEMBER, false)
         );
     }

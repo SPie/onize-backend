@@ -7,7 +7,6 @@ use App\Exceptions\ModelNotFoundException;
 use App\Models\User\UserModelFactoryInterface;
 use App\Models\User\UserModelInterface;
 use App\Repositories\User\UserRepository;
-use App\Services\JWT\JWTService;
 
 /**
  * Class UsersService
@@ -28,25 +27,15 @@ class UsersService implements UsersServiceInterface
     private $userModelFactory;
 
     /**
-     * @var JWTService
-     */
-    private $jwtService;
-
-    /**
      * UsersService constructor.
      *
      * @param UserRepository            $userRepository
      * @param UserModelFactoryInterface $userModelFactory
-     * @param JWTService                $jwtService
      */
-    public function __construct(
-        UserRepository $userRepository,
-        UserModelFactoryInterface $userModelFactory,
-        JWTService $jwtService
-    ) {
+    public function __construct(UserRepository $userRepository, UserModelFactoryInterface $userModelFactory)
+    {
         $this->userRepository = $userRepository;
         $this->userModelFactory = $userModelFactory;
-        $this->jwtService = $jwtService;
     }
 
     /**
@@ -63,14 +52,6 @@ class UsersService implements UsersServiceInterface
     protected function getUserModelFactory(): UserModelFactoryInterface
     {
         return $this->userModelFactory;
-    }
-
-    /**
-     * @return JWTService
-     */
-    protected function getJWTService(): JWTService
-    {
-        return $this->jwtService;
     }
 
     /**

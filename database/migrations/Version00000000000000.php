@@ -24,7 +24,8 @@ class Version00000000000000 extends AbstractMigration
     {
         $this
             ->createUsersTable($schema)
-            ->createRefreshTokensTable($schema);
+            ->createRefreshTokensTable($schema)
+            ->createLoginAttemptsTable($schema);
     }
 
     /**

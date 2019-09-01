@@ -7,6 +7,7 @@ use App\Models\User\UserDoctrineModel;
 use App\Models\User\UserModelInterface;
 use App\Services\JWT\JWTService;
 use App\Services\User\UsersServiceInterface;
+use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
 use Illuminate\Validation\ValidationException;
 use Mockery\MockInterface;
@@ -14,6 +15,7 @@ use Symfony\Component\HttpFoundation\Response;
 use Test\AuthHelper;
 use Test\ControllerHelper;
 use Test\RequestResponseHelper;
+use Test\SecurityHelper;
 use Test\UserHelper;
 
 /**
@@ -24,6 +26,7 @@ class UsersControllerTest extends TestCase
     use AuthHelper;
     use ControllerHelper;
     use RequestResponseHelper;
+    use SecurityHelper;
     use UserHelper;
 
     //region Tests
@@ -265,21 +268,13 @@ class UsersControllerTest extends TestCase
      */
     public function testLoginWithInvalidRequestParameters(): void
     {
-        $request = $this->createRequest();
-        $usersController = $this->createUsersController();
-        $this->mockControllerValidate(
-            $usersController,
-            $this->createValidationException(),
-            $request,
-            [
-                'email'    => ['required'],
-                'password' => ['required'],
-            ]
-        );
-
         $this->expectException(ValidationException::class);
 
-        $usersController->login($request, $this->createJWTService());
+        $this->createUsersController()->login(
+            $this->createRequest(),
+            $this->createJWTService(),
+            $this->createLoginThrottlingService()
+        );
     }
 
     /**
@@ -287,38 +282,30 @@ class UsersControllerTest extends TestCase
      */
     public function testLoginWithoutRefreshToken(): void
     {
-        $request = $this->createRequest();
-        $response = $this->createJsonResponse('', 204);
         $email = $this->getFaker()->safeEmail;
         $password = $this->getFaker()->password;
+        $ipAddress = $this->getFaker()->ipv4;
+        $request = $this->createRequestForLogin($email, $password, $ipAddress);
+        $response = $this->createJsonResponse('', 204);
         $jwtService = $this->createJWTService();
         $this->mockJWTServiceLogin(
             $jwtService,
             $response,
             $response,
             [
-                'email'    => $email,
-                'password' => $password,
+                'email'     => $email,
+                'password'  => $password,
+                'ipAddress' => $ipAddress,
             ],
             false
         );
         $usersController = $this->createUsersController();
-        $this
-            ->mockControllerCreateResponse($usersController, $response, [], 204)
-            ->mockControllerValidate(
-                $usersController,
-                [
-                    'email'    => $email,
-                    'password' => $password,
-                ],
-                $request,
-                [
-                    'email'    => ['required'],
-                    'password' => ['required'],
-                ]
-            );
+        $this->mockControllerCreateResponse($usersController, $response, [], 204);
 
-        $this->assertEquals($response, $usersController->login($request, $jwtService));
+        $this->assertEquals(
+            $response,
+            $usersController->login($request, $jwtService, $this->createLoginThrottlingService())
+        );
     }
 
     /**
@@ -326,39 +313,80 @@ class UsersControllerTest extends TestCase
      */
     public function testLoginWithRefreshToken(): void
     {
-        $request = $this->createRequest();
-        $request->offsetSet('remember', true);
-        $response = $this->createJsonResponse('', 204);
         $email = $this->getFaker()->safeEmail;
         $password = $this->getFaker()->password;
+        $ipAddress = $this->getFaker()->ipv4;
+        $request = $this->createRequestForLogin($email, $password, $ipAddress, true);
+        $response = $this->createJsonResponse('', 204);
         $jwtService = $this->createJWTService();
         $this->mockJWTServiceLogin(
             $jwtService,
             $response,
             $response,
             [
-                'email'    => $email,
-                'password' => $password,
+                'email'     => $email,
+                'password'  => $password,
+                'ipAddress' => $ipAddress,
             ],
             true
         );
         $usersController = $this->createUsersController();
-        $this
-            ->mockControllerCreateResponse($usersController, $response, [], 204)
-            ->mockControllerValidate(
-                $usersController,
-                [
-                    'email'    => $email,
-                    'password' => $password,
-                ],
-                $request,
-                [
-                    'email'    => ['required'],
-                    'password' => ['required'],
-                ]
-            );
+        $this->mockControllerCreateResponse($usersController, $response, [], 204);
 
-        $this->assertEquals($response, $usersController->login($request, $jwtService));
+        $this->assertEquals(
+            $response,
+            $usersController->login($request, $jwtService, $this->createLoginThrottlingService())
+        );
+    }
+
+    /**
+     * @return void
+     */
+    public function testLoginWithTooManyLoginAttempts(): void
+    {
+        $email = $this->getFaker()->safeEmail;
+        $password = $this->getFaker()->password;
+        $ipAddress = $this->getFaker()->ipv4;
+        $loginThrottlingService = $this->createLoginThrottlingService();
+        $this->mockLoginThrottlingServiceIsLoginBlocked($loginThrottlingService, true, $ipAddress, $email);
+
+        $this->expectException(NotAuthenticatedException::class);
+
+        $this->createUsersController()->login(
+            $this->createRequestForLogin($email, $password, $ipAddress),
+            $this->createJWTService(),
+            $loginThrottlingService
+        );
+    }
+
+    /**
+     * @return void
+     */
+    public function testLoginWithInvalidLogin(): void
+    {
+        $email = $this->getFaker()->safeEmail;
+        $password = $this->getFaker()->password;
+        $ipAddress = $this->getFaker()->ipv4;
+        $request = $this->createRequestForLogin($email, $password, $ipAddress);
+        $response = $this->createJsonResponse('', 204);
+        $jwtService = $this->createJWTService();
+        $this->mockJWTServiceLogin(
+            $jwtService,
+            new NotAuthenticatedException(),
+            $response,
+            [
+                'email'     => $email,
+                'password'  => $password,
+                'ipAddress' => $ipAddress,
+            ],
+            false
+        );
+        $usersController = $this->createUsersController();
+        $this->mockControllerCreateResponse($usersController, $response, [], 204);
+
+        $this->expectException(NotAuthenticatedException::class);
+
+        $usersController->login($request, $jwtService, $this->createLoginThrottlingService());
     }
 
     /**
@@ -486,17 +514,17 @@ class UsersControllerTest extends TestCase
     }
 
     /**
-     * @param MockInterface $jwtService
-     * @param Response      $response
-     * @param Response      $inputResponse
-     * @param array         $credentials
-     * @param bool          $withRefreshToken
+     * @param MockInterface       $jwtService
+     * @param Response|\Exception $response
+     * @param Response            $inputResponse
+     * @param array               $credentials
+     * @param bool                $withRefreshToken
      *
      * @return UsersControllerTest
      */
     private function mockJWTServiceLogin(
         MockInterface $jwtService,
-        Response $response,
+        $response,
         Response $inputResponse,
         array $credentials,
         bool $withRefreshToken
@@ -510,7 +538,7 @@ class UsersControllerTest extends TestCase
                 $credentials,
                 $withRefreshToken
             )
-            ->andReturn($response);
+            ->andThrow($response);
 
         return $this;
     }
@@ -570,6 +598,29 @@ class UsersControllerTest extends TestCase
         $reflectionMethod->setAccessible(true);
 
         return $reflectionMethod;
+    }
+
+    /**
+     * @param string|null $email
+     * @param string|null $password
+     * @param string|null $ipAddress
+     * @param bool        $remember
+     *
+     * @return Request
+     */
+    private function createRequestForLogin(
+        string $email = null,
+        string $password = null,
+        string $ipAddress = null,
+        bool $remember = false
+    ): Request {
+        $request = $this->createRequest();
+        $request->offsetSet('email', $email ?: $this->getFaker()->safeEmail);
+        $request->offsetSet('password', $password ?: $this->getFaker()->password);
+        $request->offsetSet('ipAddress', $ipAddress ?: $this->getFaker()->ipv4);
+        $request->offsetSet('remember', $remember);
+
+        return $request;
     }
 
     //endregion

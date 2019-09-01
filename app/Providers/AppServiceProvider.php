@@ -23,6 +23,8 @@ use App\Services\JWT\JWTRefreshTokenRepository;
 use App\Services\JWT\JWTService;
 use App\Services\JWT\SPieJWTRefreshTokenRepository;
 use App\Services\JWT\SPieLaravelJWTService;
+use App\Services\Security\LoginThrottlingService;
+use App\Services\Security\LoginThrottlingServiceInterface;
 use App\Services\User\UsersService;
 use App\Services\User\UsersServiceInterface;
 use Doctrine\ORM\EntityManager;
@@ -126,6 +128,13 @@ class AppServiceProvider extends ServiceProvider
                 $this->getQueueManager()->connection('rabbitmq'),
                 $this->app->make(Factory::class),
                 $this->app['config']['email.templatesDir']
+            );
+        });
+        $this->app->singleton(LoginThrottlingServiceInterface::class, function ($app) {
+            return new LoginThrottlingService(
+                $this->app->get(LoginAttemptRepository::class),
+                $this->app['config']['security.maxLoginAttempts'],
+                $this->app['config']['security.throttlingTimeInMinutes']
             );
         });
 

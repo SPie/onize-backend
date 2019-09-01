@@ -3,6 +3,7 @@
 namespace App\Models\User;
 
 use App\Models\AbstractDoctrineModel;
+use Doctrine\ORM\Mapping as ORM;
 
 /**
  * Class LoginAttemptDoctrineModel

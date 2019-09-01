@@ -49,6 +49,7 @@ class AuthApiCallsTest extends IntegrationTestCase
                     [UserModelInterface::PROPERTY_PASSWORD => Hash::make($password)]
                 )->first()->getEmail(),
                 UserModelInterface::PROPERTY_PASSWORD => $password,
+                'ipAddress'                           => $this->getFaker()->ipv4,
             ]
         );
 
@@ -61,7 +62,7 @@ class AuthApiCallsTest extends IntegrationTestCase
      *
      * @throws Exception
      */
-    public function testLoginWithoutCredentials(): void
+    public function testLoginWithoutCredentialsAndIpAddress(): void
     {
         $response = $this->doApiCall(
             URL::route(UsersController::ROUTE_NAME_LOGIN),
@@ -77,6 +78,8 @@ class AuthApiCallsTest extends IntegrationTestCase
         $this->assertEquals('validation.required', \reset($responseData[UserModelInterface::PROPERTY_EMAIL]));
         $this->assertArrayHasKey(UserModelInterface::PROPERTY_PASSWORD, $responseData);
         $this->assertEquals('validation.required', \reset($responseData[UserModelInterface::PROPERTY_PASSWORD]));
+        $this->assertArrayHasKey('ipAddress', $responseData);
+        $this->assertEquals('validation.required', \reset($responseData['ipAddress']));
     }
 
     /**
@@ -92,6 +95,7 @@ class AuthApiCallsTest extends IntegrationTestCase
             [
                 UserModelInterface::PROPERTY_EMAIL    => $this->getFaker()->safeEmail,
                 UserModelInterface::PROPERTY_PASSWORD => $this->getFaker()->password(),
+                'ipAddress'                           => $this->getFaker()->ipv4,
             ]
         );
 
@@ -112,6 +116,7 @@ class AuthApiCallsTest extends IntegrationTestCase
             [
                 UserModelInterface::PROPERTY_EMAIL    => $this->createUsers()->first()->getEmail(),
                 UserModelInterface::PROPERTY_PASSWORD => $this->getFaker()->password(),
+                'ipAddress'                           => $this->getFaker()->ipv4,
             ]
         );
 
@@ -135,13 +140,49 @@ class AuthApiCallsTest extends IntegrationTestCase
                     [UserModelInterface::PROPERTY_PASSWORD => Hash::make($password)]
                 )->first()->getEmail(),
                 UserModelInterface::PROPERTY_PASSWORD => $password,
-                'remember' => true
+                'remember'                            => true,
+                'ipAddress'                           => $this->getFaker()->ipv4,
             ]
         );
 
         $this->assertResponseStatus(Response::HTTP_NO_CONTENT);
         $this->assertNotEmpty($this->getAuthorizationHeader($response));
         $this->assertNotEmpty($this->getRefreshTokenCookie($response));
+    }
+
+    /**
+     * @return void
+     */
+    public function testLoginWithBlockedLogin(): void
+    {
+        $ipAddress = $this->getFaker()->ipv4;
+        $password = $this->getFaker()->password();
+        $user = $this->createUsers(
+            1,
+            [UserModelInterface::PROPERTY_PASSWORD => Hash::make($password)]
+        )->first();
+        $this->createLoginAttempts(
+            3,
+            [
+                'success'     => false,
+                'attemptedAt' => new \DateTime(),
+                'ipAddress'   => $ipAddress,
+                'identifier'  => $user->getEmail(),
+            ]
+        );
+
+        $response = $this->doApiCall(
+            URL::route(UsersController::ROUTE_NAME_LOGIN),
+            Request::METHOD_POST,
+            [
+                UserModelInterface::PROPERTY_EMAIL    => $user->getEmail(),
+                UserModelInterface::PROPERTY_PASSWORD => $password,
+                'ipAddress'                           => $ipAddress,
+            ]
+        );
+
+        $this->assertResponseStatus(Response::HTTP_UNAUTHORIZED);
+        $this->assertEmpty($this->getAuthorizationHeader($response));
     }
 
     /**

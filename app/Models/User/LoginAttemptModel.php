@@ -11,6 +11,11 @@ use App\Models\ModelInterface;
  */
 interface LoginAttemptModel extends ModelInterface
 {
+    const PROPERTY_IP_ADDRESS   = 'ipAddress';
+    const PROPERTY_IDENTIFIER   = 'identifier';
+    const PROPERTY_ATTEMPTED_AT = 'attemptedAt';
+    const PROPERTY_SUCCESS      = 'success';
+
     /**
      * @param string $ioAddress
      *
