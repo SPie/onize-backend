@@ -27,7 +27,7 @@ final class LoginAttemptDoctrineModelFactory implements LoginAttemptModelFactory
         return (new LoginAttemptDoctrineModel(
             $this->validateStringParameter($data, LoginAttemptModel::PROPERTY_IP_ADDRESS),
             $this->validateStringParameter($data, LoginAttemptModel::PROPERTY_IDENTIFIER),
-            $this->validateDateTimeParameter($data, LoginAttemptModel::PROPERTY_ATTEMPTED_AT),
+            $this->validateDateTimeImmutableParameter($data, LoginAttemptModel::PROPERTY_ATTEMPTED_AT),
             $this->validateBooleanParameter($data, LoginAttemptModel::PROPERTY_SUCCESS)
         ))->setId($this->validateIntegerParameter($data, LoginAttemptModel::PROPERTY_ID, false));
     }
@@ -65,7 +65,7 @@ final class LoginAttemptDoctrineModelFactory implements LoginAttemptModelFactory
             $model->setIdentifier($identifier);
         }
 
-        $attemptedAt = $this->validateDateTimeParameter(
+        $attemptedAt = $this->validateDateTimeImmutableParameter(
             $data,
             LoginAttemptModel::PROPERTY_ATTEMPTED_AT,
             false

@@ -5,7 +5,9 @@ namespace App\Providers;
 use App\Http\Controllers\User\PasswordResetController;
 use App\Http\Middleware\ApiSignature;
 use App\Models\User\LoginAttemptDoctrineModel;
+use App\Models\User\LoginAttemptDoctrineModelFactory;
 use App\Models\User\LoginAttemptModel;
+use App\Models\User\LoginAttemptModelFactory;
 use App\Models\User\RefreshTokenDoctrineModel;
 use App\Models\User\RefreshTokenDoctrineModelFactory;
 use App\Models\User\RefreshTokenModel;
@@ -99,6 +101,7 @@ class AppServiceProvider extends ServiceProvider
     {
         $this->app->singleton(UserModelFactoryInterface::class, UserDoctrineModelFactory::class);
         $this->app->singleton(RefreshTokenModelFactory::class, RefreshTokenDoctrineModelFactory::class);
+        $this->app->singleton(LoginAttemptModelFactory::class, LoginAttemptDoctrineModelFactory::class);
 
         return $this;
     }
@@ -133,6 +136,7 @@ class AppServiceProvider extends ServiceProvider
         $this->app->singleton(LoginThrottlingServiceInterface::class, function ($app) {
             return new LoginThrottlingService(
                 $this->app->get(LoginAttemptRepository::class),
+                $this->app->get(LoginAttemptModelFactory::class),
                 $this->app['config']['security.maxLoginAttempts'],
                 $this->app['config']['security.throttlingTimeInMinutes']
             );

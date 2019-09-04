@@ -41,16 +41,16 @@ interface LoginAttemptModel extends ModelInterface
     public function getIdentifier(): string;
 
     /**
-     * @param \DateTime $attemptedAt
+     * @param \DateTimeImmutable $attemptedAt
      *
      * @return LoginAttemptModel
      */
-    public function setAttemptedAt(\DateTime $attemptedAt): LoginAttemptModel;
+    public function setAttemptedAt(\DateTimeImmutable $attemptedAt): LoginAttemptModel;
 
     /**
-     * @return \DateTime
+     * @return \DateTimeImmutable
      */
-    public function getAttemptedAt(): \DateTime;
+    public function getAttemptedAt(): \DateTimeImmutable;
 
     /**
      * @param bool $success

@@ -4,6 +4,7 @@ namespace Test;
 
 use App\Models\User\LoginAttemptDoctrineModel;
 use App\Models\User\LoginAttemptModel;
+use App\Models\User\LoginAttemptModelFactory;
 use App\Models\User\UserDoctrineModel;
 use App\Models\User\UserModelFactoryInterface;
 use App\Models\User\UserModelInterface;
@@ -465,10 +466,11 @@ trait UserHelper
         \DateTime $attemptedAt = null,
         bool $success = null
     ): LoginAttemptDoctrineModel {
+        $attemptedAt = $attemptedAt ?: $this->getFaker()->dateTime;
         return new LoginAttemptDoctrineModel(
             $ipAddress ?: $this->getFaker()->ipv4,
             $identifier ?: $this->getFaker()->uuid,
-            $attemptedAt ?: $this->getFaker()->dateTime,
+            new \DateTimeImmutable($attemptedAt->format('Y-m-d H:i:s')),
             $success ?: $this->getFaker()->boolean
         );
     }
@@ -525,7 +527,7 @@ trait UserHelper
             ->with(
                 $ipAddress,
                 $identifier,
-                Mockery::on(function (\DateTimeImmutable $argument) use  ($since) {
+                Mockery::on(function (\DateTimeImmutable $argument) use ($since) {
                     return (
                         $argument > $since->sub(new \DateInterval('PT5S'))
                         && $argument < $since->add(new \DateInterval('PT5S'))
@@ -535,6 +537,14 @@ trait UserHelper
             ->andReturn($loginAttempts);
 
         return $this;
+    }
+
+    /**
+     * @return LoginAttemptModelFactory|MockInterface
+     */
+    private function createLoginAttemptModelFactory(): LoginAttemptModelFactory
+    {
+        return Mockery::spy(LoginAttemptModelFactory::class);
     }
 
     /**

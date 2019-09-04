@@ -152,4 +152,26 @@ trait RepositoryHelper
 
         return $this;
     }
+
+    //region Assertions
+
+    /**
+     * @param RepositoryInterface|MockInterface $repository
+     * @param ModelInterface                    $model
+     *
+     * @return $this
+     */
+    private function assertRepositorySave(MockInterface $repository, ModelInterface $model)
+    {
+        $repository
+            ->shouldHaveReceived('save')
+            ->with(Mockery::on(function ($argument) use ($model) {
+                return $argument == $model;
+            }))
+            ->once();
+
+        return $this;
+    }
+
+    //endregion
 }

@@ -23,7 +23,7 @@ final class LoginAttemptDoctrineModelFactoryTest extends TestCase
             'id'          => $this->getFaker()->numberBetween(),
             'ipAddress'   => $this->getFaker()->ipv4,
             'identifier'  => $this->getFaker()->uuid,
-            'attemptedAt' => $this->getFaker()->dateTime,
+            'attemptedAt' => new \DateTimeImmutable($this->getFaker()->dateTime->format('Y-m-d H:i:s')),
             'success'     => $this->getFaker()->boolean,
         ];
 
@@ -197,7 +197,7 @@ final class LoginAttemptDoctrineModelFactoryTest extends TestCase
             'id' => $this->getFaker()->numberBetween(),
             'ipAddress' => $this->getFaker()->ipv4,
             'identifier' => $this->getFaker()->uuid,
-            'attemptedAt' => $this->getFaker()->dateTime,
+            'attemptedAt' => new \DateTimeImmutable($this->getFaker()->dateTime->format('Y-m-d H:i:s')),
             'success' => $this->getFaker()->boolean,
         ];
 

@@ -23,6 +23,30 @@ trait SecurityHelper
 
     /**
      * @param LoginThrottlingServiceInterface|MockInterface $loginThrottlingService
+     * @param LoginThrottlingServiceInterface|\Exception    $returnValue
+     * @param string                                        $ipAddress
+     * @param string                                        $identifier
+     * @param bool                                          $success
+     *
+     * @return $this
+     */
+    private function mockLoginThrottlingServiceLogLoginAttempt(
+        MockInterface $loginThrottlingService,
+        $returnValue,
+        string $ipAddress,
+        string $identifier,
+        bool $success
+    ) {
+        $loginThrottlingService
+            ->shouldReceive('logLoginAttempt')
+            ->with($ipAddress, $identifier, $success)
+            ->andThrow($returnValue);
+
+        return $this;
+    }
+
+    /**
+     * @param LoginThrottlingServiceInterface|MockInterface $loginThrottlingService
      * @param bool                                          $isBlocked
      * @param string                                        $ipAddress
      * @param string                                        $identifier
@@ -42,4 +66,30 @@ trait SecurityHelper
 
         return $this;
     }
+
+    //region Assertions
+
+    /**
+     * @param LoginThrottlingServiceInterface|MockInterface $loginThrottlingService
+     * @param string                                        $ipAddress
+     * @param string                                        $identifier
+     * @param bool                                          $success
+     *
+     * @return $this
+     */
+    private function assertLoginThrottlingServiceLogLoginAttempt(
+        MockInterface $loginThrottlingService,
+        string $ipAddress,
+        string $identifier,
+        bool $success
+    ) {
+        $loginThrottlingService
+            ->shouldHaveReceived('logLoginAttempt')
+            ->with($ipAddress, $identifier, $success)
+            ->once();
+
+        return $this;
+    }
+
+    //endregion
 }

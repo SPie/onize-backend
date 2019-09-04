@@ -32,7 +32,7 @@ final class LoginAttemptDoctrineModel extends AbstractDoctrineModel implements L
     /**
      * @ORM\Column(name="attempted_at", type="datetime", nullable=true)
      *
-     * @var \DateTime
+     * @var \DateTimeImmutable
      */
     private $attemptedAt;
 
@@ -46,12 +46,12 @@ final class LoginAttemptDoctrineModel extends AbstractDoctrineModel implements L
     /**
      * LoginAttemptDoctrineModel constructor.
      *
-     * @param string    $ipAddress
-     * @param string    $identifier
-     * @param \DateTime $attemptedAt
-     * @param bool      $success
+     * @param string             $ipAddress
+     * @param string             $identifier
+     * @param \DateTimeImmutable $attemptedAt
+     * @param bool               $success
      */
-    public function __construct(string $ipAddress, string $identifier, \DateTime $attemptedAt, bool $success)
+    public function __construct(string $ipAddress, string $identifier, \DateTimeImmutable $attemptedAt, bool $success)
     {
         $this->ipAddress = $ipAddress;
         $this->identifier = $identifier;
@@ -100,11 +100,11 @@ final class LoginAttemptDoctrineModel extends AbstractDoctrineModel implements L
     }
 
     /**
-     * @param \DateTime $attemptedAt
+     * @param \DateTimeImmutable $attemptedAt
      *
      * @return LoginAttemptModel
      */
-    public function setAttemptedAt(\DateTime $attemptedAt): LoginAttemptModel
+    public function setAttemptedAt(\DateTimeImmutable $attemptedAt): LoginAttemptModel
     {
         $this->attemptedAt = $attemptedAt;
 
@@ -112,9 +112,9 @@ final class LoginAttemptDoctrineModel extends AbstractDoctrineModel implements L
     }
 
     /**
-     * @return \DateTime
+     * @return \DateTimeImmutable
      */
-    public function getAttemptedAt(): \DateTime
+    public function getAttemptedAt(): \DateTimeImmutable
     {
         return $this->attemptedAt;
     }

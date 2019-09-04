@@ -2,7 +2,9 @@
 
 namespace App\Providers;
 
+use App\Listeners\User\LogFailedLoginAttempt;
 use Laravel\Lumen\Providers\EventServiceProvider as ServiceProvider;
+use SPie\LaravelJWT\Events\FailedLoginAttempt;
 
 /**
  * Class EventServiceProvider
@@ -17,6 +19,8 @@ class EventServiceProvider extends ServiceProvider
      * @var array
      */
     protected $listen = [
-
+        FailedLoginAttempt::class => [
+            LogFailedLoginAttempt::class,
+        ],
     ];
 }

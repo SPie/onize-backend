@@ -3,6 +3,7 @@
 namespace App\Services\Security;
 
 use App\Models\User\LoginAttemptModel;
+use App\Models\User\LoginAttemptModelFactory;
 use App\Repositories\User\LoginAttemptRepository;
 
 /**
@@ -18,6 +19,11 @@ final class LoginThrottlingService implements LoginThrottlingServiceInterface
     private $loginAttemptRepository;
 
     /**
+     * @var LoginAttemptModelFactory
+     */
+    private $loginAttemptModelFactory;
+
+    /**
      * @var int
      */
     private $maxLoginAttempts;
@@ -30,16 +36,19 @@ final class LoginThrottlingService implements LoginThrottlingServiceInterface
     /**
      * LoginThrottlingService constructor.
      *
-     * @param LoginAttemptRepository $loginAttemptRepository
-     * @param int                    $maxLoginAttempts
-     * @param int                    $throttlingTimeInMinutes
+     * @param LoginAttemptRepository   $loginAttemptRepository
+     * @param LoginAttemptModelFactory $loginAttemptModelFactory
+     * @param int                      $maxLoginAttempts
+     * @param int                      $throttlingTimeInMinutes
      */
     public function __construct(
         LoginAttemptRepository $loginAttemptRepository,
+        LoginAttemptModelFactory $loginAttemptModelFactory,
         int $maxLoginAttempts,
         int $throttlingTimeInMinutes
     ) {
         $this->loginAttemptRepository = $loginAttemptRepository;
+        $this->loginAttemptModelFactory = $loginAttemptModelFactory;
         $this->maxLoginAttempts = $maxLoginAttempts;
         $this->throttlingTimeInMinutes = $throttlingTimeInMinutes;
     }
@@ -50,6 +59,14 @@ final class LoginThrottlingService implements LoginThrottlingServiceInterface
     private function getLoginAttemptRepository(): LoginAttemptRepository
     {
         return $this->loginAttemptRepository;
+    }
+
+    /**
+     * @return LoginAttemptModelFactory
+     */
+    private function getLoginAttemptModelFactory(): LoginAttemptModelFactory
+    {
+        return $this->loginAttemptModelFactory;
     }
 
     /**
@@ -66,6 +83,29 @@ final class LoginThrottlingService implements LoginThrottlingServiceInterface
     private function getThrottlingTimeInMinutes(): int
     {
         return $this->throttlingTimeInMinutes;
+    }
+
+    /**
+     * @param string $ipAddress
+     * @param string $identifier
+     * @param bool   $success
+     *
+     * @return LoginThrottlingService
+     */
+    public function logLoginAttempt(string $ipAddress, string $identifier, bool $success): LoginThrottlingServiceInterface
+    {
+        $this->getLoginAttemptRepository()->save(
+            $this->getLoginAttemptModelFactory()->create(
+                [
+                    'ipAddress'   => $ipAddress,
+                    'identifier'  => $identifier,
+                    'attemptedAt' => new \DateTimeImmutable(),
+                    'success'     => $success,
+                ]
+            )
+        );
+
+        return $this;
     }
 
     /**

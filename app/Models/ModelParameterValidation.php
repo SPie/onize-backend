@@ -120,6 +120,33 @@ trait ModelParameterValidation
      * @param array  $data
      * @param string $parameterName
      * @param bool   $required
+     *
+     * @return \DateTimeImmutable|null
+     *
+     * @throws InvalidParameterException
+     */
+    protected function validateDateTimeImmutableParameter(
+        array $data,
+        string $parameterName,
+        bool $required = true
+    ): ?\DateTimeImmutable {
+        $parameter = $this->validateEmptyParameter($data, $parameterName, $required);
+
+        if (\is_null($parameter)) {
+            return $parameter;
+        }
+
+        if (!($parameter instanceof \DateTimeImmutable)) {
+            throw new InvalidParameterException('Parameter ' . $parameterName . ' has to be an instance of DateTime.');
+        }
+
+        return $parameter;
+    }
+
+    /**
+     * @param array  $data
+     * @param string $parameterName
+     * @param bool   $required
      * @param bool   $allowEmpty
      *
      * @return array|null
