@@ -293,9 +293,8 @@ class UsersControllerTest extends TestCase
             $response,
             $response,
             [
-                'email'     => $email,
-                'password'  => $password,
-                'ipAddress' => $ipAddress,
+                'email'    => $email,
+                'password' => $password,
             ],
             false
         );
@@ -324,9 +323,8 @@ class UsersControllerTest extends TestCase
             $response,
             $response,
             [
-                'email'     => $email,
-                'password'  => $password,
-                'ipAddress' => $ipAddress,
+                'email'    => $email,
+                'password' => $password,
             ],
             true
         );
@@ -375,9 +373,8 @@ class UsersControllerTest extends TestCase
             new NotAuthenticatedException(),
             $response,
             [
-                'email'     => $email,
-                'password'  => $password,
-                'ipAddress' => $ipAddress,
+                'email'    => $email,
+                'password' => $password,
             ],
             false
         );
@@ -614,10 +611,14 @@ class UsersControllerTest extends TestCase
         string $ipAddress = null,
         bool $remember = false
     ): Request {
-        $request = $this->createRequest();
+        $server = [];
+        if (!empty($ipAddress)) {
+            $server['REMOTE_ADDR'] = $ipAddress;
+        }
+
+        $request = $this->createRequest([], [], [], [], [], $server);
         $request->offsetSet('email', $email ?: $this->getFaker()->safeEmail);
         $request->offsetSet('password', $password ?: $this->getFaker()->password);
-        $request->offsetSet('ipAddress', $ipAddress ?: $this->getFaker()->ipv4);
         $request->offsetSet('remember', $remember);
 
         return $request;

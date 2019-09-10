@@ -5,6 +5,8 @@ namespace Test;
 use App\Http\Response\JsonResponseData;
 use Illuminate\Http\JsonResponse;
 use Laravel\Lumen\Http\Request;
+use Mockery as m;
+use Mockery\MockInterface;
 use Symfony\Component\HttpFoundation\Cookie;
 use Symfony\Component\HttpFoundation\Response;
 
@@ -47,11 +49,26 @@ trait RequestResponseHelper
     }
 
     /**
+     * @param array                $query
+     * @param array                $request
+     * @param array                $attributes
+     * @param array                $cookies
+     * @param array                $files
+     * @param array                $server
+     * @param string|resource|null $content
+     *
      * @return Request
      */
-    protected function createRequest(): Request
-    {
-        return new Request();
+    private function createRequest(
+        array $query = [],
+        array $request = [],
+        array $attributes = [],
+        array $cookies = [],
+        array $files = [],
+        array $server = [],
+        $content = null
+    ): Request {
+        return new Request($query, $request, $attributes, $cookies, $files, $server, $content);
     }
 
     /**

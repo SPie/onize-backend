@@ -115,13 +115,12 @@ class UsersController extends Controller
             [
                 UserModelInterface::PROPERTY_EMAIL    => ['required'],
                 UserModelInterface::PROPERTY_PASSWORD => ['required'],
-                self::REQUEST_PARAMETER_IP_ADDRESS    => ['required'],
             ]
         );
 
         if (
             $loginThrottlingService->isLoginBlocked(
-                $requestParameters[self::REQUEST_PARAMETER_IP_ADDRESS],
+                $request->ip(),
                 $requestParameters[UserModelInterface::PROPERTY_EMAIL]
             )
         ) {

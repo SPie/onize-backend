@@ -50,7 +50,6 @@ class AuthApiCallsTest extends IntegrationTestCase
                     [UserModelInterface::PROPERTY_PASSWORD => Hash::make($password)]
                 )->first()->getEmail(),
                 UserModelInterface::PROPERTY_PASSWORD => $password,
-                'ipAddress'                           => $this->getFaker()->ipv4,
             ]
         );
 
@@ -79,8 +78,6 @@ class AuthApiCallsTest extends IntegrationTestCase
         $this->assertEquals('validation.required', \reset($responseData[UserModelInterface::PROPERTY_EMAIL]));
         $this->assertArrayHasKey(UserModelInterface::PROPERTY_PASSWORD, $responseData);
         $this->assertEquals('validation.required', \reset($responseData[UserModelInterface::PROPERTY_PASSWORD]));
-        $this->assertArrayHasKey('ipAddress', $responseData);
-        $this->assertEquals('validation.required', \reset($responseData['ipAddress']));
     }
 
     /**
@@ -96,7 +93,6 @@ class AuthApiCallsTest extends IntegrationTestCase
             [
                 UserModelInterface::PROPERTY_EMAIL    => $this->getFaker()->safeEmail,
                 UserModelInterface::PROPERTY_PASSWORD => $this->getFaker()->password(),
-                'ipAddress'                           => $this->getFaker()->ipv4,
             ]
         );
 
@@ -117,7 +113,6 @@ class AuthApiCallsTest extends IntegrationTestCase
             [
                 UserModelInterface::PROPERTY_EMAIL    => $this->createUsers()->first()->getEmail(),
                 UserModelInterface::PROPERTY_PASSWORD => $this->getFaker()->password(),
-                'ipAddress'                           => $this->getFaker()->ipv4,
             ]
         );
 
@@ -142,7 +137,6 @@ class AuthApiCallsTest extends IntegrationTestCase
                 )->first()->getEmail(),
                 UserModelInterface::PROPERTY_PASSWORD => $password,
                 'remember'                            => true,
-                'ipAddress'                           => $this->getFaker()->ipv4,
             ]
         );
 
@@ -156,7 +150,7 @@ class AuthApiCallsTest extends IntegrationTestCase
      */
     public function testLoginWithBlockedLogin(): void
     {
-        $ipAddress = $this->getFaker()->ipv4;
+        $ipAddress = '127.0.0.1';
         $password = $this->getFaker()->password();
         $user = $this->createUsers(
             1,
@@ -178,7 +172,6 @@ class AuthApiCallsTest extends IntegrationTestCase
             [
                 UserModelInterface::PROPERTY_EMAIL    => $user->getEmail(),
                 UserModelInterface::PROPERTY_PASSWORD => $password,
-                'ipAddress'                           => $ipAddress,
             ]
         );
 
@@ -194,21 +187,101 @@ class AuthApiCallsTest extends IntegrationTestCase
     public function testLoginWithLogFailedLogin(): void
     {
         $email = $this->createUsers()->first()->getEmail();
-        $ipAddress = $this->getFaker()->ipv4;
         $this->doApiCall(
             URL::route(UsersController::ROUTE_NAME_LOGIN),
             Request::METHOD_POST,
             [
                 UserModelInterface::PROPERTY_EMAIL    => $email,
                 UserModelInterface::PROPERTY_PASSWORD => $this->getFaker()->password(),
-                'ipAddress'                           => $ipAddress,
             ]
         );
 
-        $loginAttempt = $this->getLoginAttemptRepository()->findBy(['ipAddress' => $ipAddress, 'identifier' => $email])
+        $loginAttempt = $this->getLoginAttemptRepository()->findBy(['ipAddress' => '127.0.0.1', 'identifier' => $email])
             ->first();
         $this->assertNotEmpty($loginAttempt);
         $this->assertFalse($loginAttempt->wasSuccess());
+    }
+
+    /**
+     * @return void
+     *
+     * @throws Exception
+     */
+    public function testLoginWithSuccessfulLoginLog(): void
+    {
+        $password = $this->getFaker()->password();
+        $email = $this->createUsers(
+            1,
+            [UserModelInterface::PROPERTY_PASSWORD => Hash::make($password)]
+        )->first()->getEmail();
+
+        $this->doApiCall(
+            URL::route(UsersController::ROUTE_NAME_LOGIN),
+            Request::METHOD_POST,
+            [
+                UserModelInterface::PROPERTY_EMAIL    => $email,
+                UserModelInterface::PROPERTY_PASSWORD => $password,
+            ]
+        );
+
+        $loginAttempt = $this->getLoginAttemptRepository()->findBy(['ipAddress' => '127.0.0.1', 'identifier' => $email])
+            ->first();
+        $this->assertNotEmpty($loginAttempt);
+        $this->assertTrue($loginAttempt->wasSuccess());
+    }
+
+    /**
+     * @return void
+     *
+     * @throws Exception
+     */
+    public function testLoginWithFailedLoginAttemptsAndOneSuccessfulEvent(): void
+    {
+        $ipAddress = '127.0.0.1';
+        $password = $this->getFaker()->password();
+        $user = $this->createUsers(
+            1,
+            [UserModelInterface::PROPERTY_PASSWORD => Hash::make($password)]
+        )->first();
+        $this->createLoginAttempts(
+            2,
+            [
+                'success'     => false,
+                'attemptedAt' => new \DateTime(),
+                'ipAddress'   => $ipAddress,
+                'identifier'  => $user->getEmail(),
+            ]
+        );
+        $this->createLoginAttempts(
+            1,
+            [
+                'success'     => true,
+                'attemptedAt' => new \DateTime(),
+                'ipAddress'   => $ipAddress,
+                'identifier'  => $user->getEmail(),
+            ]
+        );
+        $this->createLoginAttempts(
+            2,
+            [
+                'success'     => false,
+                'attemptedAt' => new \DateTime(),
+                'ipAddress'   => $ipAddress,
+                'identifier'  => $user->getEmail(),
+            ]
+        );
+
+        $response = $this->doApiCall(
+            URL::route(UsersController::ROUTE_NAME_LOGIN),
+            Request::METHOD_POST,
+            [
+                UserModelInterface::PROPERTY_EMAIL    => $user->getEmail(),
+                UserModelInterface::PROPERTY_PASSWORD => $password,
+            ]
+        );
+
+        $this->assertResponseStatus(Response::HTTP_NO_CONTENT);
+        $this->assertNotEmpty($this->getAuthorizationHeader($response));
     }
 
     /**
