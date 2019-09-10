@@ -3,7 +3,9 @@
 use App\Exceptions\InvalidParameterException;
 use App\Listeners\User\LogFailedLoginAttempt;
 use App\Services\Security\LoginThrottlingServiceInterface;
+use Psr\Log\LoggerInterface;
 use SPie\LaravelJWT\Events\FailedLoginAttempt;
+use Test\LoggerHelper;
 use Test\ModelHelper;
 use Test\RepositoryHelper;
 use Test\SecurityHelper;
@@ -14,6 +16,7 @@ use Test\UserHelper;
  */
 final class LogFailedLoginAttemptTest extends TestCase
 {
+    use LoggerHelper;
     use ModelHelper;
     use RepositoryHelper;
     use SecurityHelper;
@@ -33,10 +36,10 @@ final class LogFailedLoginAttemptTest extends TestCase
         $this->getLogFailedLoginAttemptListener($loginThrottlingService)->handle(
             $this->createFailedLoginAttemptEvent(
                 [
-                    'email'     => $email,
-                    'password'  => $this->getFaker()->password,
-                    'ipAddress' => $ipAddress,
-                ]
+                    'email'    => $email,
+                    'password' => $this->getFaker()->password,
+                ],
+                $ipAddress
             )
         );
 
@@ -48,9 +51,10 @@ final class LogFailedLoginAttemptTest extends TestCase
      */
     public function testHandleFailedLoginAttemptWithoutIpAddress(): void
     {
-        $this->expectException(InvalidParameterException::class);
+        $loginThrottlingService = $this->createLoginThrottlingService();
+        $logger = $this->createLogger();
 
-        $this->getLogFailedLoginAttemptListener()->handle(
+        $this->getLogFailedLoginAttemptListener($loginThrottlingService, $logger)->handle(
             $this->createFailedLoginAttemptEvent(
                 [
                     'email'    => $this->getFaker()->safeEmail,
@@ -58,6 +62,9 @@ final class LogFailedLoginAttemptTest extends TestCase
                 ]
             )
         );
+
+        $loginThrottlingService->shouldNotHaveReceived('logLoginAttempt');
+        $this->assertLoggerWarning($logger, 'Could not log login attempt: Missing ipAddress');
     }
 
     /**
@@ -65,16 +72,20 @@ final class LogFailedLoginAttemptTest extends TestCase
      */
     public function testHandleFailedLoginAttemptWithoutIdentifier(): void
     {
-        $this->expectException(InvalidParameterException::class);
+        $loginThrottlingService = $this->createLoginThrottlingService();
+        $logger = $this->createLogger();
 
-        $this->getLogFailedLoginAttemptListener()->handle(
+        $this->getLogFailedLoginAttemptListener($loginThrottlingService, $logger)->handle(
             $this->createFailedLoginAttemptEvent(
                 [
-                    'ipAddress' => $this->getFaker()->ipv4,
-                    'password'  => $this->getFaker()->password,
-                ]
+                    'password' => $this->getFaker()->password,
+                ],
+                $this->getFaker()->ipv4
             )
         );
+
+        $loginThrottlingService->shouldNotHaveReceived('logLoginAttempt');
+        $this->assertLoggerWarning($logger, 'Could not log login attempt: Missing identifier');
     }
 
     /**
@@ -84,50 +95,56 @@ final class LogFailedLoginAttemptTest extends TestCase
     {
         $email = $this->getFaker()->safeEmail;
         $ipAddress = $this->getFaker()->ipv4;
+        $logger = $this->createLogger();
+        $invalidParameterException = new InvalidParameterException($this->getFaker()->text);
         $loginThrottlingService = $this->createLoginThrottlingService();
         $this->mockLoginThrottlingServiceLogLoginAttempt(
             $loginThrottlingService,
-            new InvalidParameterException(),
+            $invalidParameterException,
             $ipAddress,
             $email,
             false
         );
 
-        $this->expectException(InvalidParameterException::class);
-
-        $this->getLogFailedLoginAttemptListener($loginThrottlingService)->handle(
+        $this->getLogFailedLoginAttemptListener($loginThrottlingService, $logger)->handle(
             $this->createFailedLoginAttemptEvent(
                 [
-                    'email'     => $email,
-                    'password'  => $this->getFaker()->password,
-                    'ipAddress' => $ipAddress,
-                ]
+                    'email'    => $email,
+                    'password' => $this->getFaker()->password,
+                ],
+                $ipAddress
             )
         );
+
+        $this->assertLoggerWarning($logger, 'Could not log login attempt: ' . $invalidParameterException->getMessage());
     }
 
     //endregion
 
     /**
      * @param LoginThrottlingServiceInterface $loginThrottlingService
+     * @param LoggerInterface|null            $logger
      *
      * @return LogFailedLoginAttempt
      */
     private function getLogFailedLoginAttemptListener(
-        LoginThrottlingServiceInterface $loginThrottlingService = null
+        LoginThrottlingServiceInterface $loginThrottlingService = null,
+        LoggerInterface $logger = null
     ): LogFailedLoginAttempt {
         return new LogFailedLoginAttempt(
-            $loginThrottlingService ?: $this->createLoginThrottlingService()
+            $loginThrottlingService ?: $this->createLoginThrottlingService(),
+            $logger ?: $this->createLogger()
         );
     }
 
     /**
-     * @param array $credentials
+     * @param array       $credentials
+     * @param string|null $ipAddress
      *
      * @return FailedLoginAttempt
      */
-    private function createFailedLoginAttemptEvent(array $credentials = []): FailedLoginAttempt
+    private function createFailedLoginAttemptEvent(array $credentials = [], string $ipAddress = null): FailedLoginAttempt
     {
-        return new FailedLoginAttempt($credentials);
+        return new FailedLoginAttempt($credentials, $ipAddress);
     }
 }

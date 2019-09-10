@@ -3,10 +3,8 @@
 namespace App\Listeners\User;
 
 use App\Exceptions\InvalidParameterException;
-use App\Models\User\LoginAttemptModel;
-use App\Models\User\LoginAttemptModelFactory;
-use App\Repositories\User\LoginAttemptRepository;
 use App\Services\Security\LoginThrottlingServiceInterface;
+use Psr\Log\LoggerInterface;
 use SPie\LaravelJWT\Events\FailedLoginAttempt;
 
 /**
@@ -22,13 +20,20 @@ final class LogFailedLoginAttempt
     private $loginThrottlingService;
 
     /**
+     * @var LoggerInterface
+     */
+    private $logger;
+
+    /**
      * LogFailedLoginAttempt constructor.
      *
      * @param LoginThrottlingServiceInterface $loginThrottlingService
+     * @param LoggerInterface                 $logger
      */
-    public function __construct(LoginThrottlingServiceInterface $loginThrottlingService)
+    public function __construct(LoginThrottlingServiceInterface $loginThrottlingService, LoggerInterface $logger)
     {
         $this->loginThrottlingService = $loginThrottlingService;
+        $this->logger = $logger;
     }
 
     /**
@@ -40,19 +45,29 @@ final class LogFailedLoginAttempt
     }
 
     /**
+     * @return LoggerInterface
+     */
+    private function getLogger(): LoggerInterface
+    {
+        return $this->logger;
+    }
+
+    /**
      * @param FailedLoginAttempt $failedLoginAttempt
      */
     public function handle(FailedLoginAttempt $failedLoginAttempt): void
     {
-        $this->getLoginThrottlingService()->logLoginAttempt(
-            $this->getIpAddressFromCredentials(
-                $failedLoginAttempt->getCredentials()
-            ),
-            $this->getEmailFromCredentials(
-                $failedLoginAttempt->getCredentials()
-            ),
-            false
-        );
+        try {
+            $this->getLoginThrottlingService()->logLoginAttempt(
+                $this->getIpAddress($failedLoginAttempt),
+                $this->getEmailFromCredentials(
+                    $failedLoginAttempt->getCredentials()
+                ),
+                false
+            );
+        } catch (InvalidParameterException $e) {
+            $this->getLogger()->warning('Could not log login attempt: ' . $e->getMessage());
+        }
     }
 
     /**
@@ -65,25 +80,25 @@ final class LogFailedLoginAttempt
     private function getEmailFromCredentials(array $credentials): string
     {
         if (empty($credentials['email'])) {
-            throw new InvalidParameterException();
+            throw new InvalidParameterException('Missing identifier');
         }
 
         return $credentials['email'];
     }
 
     /**
-     * @param array $credentials
+     * @param FailedLoginAttempt $failedLoginAttempt
      *
      * @return string
      *
      * @throws InvalidParameterException
      */
-    private function getIpAddressFromCredentials(array $credentials): string
+    private function getIpAddress(FailedLoginAttempt $failedLoginAttempt): string
     {
-        if (empty($credentials['ipAddress'])) {
-            throw new InvalidParameterException();
+        if (empty($failedLoginAttempt->getIpAddress())) {
+            throw new InvalidParameterException("Missing ipAddress");
         }
 
-        return $credentials['ipAddress'];
+        return $failedLoginAttempt->getIpAddress();
     }
 }
