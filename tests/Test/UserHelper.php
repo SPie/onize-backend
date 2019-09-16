@@ -126,6 +126,7 @@ trait UserHelper
     ) {
         $expectation = $userModelFactory
             ->shouldReceive('create')
+            ->with($userData)
             ->andThrow($user);
 
         return $this;

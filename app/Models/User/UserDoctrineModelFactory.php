@@ -54,6 +54,7 @@ class UserDoctrineModelFactory implements UserModelFactoryInterface
             $this->validateStringParameter($data, UserModelInterface::PROPERTY_EMAIL),
             $this->validateStringParameter($data, UserModelInterface::PROPERTY_PASSWORD),
             $this->validateRefreshTokens($data),
+            [], // TODO
             $this->validateDateTimeParameter($data, UserModelInterface::PROPERTY_CREATED_AT, false),
             $this->validateDateTimeParameter($data, UserModelInterface::PROPERTY_UPDATED_AT, false),
             $this->validateDateTimeParameter($data, UserModelInterface::PROPERTY_DELETED_AT, false)

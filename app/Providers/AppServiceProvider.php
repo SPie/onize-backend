@@ -4,13 +4,19 @@ namespace App\Providers;
 
 use App\Http\Controllers\User\PasswordResetController;
 use App\Http\Middleware\ApiSignature;
+use App\Models\Project\ProjectDoctrineModel;
+use App\Models\Project\ProjectDoctrineModelFactory;
+use App\Models\Project\ProjectModel;
+use App\Models\Project\ProjectModelFactory;
 use App\Models\User\RefreshTokenDoctrineModel;
 use App\Models\User\RefreshTokenDoctrineModelFactory;
+use App\Models\User\RefreshTokenModel;
 use App\Models\User\RefreshTokenModelFactory;
 use App\Models\User\UserDoctrineModel;
 use App\Models\User\UserDoctrineModelFactory;
 use App\Models\User\UserModelFactoryInterface;
 use App\Models\User\UserModelInterface;
+use App\Repositories\Project\ProjectRepository;
 use App\Repositories\User\RefreshTokenRepository;
 use App\Repositories\User\UserRepository;
 use App\Services\Email\EmailService;
@@ -58,6 +64,8 @@ class AppServiceProvider extends ServiceProvider
     private function registerModels()
     {
         $this->app->bind(UserModelInterface::class, UserDoctrineModel::class);
+        $this->app->bind(RefreshTokenModel::class, RefreshTokenDoctrineModel::class);
+        $this->app->bind(ProjectModel::class, ProjectDoctrineModel::class);
 
         return $this;
     }
@@ -78,6 +86,10 @@ class AppServiceProvider extends ServiceProvider
             return $entityManager->getRepository(RefreshTokenDoctrineModel::class);
         });
 
+        $this->app->singleton(ProjectRepository::class, function () use ($entityManager) {
+            return $entityManager->getRepository(ProjectDoctrineModel::class);
+        });
+
         return $this;
     }
 
@@ -88,6 +100,7 @@ class AppServiceProvider extends ServiceProvider
     {
         $this->app->singleton(UserModelFactoryInterface::class, UserDoctrineModelFactory::class);
         $this->app->singleton(RefreshTokenModelFactory::class, RefreshTokenDoctrineModelFactory::class);
+        $this->app->singleton(ProjectModelFactory::class, ProjectDoctrineModelFactory::class);
 
         return $this;
     }

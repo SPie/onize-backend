@@ -4,12 +4,14 @@ namespace App\Models\User;
 
 use App\Models\AbstractDoctrineModel;
 use App\Models\Authenticate;
+use App\Models\Project\ProjectModel;
 use App\Models\SoftDelete;
 use App\Models\Timestamps;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Mapping as ORM;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Hash;
+use SPie\LaravelJWT\Contracts\RefreshToken;
 
 /**
  * Class UserDoctrineModel
@@ -40,11 +42,19 @@ class UserDoctrineModel extends AbstractDoctrineModel implements UserModelInterf
     private $refreshTokens;
 
     /**
+     * @ORM\OneToMany(targetEntity="App\Models\Project\ProjectDoctrineModel", mappedBy="user", cascade={"persist"})
+     *
+     * @var ProjectModel[]|ArrayCollection
+     */
+    private $projects;
+
+    /**
      * UserDoctrineModel constructor.
      *
      * @param string         $email
      * @param string         $password
-     * @param array          $refreshTokens
+     * @param RefreshToken[] $refreshTokens
+     * @param ProjectModel[] $projects
      * @param \DateTime|null $createdAt
      * @param \DateTime|null $updatedAt
      * @param \DateTime|null $deletedAt
@@ -53,16 +63,18 @@ class UserDoctrineModel extends AbstractDoctrineModel implements UserModelInterf
         string $email,
         string $password,
         array $refreshTokens = [],
+        array $projects = [],
         \DateTime $createdAt = null,
         \DateTime $updatedAt = null,
         \DateTime $deletedAt = null
     ) {
         $this->email = $email;
         $this->password = Hash::make($password);
+        $this->refreshTokens = new ArrayCollection($refreshTokens);
+        $this->projects = new ArrayCollection($projects);
         $this->createdAt = $createdAt;
         $this->updatedAt = $updatedAt;
         $this->deletedAt = $deletedAt;
-        $this->refreshTokens = new ArrayCollection($refreshTokens);
     }
 
     /**
@@ -117,6 +129,40 @@ class UserDoctrineModel extends AbstractDoctrineModel implements UserModelInterf
     public function getRefreshTokens(): Collection
     {
         return new Collection($this->refreshTokens->toArray());
+    }
+
+    /**
+     * @param ProjectModel[] $projects
+     *
+     * @return UserModelInterface
+     */
+    public function setProjects(array $projects): UserModelInterface
+    {
+        $this->projects = new ArrayCollection($projects);
+
+        return $this;
+    }
+
+    /**
+     * @param ProjectModel $project
+     *
+     * @return UserModelInterface
+     */
+    public function addProject(ProjectModel $project): UserModelInterface
+    {
+        if (!$this->projects->contains($project)) {
+            $this->projects->add($project);
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return ProjectModel[]|Collection
+     */
+    public function getProjects(): Collection
+    {
+        return new Collection($this->projects->toArray());
     }
 
     /**

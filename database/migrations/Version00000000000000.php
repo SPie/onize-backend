@@ -67,6 +67,28 @@ class Version00000000000000 extends AbstractMigration
         return $this;
     }
 
+    /**
+     * @param Schema $schema
+     *
+     * @return $this
+     */
+    private function createProjectsTable(Schema $schema)
+    {
+        (new Builder($schema))->create('projects', function (Table $table) {
+            $table->increments('id');
+            $table->string('identifier');
+            $table->unique('identifier');
+            $table->string('label');
+            $table->string('description')->setNotnull(false);
+            $table->integer('user_id', false, true);
+            $table->foreign('users', 'user_id', 'id');
+            $table->timestamps();
+            $table->softDeletes();
+        });
+
+        return $this;
+    }
+
     //endregion
 
     /**

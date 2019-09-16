@@ -3,6 +3,7 @@
 namespace App\Models\User;
 
 use App\Models\ModelInterface;
+use App\Models\Project\ProjectModel;
 use App\Models\SoftDeletable;
 use App\Models\Timestampable;
 use Illuminate\Support\Collection;
@@ -61,4 +62,23 @@ interface UserModelInterface extends ModelInterface, Timestampable, SoftDeletabl
      * @return RefreshTokenModel[]|Collection
      */
     public function getRefreshTokens(): Collection;
+
+    /**
+     * @param ProjectModel[] $projects
+     *
+     * @return UserModelInterface
+     */
+    public function setProjects(array $projects): UserModelInterface;
+
+    /**
+     * @param ProjectModel $project
+     *
+     * @return UserModelInterface
+     */
+    public function addProject(ProjectModel $project): UserModelInterface;
+
+    /**
+     * @return ProjectModel[]|Collection
+     */
+    public function getProjects(): Collection;
 }
