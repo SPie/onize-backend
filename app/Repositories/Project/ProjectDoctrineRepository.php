@@ -11,5 +11,4 @@ use App\Repositories\AbstractDoctrineRepository;
  */
 final class ProjectDoctrineRepository extends AbstractDoctrineRepository implements ProjectRepository
 {
-
 }

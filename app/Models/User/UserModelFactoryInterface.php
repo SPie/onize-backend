@@ -4,6 +4,7 @@ namespace App\Models\User;
 
 use App\Models\ModelFactoryInterface;
 use App\Models\ModelInterface;
+use App\Models\Project\ProjectModelFactory;
 
 /**
  * Interface UserModelFactoryInterface
@@ -19,6 +20,13 @@ interface UserModelFactoryInterface extends ModelFactoryInterface
      * @return UserModelFactoryInterface
      */
     public function setRefreshTokenModelFactory(RefreshTokenModelFactory $refreshTokenModelFactory): UserModelFactoryInterface;
+
+    /**
+     * @param ProjectModelFactory $projectModelFactory
+     *
+     * @return UserModelFactoryInterface
+     */
+    public function setProjectModelFactory(ProjectModelFactory $projectModelFactory): UserModelFactoryInterface;
 
     /**
      * @param array $data

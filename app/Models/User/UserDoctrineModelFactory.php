@@ -5,6 +5,8 @@ namespace App\Models\User;
 use App\Exceptions\InvalidParameterException;
 use App\Models\ModelInterface;
 use App\Models\ModelParameterValidation;
+use App\Models\Project\ProjectModel;
+use App\Models\Project\ProjectModelFactory;
 
 /**
  * Class UserDoctrineModelFactory
@@ -19,6 +21,11 @@ class UserDoctrineModelFactory implements UserModelFactoryInterface
      * @var RefreshTokenModelFactory
      */
     private $refreshTokenModelFactory;
+
+    /**
+     * @var ProjectModelFactory
+     */
+    private $projectModelFactory;
 
     /**
      * @param RefreshTokenModelFactory $refreshTokenModelFactory
@@ -42,6 +49,26 @@ class UserDoctrineModelFactory implements UserModelFactoryInterface
     }
 
     /**
+     * @param ProjectModelFactory $projectModelFactory
+     *
+     * @return UserModelFactoryInterface
+     */
+    public function setProjectModelFactory(ProjectModelFactory $projectModelFactory): UserModelFactoryInterface
+    {
+        $this->projectModelFactory = $projectModelFactory;
+
+        return $this;
+    }
+
+    /**
+     * @return ProjectModelFactory
+     */
+    private function getProjectModelFactory(): ProjectModelFactory
+    {
+        return $this->projectModelFactory;
+    }
+
+    /**
      * @param array $data
      *
      * @return UserModelInterface|ModelInterface
@@ -53,11 +80,11 @@ class UserDoctrineModelFactory implements UserModelFactoryInterface
         return (new UserDoctrineModel(
             $this->validateStringParameter($data, UserModelInterface::PROPERTY_EMAIL),
             $this->validateStringParameter($data, UserModelInterface::PROPERTY_PASSWORD),
-            $this->validateRefreshTokens($data),
-            [], // TODO
             $this->validateDateTimeParameter($data, UserModelInterface::PROPERTY_CREATED_AT, false),
             $this->validateDateTimeParameter($data, UserModelInterface::PROPERTY_UPDATED_AT, false),
-            $this->validateDateTimeParameter($data, UserModelInterface::PROPERTY_DELETED_AT, false)
+            $this->validateDateTimeParameter($data, UserModelInterface::PROPERTY_DELETED_AT, false),
+            $this->validateRefreshTokens($data),
+            $this->validateProjects($data)
         ))->setId($this->validateIntegerParameter($data, UserModelInterface::PROPERTY_ID, false));
     }
 
@@ -116,6 +143,11 @@ class UserDoctrineModelFactory implements UserModelFactoryInterface
             $model->setRefreshTokens($refreshTokens);
         }
 
+        $projects = $this->validateProjects($data);
+        if (!empty($projects)) {
+            $model->setProjects($projects);
+        }
+
         return $model;
     }
 
@@ -148,6 +180,35 @@ class UserDoctrineModelFactory implements UserModelFactoryInterface
                     throw new InvalidParameterException();
                 },
                 $refreshTokens
+            )
+            : [];
+    }
+
+    /**
+     * @param array $data
+     *
+     * @return ProjectModel[]
+     *
+     * @throws InvalidParameterException
+     */
+    private function validateProjects(array $data): array
+    {
+        $projects = $this->validateArrayParameter($data, UserModelInterface::PROPERTY_PROJECTS, false);
+
+        return \is_array($projects)
+            ? \array_map(
+                function ($project) {
+                    if ($project instanceof ProjectModel) {
+                        return $project;
+                    }
+
+                    if (\is_array($project)) {
+                        return $this->getProjectModelFactory()->create($project);
+                    }
+
+                    throw new InvalidParameterException();
+                },
+                $projects
             )
             : [];
     }

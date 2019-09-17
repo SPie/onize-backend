@@ -62,19 +62,19 @@ class UserDoctrineModel extends AbstractDoctrineModel implements UserModelInterf
     public function __construct(
         string $email,
         string $password,
-        array $refreshTokens = [],
-        array $projects = [],
         \DateTime $createdAt = null,
         \DateTime $updatedAt = null,
-        \DateTime $deletedAt = null
+        \DateTime $deletedAt = null,
+        array $refreshTokens = [],
+        array $projects = []
     ) {
         $this->email = $email;
         $this->password = Hash::make($password);
-        $this->refreshTokens = new ArrayCollection($refreshTokens);
-        $this->projects = new ArrayCollection($projects);
         $this->createdAt = $createdAt;
         $this->updatedAt = $updatedAt;
         $this->deletedAt = $deletedAt;
+        $this->refreshTokens = new ArrayCollection($refreshTokens);
+        $this->projects = new ArrayCollection($projects);
     }
 
     /**

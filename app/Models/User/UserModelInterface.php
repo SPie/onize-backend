@@ -16,9 +16,10 @@ use SPie\LaravelJWT\Contracts\JWTAuthenticatable;
  */
 interface UserModelInterface extends ModelInterface, Timestampable, SoftDeletable, JWTAuthenticatable
 {
-    const PROPERTY_EMAIL                 = 'email';
-    const PROPERTY_PASSWORD              = 'password';
-    const PROPERTY_REFRESH_TOKENS        = 'refreshTokens';
+    const PROPERTY_EMAIL          = 'email';
+    const PROPERTY_PASSWORD       = 'password';
+    const PROPERTY_REFRESH_TOKENS = 'refreshTokens';
+    const PROPERTY_PROJECTS       = 'projects';
 
     /**
      * @param string $email

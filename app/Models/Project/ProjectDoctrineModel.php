@@ -68,7 +68,7 @@ final class ProjectDoctrineModel extends AbstractDoctrineModel implements Projec
         \DateTime $createdAt = null,
         \DateTime $updatedAt = null,
         \DateTime $deletedAt = null
-    ){
+    ) {
         $this->identifier = $identifier;
         $this->label = $label;
         $this->user = $user;

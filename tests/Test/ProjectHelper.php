@@ -2,8 +2,10 @@
 
 namespace Test;
 
-use App\Models\Project\ProjectDoctrineModel;
-use App\Models\User\UserModelInterface;
+use App\Models\Project\ProjectModel;
+use App\Models\Project\ProjectModelFactory;
+use Mockery as m;
+use Mockery\MockInterface;
 
 /**
  * Trait ProjectHelper
@@ -12,4 +14,19 @@ use App\Models\User\UserModelInterface;
  */
 trait ProjectHelper
 {
+    /**
+     * @return ProjectModel|MockInterface
+     */
+    private function createProjectModel(): ProjectModel
+    {
+        return m::spy(ProjectModel::class);
+    }
+
+    /**
+     * @return ProjectModelFactory|MockInterface
+     */
+    private function createProjectModelFactory(): ProjectModelFactory
+    {
+        return m::spy(ProjectModelFactory::class);
+    }
 }

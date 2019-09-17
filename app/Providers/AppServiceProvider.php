@@ -164,15 +164,48 @@ class AppServiceProvider extends ServiceProvider
         $this->bootModelFactories();
     }
 
+    /**
+     * @return AppServiceProvider
+     */
     private function bootModelFactories(): AppServiceProvider
     {
-        $userModelFactory = $this->app->get(UserModelFactoryInterface::class);
-        $refreshTokenFactory = $this->app->get(RefreshTokenModelFactory::class);
+        $userModelFactory = $this->getUserModelFactory();
 
-        $userModelFactory->setRefreshTokenModelFactory($refreshTokenFactory);
+        $refreshTokenFactory = $this->getRefreshTokenModelFactory();
+
         $refreshTokenFactory->setUserModelFactory($userModelFactory);
+        $userModelFactory->setRefreshTokenModelFactory($refreshTokenFactory);
+
+        $projectModelFactory = $this->getProjectModelFactory();
+
+        $projectModelFactory->setUserModelFactory($userModelFactory);
+        $userModelFactory->setProjectModelFactory($projectModelFactory);
 
         return $this;
+    }
+
+    /**
+     * @return UserModelFactoryInterface
+     */
+    private function getUserModelFactory(): UserModelFactoryInterface
+    {
+        return $this->app->get(UserModelFactoryInterface::class);
+    }
+
+    /**
+     * @return RefreshTokenModelFactory
+     */
+    private function getRefreshTokenModelFactory(): RefreshTokenModelFactory
+    {
+        return $this->app->get(RefreshTokenModelFactory::class);
+    }
+
+    /**
+     * @return ProjectModelFactory
+     */
+    private function getProjectModelFactory(): ProjectModelFactory
+    {
+        return $this->app->get(ProjectModelFactory::class);
     }
 
     //endregion

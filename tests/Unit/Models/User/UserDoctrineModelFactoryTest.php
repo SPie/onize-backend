@@ -1,12 +1,14 @@
 <?php
 
 use App\Exceptions\InvalidParameterException;
+use App\Models\Project\ProjectModelFactory;
 use App\Models\User\UserDoctrineModelFactory;
 use App\Models\User\UserModelInterface;
 use Illuminate\Support\Facades\Hash;
 use Mockery\MockInterface;
 use Test\AuthHelper;
 use Test\ModelHelper;
+use Test\ProjectHelper;
 use Test\UserHelper;
 
 /**
@@ -16,6 +18,7 @@ class UserDoctrineModelFactoryTest extends TestCase
 {
     use AuthHelper;
     use ModelHelper;
+    use ProjectHelper;
     use UserHelper;
 
     //region Tests
@@ -318,6 +321,94 @@ class UserDoctrineModelFactoryTest extends TestCase
 
     /**
      * @return void
+     */
+    public function testCreateWithProjects(): void
+    {
+        $data = [
+            'email'    => $this->getFaker()->safeEmail,
+            'password' => $this->getFaker()->password(),
+            'projects' => [$this->createProjectModel()],
+        ];
+
+        $this->assertEquals($data['projects'], $this->getUserModelFactory()->create($data)->getProjects()->all());
+    }
+
+    /**
+     * @return void
+     */
+    public function testCreateWithProjectsData(): void
+    {
+        $data = [
+            'email'    => $this->getFaker()->safeEmail,
+            'password' => $this->getFaker()->password(),
+            'projects' => [
+                [$this->getFaker()->uuid => $this->getFaker()->uuid]
+            ],
+        ];
+        $project = $this->createProjectModel();
+        $projectModelFactory = $this->createProjectModelFactory();
+        $this->mockModelFactoryCreate($projectModelFactory, $project, $data['projects'][0]);
+
+        $this->assertEquals(
+            [$project],
+            $this->getUserModelFactory($projectModelFactory)->create($data)->getProjects()->all()
+        );
+    }
+
+    /**
+     * @return void
+     */
+    public function testCreateWithInvalidProjectsArray(): void
+    {
+        $this->expectException(InvalidParameterException::class);
+
+        $this->getUserModelFactory()->create(
+            [
+                'email'    => $this->getFaker()->safeEmail,
+                'password' => $this->getFaker()->password(),
+                'projects' => $this->getFaker()->word,
+            ]
+        );
+    }
+
+    /**
+     * @return void
+     */
+    public function testCreateWithInvalidProjects(): void
+    {
+        $this->expectException(InvalidParameterException::class);
+
+        $this->getUserModelFactory()->create(
+            [
+                'email'    => $this->getFaker()->safeEmail,
+                'password' => $this->getFaker()->password(),
+                'projects' => [$this->getFaker()->word],
+            ]
+        );
+    }
+
+    /**
+     * @return void
+     */
+    public function testCreateWithInvalidProjectsData(): void
+    {
+        $data = [
+            'email'    => $this->getFaker()->safeEmail,
+            'password' => $this->getFaker()->password(),
+            'projects' => [
+                [$this->getFaker()->uuid => $this->getFaker()->uuid]
+            ],
+        ];
+        $projectModelFactory = $this->createProjectModelFactory();
+        $this->mockModelFactoryCreate($projectModelFactory, new InvalidParameterException(), $data['projects'][0]);
+
+        $this->expectException(InvalidParameterException::class);
+
+        $this->getUserModelFactory($projectModelFactory)->create($data);
+    }
+
+    /**
+     * @return void
      *
      * @throws InvalidParameterException
      */
@@ -358,19 +449,39 @@ class UserDoctrineModelFactoryTest extends TestCase
         $this->assertTrue(true);
     }
 
+    /**
+     * @return void
+     */
+    public function testFillWithProject(): void
+    {
+        $data = [
+            'projects' => [$this->createProjectModel()]
+        ];
+
+        $user = $this->getUserModelFactory()->fill($this->createUserDoctrineModel(), $data);
+
+        $this->assertEquals($data['projects'], $user->getProjects()->all());
+    }
+
     //endregion
 
     //region Mocks
 
     /**
+     * @param ProjectModelFactory|null $projectModelFactory
+     *
      * @return UserDoctrineModelFactory|MockInterface
      */
-    private function getUserModelFactory(): UserDoctrineModelFactory
+    private function getUserModelFactory(ProjectModelFactory $projectModelFactory = null): UserDoctrineModelFactory
     {
-        $userDoctrineModelFactory = Mockery::spy(UserDoctrineModelFactory::class);
+        $userDoctrineModelFactory = Mockery::mock(UserDoctrineModelFactory::class);
         $userDoctrineModelFactory
             ->makePartial()
             ->shouldAllowMockingProtectedMethods();
+
+        $userDoctrineModelFactory->setProjectModelFactory(
+            $projectModelFactory ?: $this->createProjectModelFactory()
+        );
 
         return $userDoctrineModelFactory;
     }

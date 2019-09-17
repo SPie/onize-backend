@@ -11,5 +11,4 @@ use App\Repositories\RepositoryInterface;
  */
 interface ProjectRepository extends RepositoryInterface
 {
-
 }
