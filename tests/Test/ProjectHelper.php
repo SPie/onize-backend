@@ -2,8 +2,11 @@
 
 namespace Test;
 
+use App\Models\Project\ProjectDoctrineModel;
 use App\Models\Project\ProjectModel;
 use App\Models\Project\ProjectModelFactory;
+use App\Services\Project\ProjectServiceInterface;
+use Illuminate\Support\Collection;
 use Mockery as m;
 use Mockery\MockInterface;
 
@@ -28,5 +31,24 @@ trait ProjectHelper
     private function createProjectModelFactory(): ProjectModelFactory
     {
         return m::spy(ProjectModelFactory::class);
+    }
+
+    /**
+     * @return ProjectServiceInterface
+     */
+    private function createProjectService(): ProjectServiceInterface
+    {
+        return m::spy(ProjectServiceInterface::class);
+    }
+
+    /**
+     * @param int   $times
+     * @param array $data
+     *
+     * @return ProjectDoctrineModel[]|Collection
+     */
+    private function createProjects(int $times = 1, array $data = []): Collection
+    {
+        return $this->createModels(ProjectDoctrineModel::class, $times, $data);
     }
 }

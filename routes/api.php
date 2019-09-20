@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Auth\AuthController;
+use App\Http\Controllers\Project\ProjectsController;
 use App\Http\Controllers\User\PasswordResetController;
 use App\Http\Controllers\User\UsersController;
 use Laravel\Lumen\Routing\Router;
@@ -60,6 +61,14 @@ $router->group(
             $router->group(['middleware' => ['token']], function (Router $router) {
                 $router->patch('', ['as' => UsersController::ROUTE_NAME_CHANGE_PASSWORD, 'uses' => 'User\UsersController@changePassword']);
             });
+        });
+
+        //endregion
+
+        //region Project calls
+
+        $router->group(['prefix' => 'projects', 'middleware' => ['token']], function (Router $router) {
+            $router->get('', ['as' => ProjectsController::ROUTE_NAME_LIST, 'uses' => 'Project\ProjectsController@projects']);
         });
 
         //endregion

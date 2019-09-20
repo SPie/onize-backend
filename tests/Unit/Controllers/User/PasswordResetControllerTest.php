@@ -5,6 +5,7 @@ use App\Exceptions\ModelNotFoundException;
 use App\Http\Controllers\User\PasswordResetController;
 use App\Models\User\UserModelInterface;
 use Illuminate\Validation\ValidationException;
+use Test\AuthHelper;
 use Test\EmailHelper;
 use Test\ReflectionMethodHelper;
 use Test\RequestResponseHelper;
@@ -15,6 +16,7 @@ use Test\UserHelper;
  */
 final class PasswordResetControllerTest extends TestCase
 {
+    use AuthHelper;
     use EmailHelper;
     use RequestResponseHelper;
     use ReflectionMethodHelper;

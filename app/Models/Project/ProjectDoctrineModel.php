@@ -16,7 +16,7 @@ use Doctrine\ORM\Mapping as ORM;
  *
  * @package App\Models\Project
  */
-final class ProjectDoctrineModel extends AbstractDoctrineModel implements ProjectModel
+class ProjectDoctrineModel extends AbstractDoctrineModel implements ProjectModel
 {
     use SoftDelete;
     use Timestamps;
@@ -156,5 +156,27 @@ final class ProjectDoctrineModel extends AbstractDoctrineModel implements Projec
     public function getDescription(): ?string
     {
         return $this->description;
+    }
+
+    public function toArray(): array
+    {
+        return \array_merge(
+            parent::toArray(),
+            [
+                self::PROPERTY_IDENTIFIER => $this->getIdentifier(),
+                self::PROPERTY_LABEL => $this->getLabel(),
+                self::PROPERTY_USER => $this->getUser()->toArray(),
+                self::PROPERTY_DESCRIPTION => $this->getDescription(),
+                self::PROPERTY_CREATED_AT => $this->getCreatedAt()
+                    ? (array)new \DateTime($this->getCreatedAt()->format('Y-m-d H:i:s'))
+                    : null,
+                self::PROPERTY_UPDATED_AT => $this->getUpdatedAt()
+                    ? (array)new \DateTime($this->getUpdatedAt()->format('Y-m-d H:i:s'))
+                    : null,
+                self::PROPERTY_DELETED_AT => $this->getDeletedAt()
+                    ? (array)new \DateTime($this->getDeletedAt()->format('Y-m-d H:i:s'))
+                    : null
+            ]
+        );
     }
 }

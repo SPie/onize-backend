@@ -11,6 +11,7 @@ use App\Services\User\UsersServiceInterface;
 use Laravel\Lumen\Testing\TestCase;
 use LaravelDoctrine\Migrations\Testing\DatabaseMigrations;
 use Mockery\MockInterface;
+use Test\AuthHelper;
 use Test\ModelHelper;
 use Test\ReflectionMethodHelper;
 use Test\RepositoryHelper;
@@ -21,6 +22,7 @@ use Test\UserHelper;
  */
 class UsersServiceTest extends TestCase
 {
+    use AuthHelper;
     use DatabaseMigrations;
     use ModelHelper;
     use RepositoryHelper;

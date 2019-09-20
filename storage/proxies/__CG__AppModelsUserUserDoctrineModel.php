@@ -64,10 +64,10 @@ class UserDoctrineModel extends \App\Models\User\UserDoctrineModel implements \D
     public function __sleep()
     {
         if ($this->__isInitialized__) {
-            return ['__isInitialized__', '' . "\0" . 'App\\Models\\User\\UserDoctrineModel' . "\0" . 'email', '' . "\0" . 'App\\Models\\User\\UserDoctrineModel' . "\0" . 'refreshTokens', 'id', 'password', 'createdAt', 'updatedAt', 'deletedAt'];
+            return ['__isInitialized__', '' . "\0" . 'App\\Models\\User\\UserDoctrineModel' . "\0" . 'email', '' . "\0" . 'App\\Models\\User\\UserDoctrineModel' . "\0" . 'refreshTokens', '' . "\0" . 'App\\Models\\User\\UserDoctrineModel' . "\0" . 'projects', 'id', 'password', 'createdAt', 'updatedAt', 'deletedAt'];
         }
 
-        return ['__isInitialized__', '' . "\0" . 'App\\Models\\User\\UserDoctrineModel' . "\0" . 'email', '' . "\0" . 'App\\Models\\User\\UserDoctrineModel' . "\0" . 'refreshTokens', 'id', 'password', 'createdAt', 'updatedAt', 'deletedAt'];
+        return ['__isInitialized__', '' . "\0" . 'App\\Models\\User\\UserDoctrineModel' . "\0" . 'email', '' . "\0" . 'App\\Models\\User\\UserDoctrineModel' . "\0" . 'refreshTokens', '' . "\0" . 'App\\Models\\User\\UserDoctrineModel' . "\0" . 'projects', 'id', 'password', 'createdAt', 'updatedAt', 'deletedAt'];
     }
 
     /**
@@ -226,6 +226,39 @@ class UserDoctrineModel extends \App\Models\User\UserDoctrineModel implements \D
         $this->__initializer__ && $this->__initializer__->__invoke($this, 'getRefreshTokens', []);
 
         return parent::getRefreshTokens();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function setProjects(array $projects): \App\Models\User\UserModelInterface
+    {
+
+        $this->__initializer__ && $this->__initializer__->__invoke($this, 'setProjects', [$projects]);
+
+        return parent::setProjects($projects);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function addProject(\App\Models\Project\ProjectModel $project): \App\Models\User\UserModelInterface
+    {
+
+        $this->__initializer__ && $this->__initializer__->__invoke($this, 'addProject', [$project]);
+
+        return parent::addProject($project);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function getProjects(): \Illuminate\Support\Collection
+    {
+
+        $this->__initializer__ && $this->__initializer__->__invoke($this, 'getProjects', []);
+
+        return parent::getProjects();
     }
 
     /**

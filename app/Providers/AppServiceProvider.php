@@ -2,6 +2,7 @@
 
 namespace App\Providers;
 
+use App\Http\Controllers\Project\ProjectsController;
 use App\Http\Controllers\User\PasswordResetController;
 use App\Http\Middleware\ApiSignature;
 use App\Models\Project\ProjectDoctrineModel;
@@ -114,6 +115,10 @@ class AppServiceProvider extends ServiceProvider
             return new PasswordResetController($this->app['config']['app.tokenPlaceHolder']);
         });
 
+        $this->app->bind(ProjectsController::class, function () {
+            return new ProjectsController($this->getJWTService()->getAuthenticatedUser());
+        });
+
         return $this;
     }
 
@@ -150,6 +155,14 @@ class AppServiceProvider extends ServiceProvider
         });
 
         return $this;
+    }
+
+    /**
+     * @return JWTService
+     */
+    private function getJWTService(): JWTService
+    {
+        return $this->app->get(JWTService::class);
     }
 
     //endregion

@@ -478,14 +478,6 @@ class UsersControllerTest extends TestCase
     }
 
     /**
-     * @return JWTService|MockInterface
-     */
-    private function createJWTService(): JWTService
-    {
-        return Mockery::spy(JWTService::class);
-    }
-
-    /**
      * @param MockInterface $jwtService
      * @param Response      $response
      * @param Response      $inputResponse

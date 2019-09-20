@@ -193,13 +193,13 @@ class UserDoctrineModel extends AbstractDoctrineModel implements UserModelInterf
             [
                 self::PROPERTY_EMAIL      => $this->getEmail(),
                 self::PROPERTY_CREATED_AT => $this->getCreatedAt()
-                    ? (array)$this->getCreatedAt()
+                    ? (array)new \DateTime($this->getCreatedAt()->format('Y-m-d H:i:s'))
                     : null,
                 self::PROPERTY_UPDATED_AT => $this->getUpdatedAt()
-                    ? (array)$this->getUpdatedAt()
+                    ? (array)new \DateTime($this->getUpdatedAt()->format('Y-m-d H:i:s'))
                     : null,
                 self::PROPERTY_DELETED_AT => $this->getDeletedAt()
-                    ? (array)$this->getDeletedAt()
+                    ? (array)new \DateTime($this->getDeletedAt()->format('Y-m-d H:i:s'))
                     : null,
             ]
         );

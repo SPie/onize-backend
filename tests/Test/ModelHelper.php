@@ -4,6 +4,7 @@ namespace Test;
 
 use App\Models\ModelFactoryInterface;
 use App\Models\ModelInterface;
+use Doctrine\ORM\EntityManager;
 use Illuminate\Support\Collection;
 use Mockery;
 use Mockery\MockInterface;
@@ -78,6 +79,18 @@ trait ModelHelper
                 $data
             )
             ->andThrow($returnModel);
+
+        return $this;
+    }
+
+    /**
+     * @param string $modelName
+     *
+     * @return $this
+     */
+    private function clearModelCache(string $modelName = null)
+    {
+        $this->app->get(EntityManager::class)->clear($modelName);
 
         return $this;
     }

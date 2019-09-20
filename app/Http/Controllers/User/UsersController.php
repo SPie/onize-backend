@@ -42,20 +42,13 @@ class UsersController extends Controller
     private $usersService;
 
     /**
-     * @var JWTService
-     */
-    private $jwtService;
-
-    /**
      * UsersController constructor.
      *
      * @param UsersServiceInterface $usersService
-     * @param JWTService            $jwtService
      */
-    public function __construct(UsersServiceInterface $usersService, JWTService $jwtService)
+    public function __construct(UsersServiceInterface $usersService)
     {
         $this->usersService = $usersService;
-        $this->jwtService = $jwtService;
     }
 
     /**
@@ -64,14 +57,6 @@ class UsersController extends Controller
     protected function getUserService(): UsersServiceInterface
     {
         return $this->usersService;
-    }
-
-    /**
-     * @return JWTService
-     */
-    protected function getJwtService(): JWTService
-    {
-        return $this->jwtService;
     }
 
     //region Controller actions
