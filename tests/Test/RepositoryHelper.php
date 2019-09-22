@@ -49,4 +49,23 @@ trait RepositoryHelper
 
         return $this;
     }
+
+    /**
+     * @param RepositoryInterface|MockInterface $repository
+     * @param ModelInterface                    $model
+     * @param int                               $times
+     *
+     * @return $this
+     */
+    private function assertRepositorySave(MockInterface $repository, ModelInterface $model, int $times = 1)
+    {
+        $repository
+            ->shouldReceive('save')
+            ->with(Mockery::on(function ($argument) use ($model) {
+                return $argument == $model;
+            }))
+            ->times($times);
+
+        return $this;
+    }
 }
