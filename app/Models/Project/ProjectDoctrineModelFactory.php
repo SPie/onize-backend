@@ -7,6 +7,8 @@ use App\Models\ModelInterface;
 use App\Models\ModelParameterValidation;
 use App\Models\User\UserModelFactoryInterface;
 use App\Models\User\UserModelInterface;
+use App\Models\Uuid;
+use App\Services\Uuid\UuidFactory;
 
 /**
  * Class ProjectDoctrineModelFactory
@@ -16,11 +18,22 @@ use App\Models\User\UserModelInterface;
 final class ProjectDoctrineModelFactory implements ProjectModelFactory
 {
     use ModelParameterValidation;
+    use Uuid;
 
     /**
      * @var UserModelFactoryInterface
      */
     private $userModelFactory;
+
+    /**
+     * ProjectDoctrineModelFactory constructor.
+     *
+     * @param UuidFactory $uuidFactory
+     */
+    public function __construct(UuidFactory $uuidFactory)
+    {
+        $this->uuidFactory = $uuidFactory;
+    }
 
     /**
      * @param UserModelFactoryInterface $userModelFactory
@@ -50,7 +63,7 @@ final class ProjectDoctrineModelFactory implements ProjectModelFactory
     public function create(array $data): ModelInterface
     {
         return (new ProjectDoctrineModel(
-            $this->validateStringParameter($data, ProjectModel::PROPERTY_IDENTIFIER),
+            $this->getUuidFactory()->create(),
             $this->validateStringParameter($data, ProjectModel::PROPERTY_LABEL),
             $this->validateUserModel($data),
             $this->validateStringParameter($data, ProjectModel::PROPERTY_DESCRIPTION, false),
@@ -68,11 +81,6 @@ final class ProjectDoctrineModelFactory implements ProjectModelFactory
      */
     public function fill(ModelInterface $model, array $data): ModelInterface
     {
-        $identifier = $this->validateStringParameter($data, ProjectModel::PROPERTY_IDENTIFIER, false);
-        if (!empty($identifier)) {
-            $model->setIdentifier($identifier);
-        }
-
         $label = $this->validateStringParameter($data, ProjectModel::PROPERTY_LABEL, false);
         if (!empty($label)) {
             $model->setLabel($label);

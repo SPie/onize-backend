@@ -4,6 +4,7 @@ namespace Test;
 
 use App\Models\ModelFactoryInterface;
 use App\Models\ModelInterface;
+use App\Services\Uuid\UuidFactory;
 use Doctrine\ORM\EntityManager;
 use Illuminate\Support\Collection;
 use Mockery;
@@ -91,6 +92,29 @@ trait ModelHelper
     private function clearModelCache(string $modelName = null)
     {
         $this->app->get(EntityManager::class)->clear($modelName);
+
+        return $this;
+    }
+
+    /**
+     * @return UuidFactory
+     */
+    private function createUuidFactory(): UuidFactory
+    {
+        return Mockery::spy(UuidFactory::class);
+    }
+
+    /**
+     * @param UuidFactory|MockInterface $uuidFactory
+     * @param string                    $uuid
+     *
+     * @return $this
+     */
+    private function mockUuidFactoryCreate(MockInterface $uuidFactory, string $uuid)
+    {
+        $uuidFactory
+            ->shouldReceive('create')
+            ->andReturn($uuid);
 
         return $this;
     }

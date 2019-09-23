@@ -26,12 +26,17 @@ use App\Services\JWT\JWTRefreshTokenRepository;
 use App\Services\JWT\JWTService;
 use App\Services\JWT\SPieJWTRefreshTokenRepository;
 use App\Services\JWT\SPieLaravelJWTService;
+use App\Services\Project\ProjectService;
+use App\Services\Project\ProjectServiceInterface;
 use App\Services\User\UsersService;
 use App\Services\User\UsersServiceInterface;
+use App\Services\Uuid\RamseyUuidFactory;
+use App\Services\Uuid\UuidFactory;
 use Doctrine\ORM\EntityManager;
 use Illuminate\Contracts\View\Factory;
 use Illuminate\Queue\QueueManager;
 use Illuminate\Support\ServiceProvider;
+use Ramsey\Uuid\UuidFactory as ExternalUuidFactory;
 
 /**
  * Class AppServiceProvider
@@ -116,7 +121,7 @@ class AppServiceProvider extends ServiceProvider
         });
 
         $this->app->bind(ProjectsController::class, function () {
-            return new ProjectsController($this->getJWTService()->getAuthenticatedUser());
+            return new ProjectsController($this->getJWTService()->getAuthenticatedUser(), $this->getProjectService());
         });
 
         return $this;
@@ -128,6 +133,7 @@ class AppServiceProvider extends ServiceProvider
     private function registerServices()
     {
         $this->app->singleton(UsersServiceInterface::class, UsersService::class);
+        $this->app->singleton(ProjectServiceInterface::class, ProjectService::class);
         $this->app->singleton(JWTService::class, SPieLaravelJWTService::class);
         $this->app->singleton(JWTRefreshTokenRepository::class, SPieJWTRefreshTokenRepository::class);
         $this->app->singleton(EmailService::class, function ($app) {
@@ -136,6 +142,9 @@ class AppServiceProvider extends ServiceProvider
                 $this->app->make(Factory::class),
                 $this->app['config']['email.templatesDir']
             );
+        });
+        $this->app->singleton(UuidFactory::class, function () {
+            return new RamseyUuidFactory(new ExternalUuidFactory());
         });
 
         return $this;
@@ -163,6 +172,14 @@ class AppServiceProvider extends ServiceProvider
     private function getJWTService(): JWTService
     {
         return $this->app->get(JWTService::class);
+    }
+
+    /**
+     * @return ProjectServiceInterface
+     */
+    private function getProjectService(): ProjectServiceInterface
+    {
+        return $this->app->get(ProjectServiceInterface::class);
     }
 
     //endregion

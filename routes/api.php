@@ -69,6 +69,7 @@ $router->group(
 
         $router->group(['prefix' => 'projects', 'middleware' => ['token']], function (Router $router) {
             $router->get('', ['as' => ProjectsController::ROUTE_NAME_LIST, 'uses' => 'Project\ProjectsController@projects']);
+            $router->post('', ['as' => ProjectsController::ROUTE_NAME_ADD, 'uses' => 'Project\ProjectsController@add']);
         });
 
         //endregion

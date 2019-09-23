@@ -18,6 +18,7 @@ use Illuminate\Validation\ValidationException;
 final class ProjectsController extends Controller
 {
     const ROUTE_NAME_LIST = 'projects.list';
+    const ROUTE_NAME_ADD  = 'projects.add';
 
     const RESPONSE_PARAMETER_PROJECT  = 'project';
     const RESPONSE_PARAMETER_PROJECTS = 'projects';

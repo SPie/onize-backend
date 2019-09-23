@@ -10,7 +10,6 @@ use Illuminate\Support\Facades\Hash;
  */
 class UsersSeeder extends Seeder
 {
-
     /**
      * @return void
      */

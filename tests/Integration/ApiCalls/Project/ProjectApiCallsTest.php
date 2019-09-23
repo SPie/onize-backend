@@ -1,5 +1,7 @@
 <?php
 
+use App\Models\Project\ProjectModel;
+use App\Repositories\Project\ProjectRepository;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\URL;
 use LaravelDoctrine\Migrations\Testing\DatabaseMigrations;
@@ -60,5 +62,81 @@ final class ProjectApiCallsTest extends IntegrationTestCase
         $this->assertEmpty($response->getData(true)['projects']);
     }
 
+    /**
+     * @return void
+     */
+    public function testAddProject(): void
+    {
+        $label = $this->getFaker()->uuid;
+        $description = $this->getFaker()->text;
+
+        $response = $this->doApiCall(
+            URL::route('projects.add'),
+            Request::METHOD_POST,
+            [
+                'label'       => $label,
+                'description' => $description,
+            ],
+            null,
+            $this->createAuthHeader($this->createUsers()->first())
+        );
+
+        $this->assertResponseStatus(201);
+        $responseData = $response->getData(true);
+        $this->assertEquals($label, $responseData['project']['label']);
+        $this->assertEquals($description, $responseData['project']['description']);
+        $this->assertNotEmpty($this->getProjectRepository()->findBy(['identifier' => $responseData['project']['identifier']]));
+    }
+
+    /**
+     * @return void
+     */
+    public function testAddProjectWithoutDescription(): void
+    {
+        $label = $this->getFaker()->uuid;
+
+        $response = $this->doApiCall(
+            URL::route('projects.add'),
+            Request::METHOD_POST,
+            [
+                'label' => $label,
+            ],
+            null,
+            $this->createAuthHeader($this->createUsers()->first())
+        );
+
+        $this->assertResponseStatus(201);
+        $responseData = $response->getData(true);
+        $this->assertEquals($label, $responseData['project']['label']);
+        $this->assertNotEmpty($this->getProjectRepository()->findBy(['identifier' => $responseData['project']['identifier']]));
+    }
+
+    /**
+     * @return void
+     */
+    public function testAddProjectWithoutLabel(): void
+    {
+        $response = $this->doApiCall(
+            URL::route('projects.add'),
+            Request::METHOD_POST,
+            [],
+            null,
+            $this->createAuthHeader($this->createUsers()->first())
+        );
+
+        $this->assertResponseStatus(422);
+        $responseData = $response->getData(true);
+        $this->assertEquals('validation.required', $responseData['label'][0]);
+        $this->assertEmpty($this->getProjectRepository()->findAll());
+    }
+
     //endregion
+
+    /**
+     * @return ProjectRepository
+     */
+    private function getProjectRepository(): ProjectRepository
+    {
+        return $this->app->get(ProjectRepository::class);
+    }
 }
