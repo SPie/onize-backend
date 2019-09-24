@@ -6,30 +6,18 @@ use App\Models\ModelInterface;
 use App\Models\SoftDeletable;
 use App\Models\Timestampable;
 use App\Models\User\UserModelInterface;
+use App\Models\Uuidable;
 
 /**
  * Interface ProjectModel
  *
  * @package App\Models\Project
  */
-interface ProjectModel extends ModelInterface, Timestampable, SoftDeletable
+interface ProjectModel extends ModelInterface, Timestampable, SoftDeletable, Uuidable
 {
-    const PROPERTY_IDENTIFIER  = 'identifier';
     const PROPERTY_LABEL       = 'label';
     const PROPERTY_USER        = 'user';
     const PROPERTY_DESCRIPTION = 'description';
-
-    /**
-     * @param string $identifier
-     *
-     * @return ProjectModel
-     */
-    public function setIdentifier(string $identifier): ProjectModel;
-
-    /**
-     * @return string
-     */
-    public function getIdentifier(): string;
 
     /**
      * @param string $label

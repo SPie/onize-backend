@@ -7,6 +7,7 @@ use App\Models\Authenticate;
 use App\Models\Project\ProjectModel;
 use App\Models\SoftDelete;
 use App\Models\Timestamps;
+use App\Models\Uuid;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Mapping as ORM;
 use Illuminate\Support\Collection;
@@ -26,6 +27,7 @@ class UserDoctrineModel extends AbstractDoctrineModel implements UserModelInterf
     use Authenticate;
     use Timestamps;
     use SoftDelete;
+    use Uuid;
 
     /**
      * @ORM\Column(name="email", type="string", length=255, nullable=false)
@@ -51,15 +53,17 @@ class UserDoctrineModel extends AbstractDoctrineModel implements UserModelInterf
     /**
      * UserDoctrineModel constructor.
      *
+     * @param string         $uuid
      * @param string         $email
      * @param string         $password
-     * @param RefreshToken[] $refreshTokens
-     * @param ProjectModel[] $projects
      * @param \DateTime|null $createdAt
      * @param \DateTime|null $updatedAt
      * @param \DateTime|null $deletedAt
+     * @param RefreshToken[] $refreshTokens
+     * @param ProjectModel[] $projects
      */
     public function __construct(
+        string $uuid,
         string $email,
         string $password,
         \DateTime $createdAt = null,
@@ -68,6 +72,7 @@ class UserDoctrineModel extends AbstractDoctrineModel implements UserModelInterf
         array $refreshTokens = [],
         array $projects = []
     ) {
+        $this->uuid = $uuid;
         $this->email = $email;
         $this->password = Hash::make($password);
         $this->createdAt = $createdAt;
@@ -188,20 +193,18 @@ class UserDoctrineModel extends AbstractDoctrineModel implements UserModelInterf
      */
     public function toArray(): array
     {
-        return \array_merge(
-            parent::toArray(),
-            [
-                self::PROPERTY_EMAIL      => $this->getEmail(),
-                self::PROPERTY_CREATED_AT => $this->getCreatedAt()
-                    ? (array)new \DateTime($this->getCreatedAt()->format('Y-m-d H:i:s'))
-                    : null,
-                self::PROPERTY_UPDATED_AT => $this->getUpdatedAt()
-                    ? (array)new \DateTime($this->getUpdatedAt()->format('Y-m-d H:i:s'))
-                    : null,
-                self::PROPERTY_DELETED_AT => $this->getDeletedAt()
-                    ? (array)new \DateTime($this->getDeletedAt()->format('Y-m-d H:i:s'))
-                    : null,
-            ]
-        );
+        return [
+            self::PROPERTY_UUID       => $this->getUuid(),
+            self::PROPERTY_EMAIL      => $this->getEmail(),
+            self::PROPERTY_CREATED_AT => $this->getCreatedAt()
+                ? (array)new \DateTime($this->getCreatedAt()->format('Y-m-d H:i:s'))
+                : null,
+            self::PROPERTY_UPDATED_AT => $this->getUpdatedAt()
+                ? (array)new \DateTime($this->getUpdatedAt()->format('Y-m-d H:i:s'))
+                : null,
+            self::PROPERTY_DELETED_AT => $this->getDeletedAt()
+                ? (array)new \DateTime($this->getDeletedAt()->format('Y-m-d H:i:s'))
+                : null,
+        ];
     }
 }

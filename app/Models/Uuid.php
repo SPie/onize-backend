@@ -2,7 +2,7 @@
 
 namespace App\Models;
 
-use App\Services\Uuid\UuidFactory;
+use Doctrine\ORM\Mapping as ORM;
 
 /**
  * Trait Uuid
@@ -12,15 +12,29 @@ use App\Services\Uuid\UuidFactory;
 trait Uuid
 {
     /**
-     * @var
+     * @ORM\Column(name="uuid", type="string", length=255, nullable=false)
+     *
+     * @var string
      */
-    private $uuidFactory;
+    private $uuid;
 
     /**
-     * @return UuidFactory
+     * @param string $uuid
+     *
+     * @return $this|Uuidable
      */
-    private function getUuidFactory(): UuidFactory
+    public function setUuid(string $uuid): Uuidable
     {
-        return $this->uuidFactory;
+        $this->uuid = $uuid;
+
+        return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function getUuid(): string
+    {
+        return $this->uuid;
     }
 }

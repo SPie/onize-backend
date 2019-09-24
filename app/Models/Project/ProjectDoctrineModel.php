@@ -6,6 +6,7 @@ use App\Models\AbstractDoctrineModel;
 use App\Models\SoftDelete;
 use App\Models\Timestamps;
 use App\Models\User\UserModelInterface;
+use App\Models\Uuid;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
@@ -20,13 +21,7 @@ class ProjectDoctrineModel extends AbstractDoctrineModel implements ProjectModel
 {
     use SoftDelete;
     use Timestamps;
-
-    /**
-     * @ORM\Column(name="identifier", type="string", length=255, nullable=false)
-     *
-     * @var string
-     */
-    private $identifier;
+    use Uuid;
 
     /**
      * @ORM\Column(name="label", type="string", length=255, nullable=false)
@@ -52,7 +47,7 @@ class ProjectDoctrineModel extends AbstractDoctrineModel implements ProjectModel
     /**
      * ProjectDoctrineModel constructor.
      *
-     * @param string             $identifier
+     * @param string             $uuid
      * @param string             $label
      * @param UserModelInterface $user
      * @param string|null        $description
@@ -61,7 +56,7 @@ class ProjectDoctrineModel extends AbstractDoctrineModel implements ProjectModel
      * @param \DateTime|null     $deletedAt
      */
     public function __construct(
-        string $identifier,
+        string $uuid,
         string $label,
         UserModelInterface $user,
         string $description = null,
@@ -69,33 +64,13 @@ class ProjectDoctrineModel extends AbstractDoctrineModel implements ProjectModel
         \DateTime $updatedAt = null,
         \DateTime $deletedAt = null
     ) {
-        $this->identifier = $identifier;
+        $this->uuid = $uuid;
         $this->label = $label;
         $this->user = $user;
         $this->description = $description;
         $this->createdAt = $createdAt;
         $this->updatedAt = $updatedAt;
         $this->deletedAt = $deletedAt;
-    }
-
-    /**
-     * @param string $identifier
-     *
-     * @return ProjectModel
-     */
-    public function setIdentifier(string $identifier): ProjectModel
-    {
-        $this->identifier = $identifier;
-
-        return $this;
-    }
-
-    /**
-     * @return string
-     */
-    public function getIdentifier(): string
-    {
-        return $this->identifier;
     }
 
     /**
@@ -160,23 +135,20 @@ class ProjectDoctrineModel extends AbstractDoctrineModel implements ProjectModel
 
     public function toArray(): array
     {
-        return \array_merge(
-            parent::toArray(),
-            [
-                self::PROPERTY_IDENTIFIER => $this->getIdentifier(),
-                self::PROPERTY_LABEL => $this->getLabel(),
-                self::PROPERTY_USER => $this->getUser()->toArray(),
-                self::PROPERTY_DESCRIPTION => $this->getDescription(),
-                self::PROPERTY_CREATED_AT => $this->getCreatedAt()
-                    ? (array)new \DateTime($this->getCreatedAt()->format('Y-m-d H:i:s'))
-                    : null,
-                self::PROPERTY_UPDATED_AT => $this->getUpdatedAt()
-                    ? (array)new \DateTime($this->getUpdatedAt()->format('Y-m-d H:i:s'))
-                    : null,
-                self::PROPERTY_DELETED_AT => $this->getDeletedAt()
-                    ? (array)new \DateTime($this->getDeletedAt()->format('Y-m-d H:i:s'))
-                    : null
-            ]
-        );
+        return [
+            self::PROPERTY_UUID        => $this->getUuid(),
+            self::PROPERTY_LABEL       => $this->getLabel(),
+            self::PROPERTY_USER        => $this->getUser()->toArray(),
+            self::PROPERTY_DESCRIPTION => $this->getDescription(),
+            self::PROPERTY_CREATED_AT  => $this->getCreatedAt()
+                ? (array)new \DateTime($this->getCreatedAt()->format('Y-m-d H:i:s'))
+                : null,
+            self::PROPERTY_UPDATED_AT  => $this->getUpdatedAt()
+                ? (array)new \DateTime($this->getUpdatedAt()->format('Y-m-d H:i:s'))
+                : null,
+            self::PROPERTY_DELETED_AT  => $this->getDeletedAt()
+                ? (array)new \DateTime($this->getDeletedAt()->format('Y-m-d H:i:s'))
+                : null,
+        ];
     }
 }

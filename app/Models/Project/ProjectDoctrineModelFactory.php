@@ -7,7 +7,7 @@ use App\Models\ModelInterface;
 use App\Models\ModelParameterValidation;
 use App\Models\User\UserModelFactoryInterface;
 use App\Models\User\UserModelInterface;
-use App\Models\Uuid;
+use App\Models\UuidCreate;
 use App\Services\Uuid\UuidFactory;
 
 /**
@@ -18,7 +18,7 @@ use App\Services\Uuid\UuidFactory;
 final class ProjectDoctrineModelFactory implements ProjectModelFactory
 {
     use ModelParameterValidation;
-    use Uuid;
+    use UuidCreate;
 
     /**
      * @var UserModelFactoryInterface

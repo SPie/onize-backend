@@ -37,6 +37,8 @@ class Version00000000000000 extends AbstractMigration
     {
         (new Builder($schema))->create('users', function (Table $table) {
             $table->increments('id');
+            $table->string('uuid');
+            $table->unique('uuid');
             $table->string('email');
             $table->unique('email');
             $table->string('password');
@@ -77,8 +79,8 @@ class Version00000000000000 extends AbstractMigration
     {
         (new Builder($schema))->create('projects', function (Table $table) {
             $table->increments('id');
-            $table->string('identifier');
-            $table->unique('identifier');
+            $table->string('uuid');
+            $table->unique('uuid');
             $table->string('label');
             $table->string('description')->setNotnull(false);
             $table->integer('user_id', false, true);

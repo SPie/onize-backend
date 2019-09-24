@@ -64,10 +64,10 @@ class UserDoctrineModel extends \App\Models\User\UserDoctrineModel implements \D
     public function __sleep()
     {
         if ($this->__isInitialized__) {
-            return ['__isInitialized__', '' . "\0" . 'App\\Models\\User\\UserDoctrineModel' . "\0" . 'email', '' . "\0" . 'App\\Models\\User\\UserDoctrineModel' . "\0" . 'refreshTokens', '' . "\0" . 'App\\Models\\User\\UserDoctrineModel' . "\0" . 'projects', 'id', 'password', 'createdAt', 'updatedAt', 'deletedAt'];
+            return ['__isInitialized__', '' . "\0" . 'App\\Models\\User\\UserDoctrineModel' . "\0" . 'email', '' . "\0" . 'App\\Models\\User\\UserDoctrineModel' . "\0" . 'refreshTokens', '' . "\0" . 'App\\Models\\User\\UserDoctrineModel' . "\0" . 'projects', 'id', 'password', 'createdAt', 'updatedAt', 'deletedAt', '' . "\0" . 'App\\Models\\User\\UserDoctrineModel' . "\0" . 'uuid'];
         }
 
-        return ['__isInitialized__', '' . "\0" . 'App\\Models\\User\\UserDoctrineModel' . "\0" . 'email', '' . "\0" . 'App\\Models\\User\\UserDoctrineModel' . "\0" . 'refreshTokens', '' . "\0" . 'App\\Models\\User\\UserDoctrineModel' . "\0" . 'projects', 'id', 'password', 'createdAt', 'updatedAt', 'deletedAt'];
+        return ['__isInitialized__', '' . "\0" . 'App\\Models\\User\\UserDoctrineModel' . "\0" . 'email', '' . "\0" . 'App\\Models\\User\\UserDoctrineModel' . "\0" . 'refreshTokens', '' . "\0" . 'App\\Models\\User\\UserDoctrineModel' . "\0" . 'projects', 'id', 'password', 'createdAt', 'updatedAt', 'deletedAt', '' . "\0" . 'App\\Models\\User\\UserDoctrineModel' . "\0" . 'uuid'];
     }
 
     /**
@@ -494,6 +494,28 @@ class UserDoctrineModel extends \App\Models\User\UserDoctrineModel implements \D
         $this->__initializer__ && $this->__initializer__->__invoke($this, 'isDeleted', []);
 
         return parent::isDeleted();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function setUuid(string $uuid): \App\Models\Uuidable
+    {
+
+        $this->__initializer__ && $this->__initializer__->__invoke($this, 'setUuid', [$uuid]);
+
+        return parent::setUuid($uuid);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function getUuid(): string
+    {
+
+        $this->__initializer__ && $this->__initializer__->__invoke($this, 'getUuid', []);
+
+        return parent::getUuid();
     }
 
 }

@@ -85,7 +85,7 @@ final class ProjectApiCallsTest extends IntegrationTestCase
         $responseData = $response->getData(true);
         $this->assertEquals($label, $responseData['project']['label']);
         $this->assertEquals($description, $responseData['project']['description']);
-        $this->assertNotEmpty($this->getProjectRepository()->findBy(['identifier' => $responseData['project']['identifier']]));
+        $this->assertNotEmpty($this->getProjectRepository()->findBy(['uuid' => $responseData['project']['uuid']]));
     }
 
     /**
@@ -108,7 +108,7 @@ final class ProjectApiCallsTest extends IntegrationTestCase
         $this->assertResponseStatus(201);
         $responseData = $response->getData(true);
         $this->assertEquals($label, $responseData['project']['label']);
-        $this->assertNotEmpty($this->getProjectRepository()->findBy(['identifier' => $responseData['project']['identifier']]));
+        $this->assertNotEmpty($this->getProjectRepository()->findBy(['uuid' => $responseData['project']['uuid']]));
     }
 
     /**

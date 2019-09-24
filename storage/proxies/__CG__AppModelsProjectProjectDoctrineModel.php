@@ -64,10 +64,10 @@ class ProjectDoctrineModel extends \App\Models\Project\ProjectDoctrineModel impl
     public function __sleep()
     {
         if ($this->__isInitialized__) {
-            return ['__isInitialized__', '' . "\0" . 'App\\Models\\Project\\ProjectDoctrineModel' . "\0" . 'identifier', '' . "\0" . 'App\\Models\\Project\\ProjectDoctrineModel' . "\0" . 'label', '' . "\0" . 'App\\Models\\Project\\ProjectDoctrineModel' . "\0" . 'user', '' . "\0" . 'App\\Models\\Project\\ProjectDoctrineModel' . "\0" . 'description', 'id', 'deletedAt', 'createdAt', 'updatedAt'];
+            return ['__isInitialized__', '' . "\0" . 'App\\Models\\Project\\ProjectDoctrineModel' . "\0" . 'label', '' . "\0" . 'App\\Models\\Project\\ProjectDoctrineModel' . "\0" . 'user', '' . "\0" . 'App\\Models\\Project\\ProjectDoctrineModel' . "\0" . 'description', 'id', 'deletedAt', 'createdAt', 'updatedAt', '' . "\0" . 'App\\Models\\Project\\ProjectDoctrineModel' . "\0" . 'uuid'];
         }
 
-        return ['__isInitialized__', '' . "\0" . 'App\\Models\\Project\\ProjectDoctrineModel' . "\0" . 'identifier', '' . "\0" . 'App\\Models\\Project\\ProjectDoctrineModel' . "\0" . 'label', '' . "\0" . 'App\\Models\\Project\\ProjectDoctrineModel' . "\0" . 'user', '' . "\0" . 'App\\Models\\Project\\ProjectDoctrineModel' . "\0" . 'description', 'id', 'deletedAt', 'createdAt', 'updatedAt'];
+        return ['__isInitialized__', '' . "\0" . 'App\\Models\\Project\\ProjectDoctrineModel' . "\0" . 'label', '' . "\0" . 'App\\Models\\Project\\ProjectDoctrineModel' . "\0" . 'user', '' . "\0" . 'App\\Models\\Project\\ProjectDoctrineModel' . "\0" . 'description', 'id', 'deletedAt', 'createdAt', 'updatedAt', '' . "\0" . 'App\\Models\\Project\\ProjectDoctrineModel' . "\0" . 'uuid'];
     }
 
     /**
@@ -173,28 +173,6 @@ class ProjectDoctrineModel extends \App\Models\Project\ProjectDoctrineModel impl
     }
 
     
-    /**
-     * {@inheritDoc}
-     */
-    public function setIdentifier(string $identifier): \App\Models\Project\ProjectModel
-    {
-
-        $this->__initializer__ && $this->__initializer__->__invoke($this, 'setIdentifier', [$identifier]);
-
-        return parent::setIdentifier($identifier);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public function getIdentifier(): string
-    {
-
-        $this->__initializer__ && $this->__initializer__->__invoke($this, 'getIdentifier', []);
-
-        return parent::getIdentifier();
-    }
-
     /**
      * {@inheritDoc}
      */
@@ -384,6 +362,28 @@ class ProjectDoctrineModel extends \App\Models\Project\ProjectDoctrineModel impl
         $this->__initializer__ && $this->__initializer__->__invoke($this, 'getUpdatedAt', []);
 
         return parent::getUpdatedAt();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function setUuid(string $uuid): \App\Models\Uuidable
+    {
+
+        $this->__initializer__ && $this->__initializer__->__invoke($this, 'setUuid', [$uuid]);
+
+        return parent::setUuid($uuid);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function getUuid(): string
+    {
+
+        $this->__initializer__ && $this->__initializer__->__invoke($this, 'getUuid', []);
+
+        return parent::getUuid();
     }
 
 }

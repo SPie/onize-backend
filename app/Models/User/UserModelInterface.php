@@ -6,6 +6,7 @@ use App\Models\ModelInterface;
 use App\Models\Project\ProjectModel;
 use App\Models\SoftDeletable;
 use App\Models\Timestampable;
+use App\Models\Uuidable;
 use Illuminate\Support\Collection;
 use SPie\LaravelJWT\Contracts\JWTAuthenticatable;
 
@@ -14,7 +15,7 @@ use SPie\LaravelJWT\Contracts\JWTAuthenticatable;
  *
  * @package App\Models\User
  */
-interface UserModelInterface extends ModelInterface, Timestampable, SoftDeletable, JWTAuthenticatable
+interface UserModelInterface extends ModelInterface, Timestampable, SoftDeletable, JWTAuthenticatable, Uuidable
 {
     const PROPERTY_EMAIL          = 'email';
     const PROPERTY_PASSWORD       = 'password';

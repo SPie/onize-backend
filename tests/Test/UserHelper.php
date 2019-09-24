@@ -24,12 +24,17 @@ trait UserHelper
     /**
      * @param string|null $email
      * @param string|null $password
+     * @param string|null $uuid
      *
      * @return UserDoctrineModel
      */
-    protected function createUserDoctrineModel(string $email = null, string $password = null): UserDoctrineModel
-    {
+    protected function createUserDoctrineModel(
+        string $email = null,
+        string $password = null,
+        string $uuid = null
+    ): UserDoctrineModel {
         return new UserDoctrineModel(
+            $uuid ?: $this->getFaker()->uuid,
             $email ?: $this->getFaker()->safeEmail,
             $password ?: $this->getFaker()->password
         );

@@ -118,4 +118,17 @@ trait ModelHelper
 
         return $this;
     }
+
+    /**
+     * @param string $uuid
+     *
+     * @return UuidFactory
+     */
+    private function createUuidFactoryWithUuid(string $uuid = null): UuidFactory
+    {
+        $uuidFactory = $this->createUuidFactory();
+        $this->mockUuidFactoryCreate($uuidFactory, $uuid ?: $this->getFaker()->uuid);
+
+        return $uuidFactory;
+    }
 }

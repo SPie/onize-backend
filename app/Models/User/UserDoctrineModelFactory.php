@@ -7,6 +7,8 @@ use App\Models\ModelInterface;
 use App\Models\ModelParameterValidation;
 use App\Models\Project\ProjectModel;
 use App\Models\Project\ProjectModelFactory;
+use App\Models\UuidCreate;
+use App\Services\Uuid\UuidFactory;
 
 /**
  * Class UserDoctrineModelFactory
@@ -16,6 +18,7 @@ use App\Models\Project\ProjectModelFactory;
 class UserDoctrineModelFactory implements UserModelFactoryInterface
 {
     use ModelParameterValidation;
+    use UuidCreate;
 
     /**
      * @var RefreshTokenModelFactory
@@ -26,6 +29,16 @@ class UserDoctrineModelFactory implements UserModelFactoryInterface
      * @var ProjectModelFactory
      */
     private $projectModelFactory;
+
+    /**
+     * UserDoctrineModelFactory constructor.
+     *
+     * @param UuidFactory $uuidFactory
+     */
+    public function __construct(UuidFactory $uuidFactory)
+    {
+        $this->uuidFactory = $uuidFactory;
+    }
 
     /**
      * @param RefreshTokenModelFactory $refreshTokenModelFactory
@@ -78,6 +91,7 @@ class UserDoctrineModelFactory implements UserModelFactoryInterface
     public function create(array $data): ModelInterface
     {
         return (new UserDoctrineModel(
+            $this->getUuidFactory()->create(),
             $this->validateStringParameter($data, UserModelInterface::PROPERTY_EMAIL),
             $this->validateStringParameter($data, UserModelInterface::PROPERTY_PASSWORD),
             $this->validateDateTimeParameter($data, UserModelInterface::PROPERTY_CREATED_AT, false),

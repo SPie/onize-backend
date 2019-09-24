@@ -4,6 +4,7 @@ use App\Exceptions\InvalidParameterException;
 use App\Models\Project\ProjectModelFactory;
 use App\Models\User\UserDoctrineModelFactory;
 use App\Models\User\UserModelInterface;
+use App\Services\Uuid\UuidFactory;
 use Illuminate\Support\Facades\Hash;
 use Mockery\MockInterface;
 use Test\AuthHelper;
@@ -30,6 +31,7 @@ class UserDoctrineModelFactoryTest extends TestCase
      */
     public function testCreate(): void
     {
+        $uuid = $this->getFaker()->uuid;
         $data = [
             UserModelInterface::PROPERTY_EMAIL      => $this->getFaker()->safeEmail,
             UserModelInterface::PROPERTY_PASSWORD   => $this->getFaker()->password(),
@@ -39,8 +41,9 @@ class UserDoctrineModelFactoryTest extends TestCase
             UserModelInterface::PROPERTY_DELETED_AT => $this->getFaker()->dateTime(),
         ];
 
-        $user = $this->getUserModelFactory()->create($data);
+        $user = $this->getUserModelFactory($this->createUuidFactoryWithUuid($uuid))->create($data);
 
+        $this->assertEquals($uuid, $user->getUuid());
         $this->assertEquals($data[UserModelInterface::PROPERTY_EMAIL], $user->getEmail());
         $this->assertTrue(Hash::check($data[UserModelInterface::PROPERTY_PASSWORD], $user->getAuthPassword()));
         $this->assertEquals($data[UserModelInterface::PROPERTY_ID], $user->getId());
@@ -351,7 +354,7 @@ class UserDoctrineModelFactoryTest extends TestCase
 
         $this->assertEquals(
             [$project],
-            $this->getUserModelFactory($projectModelFactory)->create($data)->getProjects()->all()
+            $this->getUserModelFactory(null, $projectModelFactory)->create($data)->getProjects()->all()
         );
     }
 
@@ -404,7 +407,7 @@ class UserDoctrineModelFactoryTest extends TestCase
 
         $this->expectException(InvalidParameterException::class);
 
-        $this->getUserModelFactory($projectModelFactory)->create($data);
+        $this->getUserModelFactory(null, $projectModelFactory)->create($data);
     }
 
     /**
@@ -415,13 +418,13 @@ class UserDoctrineModelFactoryTest extends TestCase
     public function testFill(): void
     {
         $data = [
-            UserModelInterface::PROPERTY_EMAIL                 => $this->getFaker()->safeEmail,
-            UserModelInterface::PROPERTY_PASSWORD              => $this->getFaker()->password(),
-            UserModelInterface::PROPERTY_ID                    => $this->getFaker()->numberBetween(),
-            UserModelInterface::PROPERTY_CREATED_AT            => $this->getFaker()->dateTime(),
-            UserModelInterface::PROPERTY_UPDATED_AT            => $this->getFaker()->dateTime(),
-            UserModelInterface::PROPERTY_DELETED_AT            => $this->getFaker()->dateTime(),
-            UserModelInterface::PROPERTY_REFRESH_TOKENS        => [
+            UserModelInterface::PROPERTY_EMAIL          => $this->getFaker()->safeEmail,
+            UserModelInterface::PROPERTY_PASSWORD       => $this->getFaker()->password(),
+            UserModelInterface::PROPERTY_ID             => $this->getFaker()->numberBetween(),
+            UserModelInterface::PROPERTY_CREATED_AT     => $this->getFaker()->dateTime(),
+            UserModelInterface::PROPERTY_UPDATED_AT     => $this->getFaker()->dateTime(),
+            UserModelInterface::PROPERTY_DELETED_AT     => $this->getFaker()->dateTime(),
+            UserModelInterface::PROPERTY_REFRESH_TOKENS => [
                 $this->createRefreshToken(),
             ],
         ];
@@ -468,13 +471,19 @@ class UserDoctrineModelFactoryTest extends TestCase
     //region Mocks
 
     /**
+     * @param UuidFactory|null         $uuidFactory
      * @param ProjectModelFactory|null $projectModelFactory
      *
      * @return UserDoctrineModelFactory|MockInterface
      */
-    private function getUserModelFactory(ProjectModelFactory $projectModelFactory = null): UserDoctrineModelFactory
-    {
-        $userDoctrineModelFactory = Mockery::mock(UserDoctrineModelFactory::class);
+    private function getUserModelFactory(
+        UuidFactory $uuidFactory = null,
+        ProjectModelFactory $projectModelFactory = null
+    ): UserDoctrineModelFactory {
+        $userDoctrineModelFactory = Mockery::mock(
+            UserDoctrineModelFactory::class,
+            [$uuidFactory ?: $this->createUuidFactoryWithUuid()]
+        );
         $userDoctrineModelFactory
             ->makePartial()
             ->shouldAllowMockingProtectedMethods();

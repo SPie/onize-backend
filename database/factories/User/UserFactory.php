@@ -13,8 +13,9 @@ use LaravelDoctrine\ORM\Testing\Factory;
 
 $factory->define(UserDoctrineModel::class, function (Faker $faker, array $attributes = []) {
     return [
-        UserModelInterface::PROPERTY_EMAIL    => $attributes[UserModelInterface::PROPERTY_EMAIL] ?? $faker->safeEmail,
-        UserModelInterface::PROPERTY_PASSWORD => $attributes[UserModelInterface::PROPERTY_PASSWORD] ?? Hash::make($faker->password()),
-        UserModelInterface::PROPERTY_REFRESH_TOKENS => $attributes[UserModelInterface::PROPERTY_REFRESH_TOKENS] ?? []
+        UserModelInterface::PROPERTY_UUID           => $attributes[UserModelInterface::PROPERTY_UUID] ?? $faker->uuid,
+        UserModelInterface::PROPERTY_EMAIL          => $attributes[UserModelInterface::PROPERTY_EMAIL] ?? $faker->safeEmail,
+        UserModelInterface::PROPERTY_PASSWORD       => $attributes[UserModelInterface::PROPERTY_PASSWORD] ?? Hash::make($faker->password()),
+        UserModelInterface::PROPERTY_REFRESH_TOKENS => $attributes[UserModelInterface::PROPERTY_REFRESH_TOKENS] ?? [],
     ];
 });

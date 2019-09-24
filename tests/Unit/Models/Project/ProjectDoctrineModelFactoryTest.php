@@ -27,7 +27,7 @@ final class ProjectDoctrineModelFactoryTest extends TestCase
      */
     public function testCreate(): void
     {
-        $identifier = $this->getFaker()->uuid;
+        $uuid = $this->getFaker()->uuid;
         $data = [
             'id'          => $this->getFaker()->numberBetween(),
             'label'       => $this->getFaker()->word,
@@ -40,7 +40,7 @@ final class ProjectDoctrineModelFactoryTest extends TestCase
 
         $this->assertEquals(
             $this->createProjectDoctrineModel(
-                $identifier,
+                $uuid,
                 $data['label'],
                 $data['user'],
                 $data['description'],
@@ -49,7 +49,7 @@ final class ProjectDoctrineModelFactoryTest extends TestCase
                 $data['deletedAt'],
                 $data['id']
             ),
-            $this->getProjectDoctrineModelFactory($this->createUuidFactoryWithIdentifier($identifier))->create($data)
+            $this->getProjectDoctrineModelFactory($this->createUuidFactoryWithUuid($uuid))->create($data)
         );
     }
 
@@ -58,7 +58,7 @@ final class ProjectDoctrineModelFactoryTest extends TestCase
      */
     public function testCreateOnlyWithRequiredParameters(): void
     {
-        $identifier = $this->getFaker()->uuid;
+        $uuid = $this->getFaker()->uuid;
         $data = [
             'label'       => $this->getFaker()->word,
             'user'        => $this->createUserModel(),
@@ -66,11 +66,11 @@ final class ProjectDoctrineModelFactoryTest extends TestCase
 
         $this->assertEquals(
             new ProjectDoctrineModel(
-                $identifier,
+                $uuid,
                 $data['label'],
                 $data['user']
             ),
-            $this->getProjectDoctrineModelFactory($this->createUuidFactoryWithIdentifier($identifier))->create($data)
+            $this->getProjectDoctrineModelFactory($this->createUuidFactoryWithUuid($uuid))->create($data)
         );
     }
 
@@ -79,7 +79,7 @@ final class ProjectDoctrineModelFactoryTest extends TestCase
      */
     public function testCreateOnlyWithUserDataArray(): void
     {
-        $identifier = $this->getFaker()->uuid;
+        $uuid = $this->getFaker()->uuid;
         $data = [
             'label'       => $this->getFaker()->word,
             'user'        => [$this->getFaker()->uuid => $this->getFaker()->uuid],
@@ -90,12 +90,12 @@ final class ProjectDoctrineModelFactoryTest extends TestCase
 
         $this->assertEquals(
             new ProjectDoctrineModel(
-                $identifier,
+                $uuid,
                 $data['label'],
                 $user
             ),
             $this->getProjectDoctrineModelFactory(
-                $this->createUuidFactoryWithIdentifier($identifier),
+                $this->createUuidFactoryWithUuid($uuid),
                 $userModelFactory
             )->create($data)
         );
@@ -242,17 +242,17 @@ final class ProjectDoctrineModelFactoryTest extends TestCase
     /**
      * @return void
      */
-    public function testCreateOnlyWithUnusedIdentifier(): void
+    public function testCreateOnlyWithUnusedUuid(): void
     {
         $data = [
-            'identifier' => $this->getFaker()->uuid,
+            'uuid'  => $this->getFaker()->uuid,
             'label' => $this->getFaker()->word,
             'user'  => $this->createUserModel(),
         ];
 
         $project = $this->getProjectDoctrineModelFactory()->create($data);
 
-        $this->assertNotEquals($data['identifier'], $project->getIdentifier());
+        $this->assertNotEquals($data['uuid'], $project->getUuid());
     }
 
 
@@ -274,7 +274,7 @@ final class ProjectDoctrineModelFactoryTest extends TestCase
 
         $this->assertEquals(
             (new ProjectDoctrineModel(
-                $project->getIdentifier(),
+                $project->getUuid(),
                 $data['label'],
                 $data['user'],
                 $data['description'],
@@ -422,14 +422,14 @@ final class ProjectDoctrineModelFactoryTest extends TestCase
     /**
      * @return void
      */
-    public function testFillUnusedIdentifier(): void
+    public function testFillUnusedUuid(): void
     {
-        $data = ['identifier' => $this->getFaker()->uuid];
+        $data = ['uuid' => $this->getFaker()->uuid];
         $project = $this->createProjectDoctrineModel();
 
         $project = $this->getProjectDoctrineModelFactory()->fill($project, $data);
 
-        $this->assertNotEquals($data['identifier'], $project->getIdentifier());
+        $this->assertNotEquals($data['uuid'], $project->getUuid());
     }
 
     //endregion
@@ -450,7 +450,7 @@ final class ProjectDoctrineModelFactoryTest extends TestCase
     }
 
     /**
-     * @param string|null             $identifier
+     * @param string|null             $uuid
      * @param string|null             $label
      * @param UserModelInterface|null $user
      * @param string|null             $description
@@ -462,7 +462,7 @@ final class ProjectDoctrineModelFactoryTest extends TestCase
      * @return ProjectDoctrineModel
      */
     private function createProjectDoctrineModel(
-        string $identifier = null,
+        string $uuid = null,
         string $label = null,
         UserModelInterface $user = null,
         string $description = null,
@@ -472,7 +472,7 @@ final class ProjectDoctrineModelFactoryTest extends TestCase
         int $id = null
     ): ProjectDoctrineModel {
         return (new ProjectDoctrineModel(
-            $identifier ?: $this->getFaker()->uuid,
+            $uuid ?: $this->getFaker()->uuid,
             $label ?: $this->getFaker()->word,
             $user ?: $this->createUserModel(),
             $description ?: $this->getFaker()->text,
@@ -480,18 +480,5 @@ final class ProjectDoctrineModelFactoryTest extends TestCase
             $updatedAt ?: $this->getFaker()->dateTime,
             $deletedAt ?: $this->getFaker()->dateTime
         ))->setId($id ?: $this->getFaker()->numberBetween());
-    }
-
-    /**
-     * @param string $identifier
-     *
-     * @return UuidFactory
-     */
-    private function createUuidFactoryWithIdentifier(string $identifier): UuidFactory
-    {
-        $uuidFactory = $this->createUuidFactory();
-        $this->mockUuidFactoryCreate($uuidFactory, $identifier);
-
-        return $uuidFactory;
     }
 }
