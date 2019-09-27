@@ -255,6 +255,28 @@ final class ProjectDoctrineModelFactoryTest extends TestCase
         $this->assertNotEquals($data['uuid'], $project->getUuid());
     }
 
+    /**
+     * @return void
+     */
+    public function testCreateWithEmptyDescription(): void
+    {
+        $uuid = $this->getFaker()->uuid;
+        $data = [
+            'label'       => $this->getFaker()->word,
+            'user'        => $this->createUserModel(),
+            'description' => '',
+        ];
+
+        $this->assertEquals(
+            new ProjectDoctrineModel(
+                $uuid,
+                $data['label'],
+                $data['user'],
+                ''
+            ),
+            $this->getProjectDoctrineModelFactory($this->createUuidFactoryWithUuid($uuid))->create($data)
+        );
+    }
 
     /**
      * @return void

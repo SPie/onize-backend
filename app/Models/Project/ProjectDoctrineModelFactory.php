@@ -66,7 +66,7 @@ final class ProjectDoctrineModelFactory implements ProjectModelFactory
             $this->getUuidFactory()->create(),
             $this->validateStringParameter($data, ProjectModel::PROPERTY_LABEL),
             $this->validateUserModel($data),
-            $this->validateStringParameter($data, ProjectModel::PROPERTY_DESCRIPTION, false),
+            $this->validateStringParameter($data, ProjectModel::PROPERTY_DESCRIPTION, false, true),
             $this->validateDateTimeParameter($data, ProjectModel::PROPERTY_CREATED_AT, false),
             $this->validateDateTimeParameter($data, ProjectModel::PROPERTY_UPDATED_AT, false),
             $this->validateDateTimeParameter($data, ProjectModel::PROPERTY_DELETED_AT, false)
