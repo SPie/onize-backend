@@ -2,6 +2,7 @@
 
 namespace App\Services\Project;
 
+use App\Exceptions\ModelNotFoundException;
 use App\Models\Project\ProjectModel;
 use App\Models\Project\ProjectModelFactory;
 use App\Models\User\UserModelInterface;
@@ -67,5 +68,17 @@ final class ProjectService implements ProjectServiceInterface
                 )
             )
         );
+    }
+
+    /**
+     * @param string $uuid
+     *
+     * @return ProjectServiceInterface
+     *
+     * @throws ModelNotFoundException
+     */
+    public function removeProject(string $uuid): ProjectServiceInterface
+    {
+        return $this;
     }
 }

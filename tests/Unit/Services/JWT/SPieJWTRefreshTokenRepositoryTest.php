@@ -38,7 +38,7 @@ class SPieJWTRefreshTokenRepositoryTest extends TestCase
         $userRepository
             ->shouldReceive('findOneByEmail')
             ->andReturn($user);
-        $refreshTokenRepository = $this->createRefreshTokenRepository();
+        $refreshTokenRepository = $this->getRefreshTokenRepository();
         $refreshTokenRepository
             ->shouldReceive('save');
 
@@ -124,7 +124,7 @@ class SPieJWTRefreshTokenRepositoryTest extends TestCase
         $refreshTokenId = $this->getFaker()->uuid;
         $refreshToken = $this->createRefreshToken();
 
-        $refreshTokenRepository = $this->createRefreshTokenRepository();
+        $refreshTokenRepository = $this->getRefreshTokenRepository();
         $refreshTokenRepository
             ->shouldReceive('findOneByRefreshTokenId')
             ->andReturn($refreshToken);
@@ -166,7 +166,7 @@ class SPieJWTRefreshTokenRepositoryTest extends TestCase
      */
     public function testRevokeRefreshTokenWithoutRefreshToken(): void
     {
-        $refreshTokenRepository = $this->createRefreshTokenRepository();
+        $refreshTokenRepository = $this->getRefreshTokenRepository();
         $refreshTokenRepository
             ->shouldReceive('findOneByRefreshTokenId')
             ->andReturnNull();
@@ -193,7 +193,7 @@ class SPieJWTRefreshTokenRepositoryTest extends TestCase
             ->shouldReceive('getValidUntil')
             ->andReturnNull();
 
-        $refreshTokenRepository = $this->createRefreshTokenRepository();
+        $refreshTokenRepository = $this->getRefreshTokenRepository();
         $refreshTokenRepository
             ->shouldReceive('findOneByRefreshTokenId')
             ->andReturn($refreshToken);
@@ -218,7 +218,7 @@ class SPieJWTRefreshTokenRepositoryTest extends TestCase
             ->shouldReceive('getValidUntil')
             ->andReturnNull();
 
-        $refreshTokenRepository = $this->createRefreshTokenRepository();
+        $refreshTokenRepository = $this->getRefreshTokenRepository();
         $refreshTokenRepository
             ->shouldReceive('findOneByRefreshTokenId')
             ->andReturn($refreshToken);
@@ -243,7 +243,7 @@ class SPieJWTRefreshTokenRepositoryTest extends TestCase
             ->shouldReceive('getValidUntil')
             ->andReturn((new \DateTime())->sub(new \DateInterval('P1D')));
 
-        $refreshTokenRepository = $this->createRefreshTokenRepository();
+        $refreshTokenRepository = $this->getRefreshTokenRepository();
         $refreshTokenRepository
             ->shouldReceive('findOneByRefreshTokenId')
             ->andReturn($refreshToken);
@@ -263,7 +263,7 @@ class SPieJWTRefreshTokenRepositoryTest extends TestCase
      */
     public function testIsRefreshTokenRevokedWIthoutRefreshToken(): void
     {
-        $refreshTokenRepository = $this->createRefreshTokenRepository();
+        $refreshTokenRepository = $this->getRefreshTokenRepository();
         $refreshTokenRepository
             ->shouldReceive('findOneByRefreshTokenId')
             ->andReturnNull();
@@ -296,7 +296,7 @@ class SPieJWTRefreshTokenRepositoryTest extends TestCase
             SPieJWTRefreshTokenRepository::class,
             [
                 $refreshTokenModelFactory ?: $this->createRefreshTokenModelFactory(),
-                $refreshTokenRepository ?: $this->createRefreshTokenRepository(),
+                $refreshTokenRepository ?: $this->getRefreshTokenRepository(),
                 $userRepository ?: $this->createUserRepository()
             ]
         );

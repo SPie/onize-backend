@@ -1,9 +1,11 @@
 <?php
 
 use App\Models\User\RefreshTokenModel;
+use App\Repositories\DatabaseHandler;
 use App\Repositories\User\RefreshTokenDoctrineRepository;
 use Mockery\MockInterface;
 use Test\AuthHelper;
+use Test\ModelHelper;
 use Test\UserHelper;
 
 /**
@@ -12,6 +14,7 @@ use Test\UserHelper;
 class RefreshTokenDoctrineRepositoryTest extends TestCase
 {
     use AuthHelper;
+    use ModelHelper;
     use UserHelper;
 
     //region Tests
@@ -23,18 +26,13 @@ class RefreshTokenDoctrineRepositoryTest extends TestCase
     {
         $refreshTokenId = $this->getFaker()->uuid;
         $refreshToken = $this->createRefreshToken();
+        $databaseHandler = $this->createDatabaseHandler();
+        $this->mockDatabaseHandlerLoad($databaseHandler, $refreshToken, ['identifier' => $refreshTokenId]);
 
-        $refreshTokenRepository = $this->createRefreshTokenRepository();
-        $refreshTokenRepository
-            ->shouldReceive('findOneBy')
-            ->andReturn($refreshToken);
-
-        $this->assertEquals($refreshToken, $refreshTokenRepository->findOneByRefreshTokenId($refreshTokenId));
-
-        $refreshTokenRepository
-            ->shouldHaveReceived('findOneBy')
-            ->with([RefreshTokenModel::PROPERTY_IDENTIFIER => $refreshTokenId])
-            ->once();
+        $this->assertEquals(
+            $refreshToken,
+            $this->getrefreshtokenrepository($databaseHandler)->findOneByRefreshTokenId($refreshTokenId)
+        );
     }
 
     /**
@@ -42,12 +40,11 @@ class RefreshTokenDoctrineRepositoryTest extends TestCase
      */
     public function testFindOneByRefreshTokenIdWithoutRefreshToken(): void
     {
-        $refreshTokenRepository = $this->createRefreshTokenRepository();
-        $refreshTokenRepository
-            ->shouldReceive('findOneBy')
-            ->andReturnNull();
+        $refreshTokenId = $this->getFaker()->uuid;
+        $databaseHandler = $this->createDatabaseHandler();
+        $this->mockDatabaseHandlerLoad($databaseHandler, null, ['identifier' => $refreshTokenId]);
 
-        $this->assertEmpty($refreshTokenRepository->findOneByRefreshTokenId($this->getFaker()->uuid));
+        $this->assertEmpty($this->getRefreshTokenRepository($databaseHandler)->findOneByRefreshTokenId($refreshTokenId));
     }
 
     //endregion
@@ -55,16 +52,13 @@ class RefreshTokenDoctrineRepositoryTest extends TestCase
     //region Mocks
 
     /**
-     * @return RefreshTokenDoctrineRepository|MockInterface
+     * @param DatabaseHandler|null $databaseHandler
+     *
+     * @return RefreshTokenDoctrineRepository
      */
-    private function createRefreshTokenRepository(): RefreshTokenDoctrineRepository
+    private function getRefreshTokenRepository(DatabaseHandler $databaseHandler = null): RefreshTokenDoctrineRepository
     {
-        $refreshTokenRepository = Mockery::spy(RefreshTokenDoctrineRepository::class);
-        $refreshTokenRepository
-            ->makePartial()
-            ->shouldAllowMockingProtectedMethods();
-
-        return $refreshTokenRepository;
+        return new RefreshTokenDoctrineRepository($databaseHandler ?: $this->createDatabaseHandler());
     }
 
     //endregion

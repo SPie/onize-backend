@@ -277,14 +277,6 @@ trait UserHelper
     }
 
     /**
-     * @return UserRepository
-     */
-    protected function getUserRepository(): UserRepository
-    {
-        return $this->app->get(UserRepository::class);
-    }
-
-    /**
      * @return UsersServiceInterface
      */
     protected function getUserService(): UsersServiceInterface

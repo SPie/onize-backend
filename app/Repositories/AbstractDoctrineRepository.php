@@ -4,10 +4,6 @@ namespace App\Repositories;
 
 use App\Models\ModelInterface;
 use Doctrine\Common\Collections\Criteria;
-use Doctrine\Common\Persistence\Mapping\ClassMetadata;
-use Doctrine\ORM\EntityManagerInterface;
-use Doctrine\ORM\LazyCriteriaCollection;
-use Doctrine\ORM\Persisters\Entity\EntityPersister;
 use Illuminate\Support\Collection;
 
 /**
@@ -17,43 +13,27 @@ use Illuminate\Support\Collection;
  */
 abstract class AbstractDoctrineRepository implements RepositoryInterface
 {
-
     /**
-     * @var EntityManagerInterface
+     * @var DatabaseHandler
      */
-    private $entityManager;
-
-    /**
-     * @var string
-     */
-    private $className;
+    private $databaseHandler;
 
     /**
      * AbstractDoctrineRepository constructor.
      *
-     * @param EntityManagerInterface $entityManager
-     * @param ClassMetadata          $classMetadata
+     * @param DatabaseHandler $databaseHandler
      */
-    public function __construct(EntityManagerInterface $entityManager, ClassMetadata $classMetadata)
+    public function __construct(DatabaseHandler $databaseHandler)
     {
-        $this->entityManager = $entityManager;
-        $this->className     = $classMetadata->getName();
+        $this->databaseHandler = $databaseHandler;
     }
 
     /**
-     * @return EntityManagerInterface
+     * @return DatabaseHandler
      */
-    protected function getEntityManager(): EntityManagerInterface
+    private function getDatabaseHandler()
     {
-        return $this->entityManager;
-    }
-
-    /**
-     * @return string
-     */
-    public function getClassName()
-    {
-        return $this->className;
+        return $this->databaseHandler;
     }
 
     /**
@@ -63,8 +43,7 @@ abstract class AbstractDoctrineRepository implements RepositoryInterface
      */
     public function find($id): ?ModelInterface
     {
-        /** @noinspection PhpIncompatibleReturnTypeInspection */
-        return $this->getEntityManager()->find($this->getClassName(), $id);
+        return $this->getDatabaseHandler()->find($id);
     }
 
     /**
@@ -72,7 +51,8 @@ abstract class AbstractDoctrineRepository implements RepositoryInterface
      */
     public function findAll(): Collection
     {
-        return $this->findBy();
+        return $this->getDatabaseHandler()->loadAll();
+
     }
 
     /**
@@ -83,20 +63,9 @@ abstract class AbstractDoctrineRepository implements RepositoryInterface
      *
      * @return Collection
      */
-    public function findBy(
-        array $criteria = [],
-        array $orderBy = null,
-        $limit = null,
-        $offset = null
-    ): Collection {
-        return new Collection(
-            $this->getEntityPersister()->loadAll(
-                $criteria,
-                $orderBy,
-                $limit,
-                $offset
-            )
-        );
+    public function findBy(array $criteria = [], array $orderBy = null, $limit = null, $offset = null): Collection
+    {
+        return $this->getDatabaseHandler()->loadAll($criteria, $orderBy, $limit, $offset);
     }
 
     /**
@@ -106,8 +75,7 @@ abstract class AbstractDoctrineRepository implements RepositoryInterface
      */
     public function findOneBy(array $criteria): ?ModelInterface
     {
-        /** @noinspection PhpIncompatibleReturnTypeInspection */
-        return $this->getEntityPersister()->load($criteria);
+        return $this->getDatabaseHandler()->load($criteria);
     }
 
     /**
@@ -117,7 +85,7 @@ abstract class AbstractDoctrineRepository implements RepositoryInterface
      */
     public function findByCriteria(Criteria $criteria): Collection
     {
-        return new Collection((new LazyCriteriaCollection($this->getEntityPersister(), $criteria))->getValues());
+        return $this->getDatabaseHandler()->loadByCriteria($criteria);
     }
 
     /**
@@ -128,13 +96,7 @@ abstract class AbstractDoctrineRepository implements RepositoryInterface
      */
     public function save(ModelInterface $model, bool $flush = true): ModelInterface
     {
-        $this->getEntityManager()->persist($model);
-
-        if ($flush) {
-            $this->getEntityManager()->flush();
-        }
-
-        return $model;
+        return $this->getDatabaseHandler()->save($model, $flush);
     }
 
     /**
@@ -145,11 +107,7 @@ abstract class AbstractDoctrineRepository implements RepositoryInterface
      */
     public function delete(ModelInterface $model, bool $flush = true)
     {
-        $this->getEntityManager()->remove($model);
-
-        if ($flush) {
-            $this->getEntityManager()->flush();
-        }
+        $this->getDatabaseHandler()->delete($model, $flush);
 
         return $this;
     }
@@ -159,16 +117,8 @@ abstract class AbstractDoctrineRepository implements RepositoryInterface
      */
     public function flush()
     {
-        $this->getEntityManager()->flush();
+        $this->getDatabaseHandler()->flush();
 
         return $this;
-    }
-
-    /**
-     * @return EntityPersister
-     */
-    protected function getEntityPersister(): EntityPersister
-    {
-        return $this->getEntityManager()->getUnitOfWork()->getEntityPersister($this->getClassName());
     }
 }

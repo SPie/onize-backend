@@ -1,8 +1,10 @@
 <?php
 
 use App\Models\User\UserModelInterface;
+use App\Repositories\DatabaseHandler;
 use App\Repositories\User\UserDoctrineRepository;
 use Mockery\MockInterface;
+use Test\ModelHelper;
 use Test\UserHelper;
 
 /**
@@ -10,6 +12,7 @@ use Test\UserHelper;
  */
 class UserDoctrineRepositoryTest extends TestCase
 {
+    use ModelHelper;
     use UserHelper;
 
     //region Tests
@@ -21,18 +24,10 @@ class UserDoctrineRepositoryTest extends TestCase
     {
         $email = $this->getFaker()->safeEmail;
         $user = $this->createUserDoctrineModel();
+        $databaseHandler = $this->createDatabaseHandler();
+        $this->mockDatabaseHandlerLoad($databaseHandler, $user, ['email' => $email]);
 
-        $userRepository = $this->createUserRepository();
-        $userRepository
-            ->shouldReceive('findOneBy')
-            ->andReturn($user);
-
-        $this->assertEquals($user, $userRepository->findOneByEmail($email));
-
-        $userRepository
-            ->shouldHaveReceived('findOneBy')
-            ->with([UserModelInterface::PROPERTY_EMAIL => $email])
-            ->once();
+        $this->assertEquals($user, $this->getUserRepository($databaseHandler)->findOneByEmail($email));
     }
 
     /**
@@ -40,12 +35,11 @@ class UserDoctrineRepositoryTest extends TestCase
      */
     public function testFindOneByEmailWithoutUser(): void
     {
-        $userRepository = $this->createUserRepository();
-        $userRepository
-            ->shouldReceive('findOneBy')
-            ->andReturnNull();
+        $email = $this->getFaker()->safeEmail;
+        $databaseHandler = $this->createDatabaseHandler();
+        $this->mockDatabaseHandlerLoad($databaseHandler, null, ['email' => $email]);
 
-        $this->assertEmpty($userRepository->findOneByEmail($this->getFaker()->safeEmail));
+        $this->assertEmpty($this->getUserRepository($databaseHandler)->findOneByEmail($email));
     }
 
     /**
@@ -53,14 +47,12 @@ class UserDoctrineRepositoryTest extends TestCase
      */
     public function testRetrieveById(): void
     {
+        $email = $this->getFaker()->safeEmail;
         $user = $this->createUserDoctrineModel();
+        $databaseHandler = $this->createDatabaseHandler();
+        $this->mockDatabaseHandlerLoad($databaseHandler, $user, ['email' => $email]);
 
-        $userRepository = $this->createUserRepository();
-        $userRepository
-            ->shouldReceive('findOneByEmail')
-            ->andReturn($user);
-
-        $this->assertEquals($user, $userRepository->retrieveById($this->getFaker()->safeEmail));
+        $this->assertEquals($user, $this->getUserRepository($databaseHandler)->retrieveById($email));
     }
 
     /**
@@ -68,12 +60,11 @@ class UserDoctrineRepositoryTest extends TestCase
      */
     public function testRetrieveByIdWithoutUser(): void
     {
-        $userRepository = $this->createUserRepository();
-        $userRepository
-            ->shouldReceive('findOneByEmail')
-            ->andReturnNull();
+        $email = $this->getFaker()->safeEmail;
+        $databaseHandler = $this->createDatabaseHandler();
+        $this->mockDatabaseHandlerLoad($databaseHandler, null, ['email' => $email]);
 
-        $this->assertEmpty($userRepository->retrieveById($this->getFaker()->safeEmail));
+        $this->assertEmpty($this->getUserRepository($databaseHandler)->retrieveById($this->getFaker()->safeEmail));
     }
 
     /**
@@ -81,16 +72,14 @@ class UserDoctrineRepositoryTest extends TestCase
      */
     public function testRetrieveByToken(): void
     {
+        $email = $this->getFaker()->safeEmail;
         $user = $this->createUserDoctrineModel();
-
-        $userRepository = $this->createUserRepository();
-        $userRepository
-            ->shouldReceive('findOneByEmail')
-            ->andReturn($user);
+        $databaseHandler = $this->createDatabaseHandler();
+        $this->mockDatabaseHandlerLoad($databaseHandler, $user, ['email' => $email]);
 
         $this->assertEquals(
             $user,
-            $userRepository->retrieveByToken($this->getFaker()->safeEmail, $this->getFaker()->uuid)
+            $this->getUserRepository($databaseHandler)->retrieveByToken($email, $this->getFaker()->uuid)
         );
     }
 
@@ -99,14 +88,11 @@ class UserDoctrineRepositoryTest extends TestCase
      */
     public function testRetrieveByTokenWithoutUser(): void
     {
-        $userRepository = $this->createUserRepository();
-        $userRepository
-            ->shouldReceive('findOneByEmail')
-            ->andReturnNull();
+        $email = $this->getFaker()->safeEmail;
+        $databaseHandler = $this->createDatabaseHandler();
+        $this->mockDatabaseHandlerLoad($databaseHandler, null, ['email' => $email]);
 
-        $this->assertEmpty(
-            $userRepository->retrieveByToken($this->getFaker()->safeEmail, $this->getFaker()->uuid)
-        );
+        $this->assertEmpty($this->getUserRepository($databaseHandler)->retrieveByToken($email, $this->getFaker()->uuid));
     }
 
     /**
@@ -115,8 +101,8 @@ class UserDoctrineRepositoryTest extends TestCase
     public function testUpdateRememberToken(): void
     {
         $this->assertEmpty(
-            $this->createUserRepository()->updateRememberToken(
-                $this->createUserDoctrineModel(),
+            $this->getUserRepository()->updateRememberToken(
+                $this->createUserModel(),
                 $this->getFaker()->uuid
             )
         );
@@ -126,15 +112,12 @@ class UserDoctrineRepositoryTest extends TestCase
     {
         $password = $this->getFaker()->password;
         $user = $this->createUserDoctrineModel(null, $password);
-
-        $userRepository = $this->createUserRepository();
-        $userRepository
-            ->shouldReceive('findOneByEmail')
-            ->andReturn($user);
+        $databaseHandler = $this->createDatabaseHandler();
+        $this->mockDatabaseHandlerLoad($databaseHandler, $user, ['email' => $user->getEmail()]);
 
         $this->assertEquals(
             $user,
-            $userRepository->retrieveByCredentials([
+            $this->getUserRepository($databaseHandler)->retrieveByCredentials([
                 UserModelInterface::PROPERTY_EMAIL    => $user->getEmail(),
                 UserModelInterface::PROPERTY_PASSWORD => $password,
             ])
@@ -147,7 +130,7 @@ class UserDoctrineRepositoryTest extends TestCase
     public function testRetrieveByCredentialsWithoutEmail(): void
     {
         $this->assertEmpty(
-            $this->createUserRepository()
+            $this->getUserRepository()
                  ->retrieveByCredentials([UserModelInterface::PROPERTY_PASSWORD => $this->getFaker()->password])
         );
     }
@@ -155,7 +138,7 @@ class UserDoctrineRepositoryTest extends TestCase
     public function testRetrieveByCredentialsWithoutPassword(): void
     {
         $this->assertEmpty(
-            $this->createUserRepository()
+            $this->getUserRepository()
                  ->retrieveByCredentials([UserModelInterface::PROPERTY_EMAIL => $this->getFaker()->safeEmail])
         );
     }
@@ -163,14 +146,11 @@ class UserDoctrineRepositoryTest extends TestCase
     public function testRetrieveByCredentialsWithInvalidPassword(): void
     {
         $user = $this->createUserDoctrineModel();
-
-        $userRepository = $this->createUserRepository();
-        $userRepository
-            ->shouldReceive('findOneByEmail')
-            ->andReturn($user);
+        $databaseHandler = $this->createDatabaseHandler();
+        $this->mockDatabaseHandlerLoad($databaseHandler, $user, ['email' => $user->getEmail()]);
 
         $this->assertEmpty(
-            $userRepository->retrieveByCredentials([
+            $this->getUserRepository($databaseHandler)->retrieveByCredentials([
                 UserModelInterface::PROPERTY_EMAIL    => $user->getEmail(),
                 UserModelInterface::PROPERTY_PASSWORD => $this->getFaker()->password,
             ])
@@ -179,14 +159,13 @@ class UserDoctrineRepositoryTest extends TestCase
 
     public function testRetrieveByCredentialsWithoutUser(): void
     {
-        $userRepository = $this->createUserRepository();
-        $userRepository
-            ->shouldReceive('findOneByEmail')
-            ->andReturnNull();
+        $email = $this->getFaker()->safeEmail;
+        $databaseHandler = $this->createDatabaseHandler();
+        $this->mockDatabaseHandlerLoad($databaseHandler, null, ['email' => $email]);
 
         $this->assertEmpty(
-            $userRepository->retrieveByCredentials([
-                UserModelInterface::PROPERTY_EMAIL    => $this->getFaker()->safeEmail,
+            $this->getUserRepository($databaseHandler)->retrieveByCredentials([
+                UserModelInterface::PROPERTY_EMAIL    => $email,
                 UserModelInterface::PROPERTY_PASSWORD => $this->getFaker()->password,
             ])
         );
@@ -198,7 +177,7 @@ class UserDoctrineRepositoryTest extends TestCase
         $user = $this->createUserDoctrineModel(null, $password);
 
         $this->assertTrue(
-            $this->createUserRepository()->validateCredentials(
+            $this->getUserRepository()->validateCredentials(
                 $user,
                 [
                     UserModelInterface::PROPERTY_EMAIL    => $user->getEmail(),
@@ -213,7 +192,7 @@ class UserDoctrineRepositoryTest extends TestCase
         $user = $this->createUserDoctrineModel();
 
         $this->assertFalse(
-            $this->createUserRepository()->validateCredentials(
+            $this->getUserRepository()->validateCredentials(
                 $user,
                 [
                     UserModelInterface::PROPERTY_EMAIL    => $user->getEmail(),
@@ -229,7 +208,7 @@ class UserDoctrineRepositoryTest extends TestCase
         $user = $this->createUserDoctrineModel(null, $password);
 
         $this->assertFalse(
-            $this->createUserRepository()->validateCredentials(
+            $this->getUserRepository()->validateCredentials(
                 $user,
                 [
                     UserModelInterface::PROPERTY_EMAIL    => $this->getFaker()->safeEmail,
@@ -244,7 +223,7 @@ class UserDoctrineRepositoryTest extends TestCase
         $password = $this->getFaker()->password;
 
         $this->assertFalse(
-            $this->createUserRepository()->validateCredentials(
+            $this->getUserRepository()->validateCredentials(
                 $this->createUserDoctrineModel(null, $password),
                 [
                     UserModelInterface::PROPERTY_PASSWORD => $password,
@@ -258,7 +237,7 @@ class UserDoctrineRepositoryTest extends TestCase
         $user = $this->createUserDoctrineModel();
 
         $this->assertFalse(
-            $this->createUserRepository()->validateCredentials(
+            $this->getUserRepository()->validateCredentials(
                 $user,
                 [
                     UserModelInterface::PROPERTY_EMAIL => $user->getEmail(),
@@ -272,14 +251,13 @@ class UserDoctrineRepositoryTest extends TestCase
     //region Mocks
 
     /**
-     * @return UserDoctrineRepository|MockInterface
+     * @param DatabaseHandler|null $databaseHandler
+     *
+     * @return UserDoctrineRepository
      */
-    private function createUserRepository(): UserDoctrineRepository
+    private function getUserRepository(DatabaseHandler $databaseHandler = null): UserDoctrineRepository
     {
-        $userDoctrineRepository = Mockery::spy(UserDoctrineRepository::class);
-        return $userDoctrineRepository
-            ->makePartial()
-            ->shouldAllowMockingProtectedMethods();
+        return new UserDoctrineRepository($databaseHandler ?: $this->createDatabaseHandler());
     }
 
     //endregion

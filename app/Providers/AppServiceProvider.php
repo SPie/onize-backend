@@ -17,8 +17,13 @@ use App\Models\User\UserDoctrineModel;
 use App\Models\User\UserDoctrineModelFactory;
 use App\Models\User\UserModelFactoryInterface;
 use App\Models\User\UserModelInterface;
+use App\Repositories\DatabaseHandler;
+use App\Repositories\DoctrineDatabaseHandler;
+use App\Repositories\Project\ProjectDoctrineRepository;
 use App\Repositories\Project\ProjectRepository;
+use App\Repositories\User\RefreshTokenDoctrineRepository;
 use App\Repositories\User\RefreshTokenRepository;
+use App\Repositories\User\UserDoctrineRepository;
 use App\Repositories\User\UserRepository;
 use App\Services\Email\EmailService;
 use App\Services\Email\QueuedEmailService;
@@ -33,6 +38,7 @@ use App\Services\User\UsersServiceInterface;
 use App\Services\Uuid\RamseyUuidFactory;
 use App\Services\Uuid\UuidFactory;
 use Doctrine\ORM\EntityManager;
+use Illuminate\Contracts\Container\Container;
 use Illuminate\Contracts\View\Factory;
 use Illuminate\Queue\QueueManager;
 use Illuminate\Support\ServiceProvider;
@@ -81,22 +87,41 @@ class AppServiceProvider extends ServiceProvider
      */
     private function registerRepositories()
     {
-        /** @var EntityManager $entityManager */
-        $entityManager = $this->app->get(EntityManager::class);
-
-        $this->app->singleton(UserRepository::class, function () use ($entityManager) {
-            return $entityManager->getRepository(UserDoctrineModel::class);
+        $this->app->bind(DatabaseHandler::class, function (Container $app, array $parameters) {
+            return new DoctrineDatabaseHandler($parameters[0], $parameters[1]);
         });
 
-        $this->app->singleton(RefreshTokenRepository::class, function () use ($entityManager) {
-            return $entityManager->getRepository(RefreshTokenDoctrineModel::class);
+        $this->app->singleton(UserRepository::class, function () {
+            return new UserDoctrineRepository($this->makeDatabaseHandler(UserDoctrineModel::class));
         });
 
-        $this->app->singleton(ProjectRepository::class, function () use ($entityManager) {
-            return $entityManager->getRepository(ProjectDoctrineModel::class);
+        $this->app->singleton(RefreshTokenRepository::class, function () {
+            return new RefreshTokenDoctrineRepository($this->makeDatabaseHandler(RefreshTokenDoctrineModel::class));
+        });
+
+        $this->app->singleton(ProjectRepository::class, function () {
+            return new ProjectDoctrineRepository($this->makeDatabaseHandler(ProjectDoctrineModel::class));
         });
 
         return $this;
+    }
+
+    /**
+     * @return EntityManager
+     */
+    private function getEntityManager(): EntityManager
+    {
+        return $this->app->get(EntityManager::class);
+    }
+
+    /**
+     * @param string $className
+     *
+     * @return DatabaseHandler
+     */
+    private function makeDatabaseHandler(string $className): DatabaseHandler
+    {
+        return $this->app->make(DatabaseHandler::class, [$this->getEntityManager(), $className]);
     }
 
     /**

@@ -20,4 +20,11 @@ interface ProjectRepository extends RepositoryInterface
      * @return ProjectModel|ModelInterface
      */
     public function save(ModelInterface $model, bool $flush = true): ModelInterface;
+
+    /**
+     * @param string $uuid
+     *
+     * @return ProjectModel|null
+     */
+    public function findByUuid(string $uuid): ?ProjectModel;
 }

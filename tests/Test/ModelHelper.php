@@ -4,6 +4,7 @@ namespace Test;
 
 use App\Models\ModelFactoryInterface;
 use App\Models\ModelInterface;
+use App\Repositories\DatabaseHandler;
 use App\Services\Uuid\UuidFactory;
 use Doctrine\ORM\EntityManager;
 use Illuminate\Support\Collection;
@@ -17,6 +18,14 @@ use Mockery\MockInterface;
  */
 trait ModelHelper
 {
+    /**
+     * @return ModelInterface
+     */
+    private function createModel(): ModelInterface
+    {
+        return Mockery::spy(ModelInterface::class);
+    }
+
     /**
      * @param string      $modelClass
      * @param int         $times
@@ -130,5 +139,33 @@ trait ModelHelper
         $this->mockUuidFactoryCreate($uuidFactory, $uuid ?: $this->getFaker()->uuid);
 
         return $uuidFactory;
+    }
+
+    /**
+     * @return DatabaseHandler|MockInterface
+     */
+    private function createDatabaseHandler(): DatabaseHandler
+    {
+        return Mockery::spy(DatabaseHandler::class);
+    }
+
+    /**
+     * @param DatabaseHandler|MockInterface $databaseHandler
+     * @param ModelInterface|null           $model
+     * @param array                         $criteria
+     *
+     * @return $this
+     */
+    private function mockDatabaseHandlerLoad(
+        MockInterface $databaseHandler,
+        ?ModelInterface $model,
+        array $criteria
+    ): self {
+        $databaseHandler
+            ->shouldReceive('load')
+            ->with($criteria)
+            ->andReturn($model);
+
+        return $this;
     }
 }

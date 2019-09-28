@@ -76,6 +76,19 @@ final class ProjectServiceTest extends TestCase
         $projectRepository->shouldNotHaveReceived('save');
     }
 
+    /**
+     * @return void
+     */
+    public function testRemoveProject(): void
+    {
+        $uuid = $this->getFaker()->uuid;
+        $project = $this->createProjectModel();
+        $projectRepository = $this->createProjectRepository();
+        $projectService = $this->getProjectService($projectRepository);
+
+        $this->assertEquals($projectService, $projectService->removeProject($uuid));
+    }
+
     //endregion
 
     /**

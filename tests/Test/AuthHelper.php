@@ -39,7 +39,7 @@ trait AuthHelper
     /**
      * @return RefreshTokenRepository|MockInterface
      */
-    protected function createRefreshTokenRepository(): RefreshTokenRepository
+    protected function getRefreshTokenRepository(): RefreshTokenRepository
     {
         return Mockery::spy(RefreshTokenRepository::class);
     }

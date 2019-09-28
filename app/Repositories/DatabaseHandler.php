@@ -7,23 +7,25 @@ use Doctrine\Common\Collections\Criteria;
 use Illuminate\Support\Collection;
 
 /**
- * Interface RepositoryInterface
+ * Interface DatabaseHandler
  *
  * @package App\Repositories
  */
-interface RepositoryInterface
+interface DatabaseHandler
 {
     /**
      * @param int $id
      *
      * @return ModelInterface|null
      */
-    public function find($id): ?ModelInterface;
+    public function find(int $id): ?ModelInterface;
 
     /**
-     * @return Collection
+     * @param array $criteria
+     *
+     * @return ModelInterface|null
      */
-    public function findAll(): Collection;
+    public function load(array $criteria): ?ModelInterface;
 
     /**
      * @param array      $criteria
@@ -33,21 +35,19 @@ interface RepositoryInterface
      *
      * @return Collection
      */
-    public function findBy(array $criteria = [], array $orderBy = null, $limit = null, $offset = null): Collection;
-
-    /**
-     * @param array $criteria
-     *
-     * @return ModelInterface|null
-     */
-    public function findOneBy(array $criteria): ?ModelInterface;
+    public function loadAll(
+        array $criteria = [],
+        array $orderBy = null,
+        int $limit = null,
+        int $offset = null
+    ): Collection;
 
     /**
      * @param Criteria $criteria
      *
      * @return Collection
      */
-    public function findByCriteria(Criteria $criteria): Collection;
+    public function loadByCriteria(Criteria $criteria): Collection;
 
     /**
      * @param ModelInterface $model
@@ -55,7 +55,7 @@ interface RepositoryInterface
      *
      * @return ModelInterface
      */
-    public function save(ModelInterface $model, bool $flush = true): ModelInterface;
+    public function save(ModelInterface $model, bool $flush): ModelInterface;
 
     /**
      * @param ModelInterface $model
@@ -63,10 +63,10 @@ interface RepositoryInterface
      *
      * @return $this
      */
-    public function delete(ModelInterface $model, bool $flush = true);
+    public function delete(ModelInterface $model, bool $flush): self;
 
     /**
      * @return $this
      */
-    public function flush();
+    public function flush(): self;
 }
