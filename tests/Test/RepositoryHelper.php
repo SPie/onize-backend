@@ -68,4 +68,20 @@ trait RepositoryHelper
 
         return $this;
     }
+
+    /**
+     * @param MockInterface  $repository
+     * @param ModelInterface $model
+     *
+     * @return $this
+     */
+    private function assertRepositoryDelete(MockInterface $repository, ModelInterface $model): self
+    {
+        $repository
+            ->shouldHaveReceived('delete')
+            ->with($model)
+            ->once();
+
+        return $this;
+    }
 }

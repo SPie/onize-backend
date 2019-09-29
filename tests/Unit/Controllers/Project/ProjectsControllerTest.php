@@ -113,6 +113,40 @@ final class ProjectsControllerTest extends TestCase
         );
     }
 
+    /**
+     * @return void
+     */
+    public function testRemove(): void
+    {
+        $request = $this->createRequest();
+        $request->offsetSet('uuid', $this->getFaker()->uuid);
+        $projectService = $this->createProjectService();
+
+        $this->assertJsonResponse(
+            $this->createJsonResponse($this->createJsonResponseData(), 204),
+            $this->getProjectsController($this->createUserModel(), $projectService)->remove($request)
+        );
+        $this->assertProjectServiceRemoveProject($projectService, $request->get('uuid'));
+    }
+
+    /**
+     * @return void
+     */
+    public function testRemoveWithoutUuid(): void
+    {
+        $projectService = $this->createProjectService();
+
+        try {
+            $this->getProjectsController($this->createUserModel(), $projectService)->remove($this->createRequest());
+
+            $this->assertTrue(false);
+        } catch (ValidationException $e) {
+            $this->assertTrue(true);
+        }
+
+        $projectService->shouldNotHaveReceived('removeProject');
+    }
+
     //endregion
 
     /**

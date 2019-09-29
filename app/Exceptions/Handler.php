@@ -10,11 +10,13 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Response;
 use Illuminate\Validation\ValidationException;
 use Illuminate\Auth\Access\AuthorizationException;
-use Illuminate\Database\Eloquent\ModelNotFoundException;
+use Illuminate\Database\Eloquent\ModelNotFoundException as LaravelModelNotFoundException;
 use Laravel\Lumen\Exceptions\Handler as ExceptionHandler;
 use Laravel\Lumen\Http\ResponseFactory;
 use SPie\LaravelJWT\Exceptions\NotAuthenticatedException as SPieLaravelJWTNotAuthenticatedException;
 use Symfony\Component\HttpKernel\Exception\HttpException;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
+use Symfony\Component\Translation\Exception\NotFoundResourceException;
 
 /**
  * Class Handler
@@ -32,6 +34,7 @@ class Handler extends ExceptionHandler
         AuthenticationException::class,
         AuthorizationException::class,
         HttpException::class,
+        LaravelModelNotFoundException::class,
         ModelNotFoundException::class,
         ValidationException::class,
         NotReportable::class
@@ -69,6 +72,10 @@ class Handler extends ExceptionHandler
 
         if ($e instanceof ValidationException) {
             return parent::render($request, $e);
+        }
+
+        if ($e instanceof ModelNotFoundException) {
+            throw new NotFoundHttpException($e->getMessage(), $e);
         }
 
         if (

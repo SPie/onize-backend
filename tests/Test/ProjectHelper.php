@@ -36,6 +36,26 @@ trait ProjectHelper
     }
 
     /**
+     * @param ProjectRepository|MockInterface $projectRepository
+     * @param ProjectModel|null               $project
+     * @param string                          $uuid
+     *
+     * @return $this
+     */
+    private function mockProjectRepositoryFindByUuid(
+        MockInterface $projectRepository,
+        ?ProjectModel $project,
+        string $uuid
+    ): self {
+        $projectRepository
+            ->shouldReceive('findByUuid')
+            ->with($uuid)
+            ->andReturn($project);
+
+        return $this;
+    }
+
+    /**
      * @return ProjectModelFactory|MockInterface
      */
     private function createProjectModelFactory(): ProjectModelFactory
@@ -44,7 +64,7 @@ trait ProjectHelper
     }
 
     /**
-     * @return ProjectServiceInterface
+     * @return ProjectServiceInterface|MockInterface
      */
     private function createProjectService(): ProjectServiceInterface
     {
@@ -83,4 +103,24 @@ trait ProjectHelper
     {
         return $this->createModels(ProjectDoctrineModel::class, $times, $data);
     }
+
+    //region Assertions
+
+    /**
+     * @param ProjectServiceInterface|MockInterface $projectService
+     * @param string                                $uuid
+     *
+     * @return $this
+     */
+    private function assertProjectServiceRemoveProject(MockInterface $projectService, string $uuid): self
+    {
+        $projectService
+            ->shouldHaveReceived('removeProject')
+            ->with($uuid)
+            ->once();
+
+        return $this;
+    }
+
+    //endregion
 }

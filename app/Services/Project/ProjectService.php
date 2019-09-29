@@ -79,6 +79,13 @@ final class ProjectService implements ProjectServiceInterface
      */
     public function removeProject(string $uuid): ProjectServiceInterface
     {
+        $project = $this->getProjectRepository()->findByUuid($uuid);
+        if (!$project) {
+            throw new ModelNotFoundException(ProjectModel::class, $uuid);
+        }
+
+        $this->getProjectRepository()->delete($project);
+
         return $this;
     }
 }

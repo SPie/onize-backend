@@ -268,8 +268,7 @@ final class DoctrineDatabaseHandlerTest extends TestCase
     private function getDoctrineDatabaseHandler(
         EntityManager $entityManager = null,
         string $classname = null
-    ): DoctrineDatabaseHandler
-    {
+    ): DoctrineDatabaseHandler {
         return new DoctrineDatabaseHandler(
             $entityManager ?: $this->createEntityManager(),
             $classname ?: $this->getFaker()->uuid

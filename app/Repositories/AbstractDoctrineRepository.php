@@ -31,7 +31,7 @@ abstract class AbstractDoctrineRepository implements RepositoryInterface
     /**
      * @return DatabaseHandler
      */
-    private function getDatabaseHandler()
+    protected function getDatabaseHandler()
     {
         return $this->databaseHandler;
     }
@@ -52,7 +52,6 @@ abstract class AbstractDoctrineRepository implements RepositoryInterface
     public function findAll(): Collection
     {
         return $this->getDatabaseHandler()->loadAll();
-
     }
 
     /**

@@ -1,6 +1,7 @@
 <?php
 
 use App\Exceptions\InvalidParameterException;
+use App\Exceptions\ModelNotFoundException;
 use App\Models\Project\ProjectModelFactory;
 use App\Repositories\Project\ProjectRepository;
 use App\Services\Project\ProjectService;
@@ -84,9 +85,33 @@ final class ProjectServiceTest extends TestCase
         $uuid = $this->getFaker()->uuid;
         $project = $this->createProjectModel();
         $projectRepository = $this->createProjectRepository();
+        $this->mockProjectRepositoryFindByUuid($projectRepository, $project, $uuid);
         $projectService = $this->getProjectService($projectRepository);
 
         $this->assertEquals($projectService, $projectService->removeProject($uuid));
+
+        $this->assertRepositoryDelete($projectRepository, $project);
+    }
+
+    /**
+     * @return void
+     */
+    public function testRemoveProjectWithoutProject(): void
+    {
+        $uuid = $this->getFaker()->uuid;
+        $projectRepository = $this->createProjectRepository();
+        $this->mockProjectRepositoryFindByUuid($projectRepository, null, $uuid);
+        $projectService = $this->getProjectService($projectRepository);
+
+        try {
+            $projectService->removeProject($uuid);
+
+            $this->assertTrue(false);
+        } catch (ModelNotFoundException $e) {
+            $this->assertTrue(true);
+        }
+
+        $projectRepository->shouldNotHaveReceived('delete');
     }
 
     //endregion

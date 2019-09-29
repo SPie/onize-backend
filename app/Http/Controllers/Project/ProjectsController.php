@@ -8,6 +8,7 @@ use App\Models\User\UserModelInterface;
 use App\Services\Project\ProjectServiceInterface;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Http\Response;
 use Illuminate\Validation\ValidationException;
 
 /**
@@ -19,6 +20,7 @@ final class ProjectsController extends Controller
 {
     const ROUTE_NAME_LIST = 'projects.list';
     const ROUTE_NAME_ADD  = 'projects.add';
+    const ROUTE_NAME_REMOVE = 'projects.remove';
 
     const RESPONSE_PARAMETER_PROJECT  = 'project';
     const RESPONSE_PARAMETER_PROJECTS = 'projects';
@@ -89,6 +91,18 @@ final class ProjectsController extends Controller
         );
     }
 
+    /**
+     * @param Request $request
+     *
+     * @return JsonResponse
+     */
+    public function remove(Request $request): JsonResponse
+    {
+        $this->getProjectService()->removeProject($this->validateUuidFromRequest($request));
+
+        return $this->createResponse([], Response::HTTP_NO_CONTENT);
+    }
+
     //endregion
 
     /**
@@ -108,5 +122,15 @@ final class ProjectsController extends Controller
             ]
 
         );
+    }
+
+    /**
+     * @param Request $request
+     *
+     * @return string
+     */
+    private function validateUuidFromRequest(Request $request): string
+    {
+        return $this->validate($request, [ProjectModel::PROPERTY_UUID => ['required']])[ProjectModel::PROPERTY_UUID];
     }
 }

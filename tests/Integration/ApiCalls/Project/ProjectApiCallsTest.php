@@ -2,6 +2,7 @@
 
 use App\Models\Project\ProjectModel;
 use App\Repositories\Project\ProjectRepository;
+use App\Repositories\User\UserRepository;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\URL;
 use LaravelDoctrine\Migrations\Testing\DatabaseMigrations;
@@ -130,6 +131,62 @@ final class ProjectApiCallsTest extends IntegrationTestCase
         $this->assertEmpty($this->getProjectRepository()->findAll());
     }
 
+    /**
+     * @return void
+     */
+    public function testRemoveProject(): void
+    {
+        $user = $this->createUsers()->first();
+        $project = $this->createProjects(1, ['user' => $user])->first();
+        $this->clearModelCache();
+
+        $this->doApiCall(
+            URL::route('projects.remove'),
+            Request::METHOD_DELETE,
+            ['uuid' => $project->getUuid()],
+            null,
+            $this->createAuthHeader($user)
+        );
+
+        $this->assertResponseStatus(204);
+        $this->assertEmpty($this->getProjectRepository()->findByUuid($project->getUuid()));
+        $this->assertNotEmpty($this->getUserRepository()->findOneByEmail($user->getEmail()));
+    }
+
+    /**
+     * @return void
+     */
+    public function testRemoveProjectWithMissingUuid(): void
+    {
+        $response = $this->doApiCall(
+            URL::route('projects.remove'),
+            Request::METHOD_DELETE,
+            [],
+            null,
+            $this->createAuthHeader($this->createUsers()->first())
+        );
+
+        $this->assertResponseStatus(422);
+        $responseData = $response->getData(true);
+        $this->assertEquals('validation.required', $responseData['uuid'][0]);
+    }
+
+    /**
+     * @return void
+     */
+    public function testRemoveProjectWithoutProject(): void
+    {
+        $response = $this->doApiCall(
+            URL::route('projects.remove'),
+            Request::METHOD_DELETE,
+            ['uuid' => $this->getFaker()->uuid],
+            null,
+            $this->createAuthHeader($this->createUsers()->first())
+        );
+
+        $this->assertResponseStatus(404);
+    }
+
     //endregion
 
     /**
@@ -138,5 +195,13 @@ final class ProjectApiCallsTest extends IntegrationTestCase
     private function getProjectRepository(): ProjectRepository
     {
         return $this->app->get(ProjectRepository::class);
+    }
+
+    /**
+     * @return UserRepository
+     */
+    private function getUserRepository(): UserRepository
+    {
+        return $this->app->get(UserRepository::class);
     }
 }
