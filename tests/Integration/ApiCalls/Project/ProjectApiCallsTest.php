@@ -176,7 +176,7 @@ final class ProjectApiCallsTest extends IntegrationTestCase
      */
     public function testRemoveProjectWithoutProject(): void
     {
-        $response = $this->doApiCall(
+        $this->doApiCall(
             URL::route('projects.remove'),
             Request::METHOD_DELETE,
             ['uuid' => $this->getFaker()->uuid],

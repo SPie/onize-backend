@@ -8,12 +8,14 @@ use App\Models\Timestamps;
 use App\Models\User\UserModelInterface;
 use App\Models\Uuid;
 use Doctrine\ORM\Mapping as ORM;
+use Gedmo\Mapping\Annotation as Gedmo;
 
 /**
  * Class ProjectDoctrineModel
  *
  * @ORM\Table(name="projects")
  * @ORM\Entity(repositoryClass="App\Repositories\Project\ProjectDoctrineRepository")
+ * @Gedmo\SoftDeleteable(fieldName="deletedAt", timeAware=false)
  *
  * @package App\Models\Project
  */

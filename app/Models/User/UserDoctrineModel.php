@@ -10,6 +10,7 @@ use App\Models\Timestamps;
 use App\Models\Uuid;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Mapping as ORM;
+use Gedmo\Mapping\Annotation as Gedmo;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Hash;
 use SPie\LaravelJWT\Contracts\RefreshToken;
@@ -19,6 +20,7 @@ use SPie\LaravelJWT\Contracts\RefreshToken;
  *
  * @ORM\Table(name="users")
  * @ORM\Entity(repositoryClass="App\Repositories\User\UserDoctrineRepository")
+ * @Gedmo\SoftDeleteable(fieldName="deletedAt", timeAware=false)
  *
  * @package App\Models\User
  */

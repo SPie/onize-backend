@@ -228,7 +228,6 @@ final class DoctrineDatabaseHandlerTest extends TestCase
         $this
             ->assertEntityManagerRemove($entityManager, $model)
             ->assertEntityManagerFlush($entityManager);
-
     }
 
     /**
