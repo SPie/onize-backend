@@ -4,6 +4,7 @@ namespace App\Exceptions;
 
 use App\Exceptions\Api\ApiException;
 use App\Exceptions\Api\NotReportable;
+use App\Exceptions\Auth\NotAllowedException;
 use Exception;
 use Illuminate\Auth\AuthenticationException;
 use Illuminate\Http\JsonResponse;
@@ -76,6 +77,10 @@ class Handler extends ExceptionHandler
 
         if ($e instanceof ModelNotFoundException) {
             throw new NotFoundHttpException($e->getMessage(), $e);
+        }
+
+        if ($e instanceof NotAllowedException) {
+            return (new ResponseFactory())->json([$e->getMessage()], Response::HTTP_FORBIDDEN);
         }
 
         if (

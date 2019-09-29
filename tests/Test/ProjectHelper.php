@@ -28,6 +28,21 @@ trait ProjectHelper
     }
 
     /**
+     * @param ProjectModel|MockInterface $project
+     * @param UserModelInterface         $user
+     *
+     * @return $this
+     */
+    private function mockProjectModelGetUser(MockInterface $project, UserModelInterface $user): self
+    {
+        $project
+            ->shouldReceive('getUser')
+            ->andReturn($user);
+
+        return $this;
+    }
+
+    /**
      * @return ProjectRepository|MockInterface
      */
     private function createProjectRepository(): ProjectRepository
@@ -94,6 +109,28 @@ trait ProjectHelper
     }
 
     /**
+     * @param ProjectServiceInterface|MockInterface $projectService
+     * @param ProjectModel|\Exception               $project
+     * @param string                                $uuid
+     * @param UserModelInterface                    $authenticatedUser
+     *
+     * @return $this
+     */
+    private function mockProjectServiceRemoveProject(
+        MockInterface $projectService,
+        $project,
+        string $uuid,
+        UserModelInterface $authenticatedUser
+    ): self {
+        $projectService
+            ->shouldReceive('removeProject')
+            ->with($uuid, $authenticatedUser)
+            ->andThrow($project);
+
+        return $this;
+    }
+
+    /**
      * @param int   $times
      * @param array $data
      *
@@ -109,14 +146,18 @@ trait ProjectHelper
     /**
      * @param ProjectServiceInterface|MockInterface $projectService
      * @param string                                $uuid
+     * @param UserModelInterface                    $user
      *
      * @return $this
      */
-    private function assertProjectServiceRemoveProject(MockInterface $projectService, string $uuid): self
-    {
+    private function assertProjectServiceRemoveProject(
+        MockInterface $projectService,
+        string $uuid,
+        UserModelInterface $user
+    ): self {
         $projectService
             ->shouldHaveReceived('removeProject')
-            ->with($uuid)
+            ->with($uuid, $user)
             ->once();
 
         return $this;

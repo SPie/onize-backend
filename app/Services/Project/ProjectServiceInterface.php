@@ -22,11 +22,10 @@ interface ProjectServiceInterface
     public function createProject(array $projectData, UserModelInterface $user): ProjectModel;
 
     /**
-     * @param string $uuid
+     * @param string             $uuid
+     * @param UserModelInterface $authenticatedUser
      *
      * @return $this
-     *
-     * @throws ModelNotFoundException
      */
-    public function removeProject(string $uuid): self;
+    public function removeProject(string $uuid, UserModelInterface $authenticatedUser): self;
 }

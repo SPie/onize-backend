@@ -1,5 +1,6 @@
 <?php
 
+use App\Exceptions\Auth\NotAllowedException;
 use App\Exceptions\InvalidParameterException;
 use App\Exceptions\ModelNotFoundException;
 use App\Models\Project\ProjectModelFactory;
@@ -82,13 +83,16 @@ final class ProjectServiceTest extends TestCase
      */
     public function testRemoveProject(): void
     {
+        $authenticatedUser = $this->createUserModel();
+        $this->mockUserModelGetId($authenticatedUser, $this->getFaker()->numberBetween());
         $uuid = $this->getFaker()->uuid;
         $project = $this->createProjectModel();
+        $this->mockProjectModelGetUser($project, $authenticatedUser);
         $projectRepository = $this->createProjectRepository();
         $this->mockProjectRepositoryFindByUuid($projectRepository, $project, $uuid);
         $projectService = $this->getProjectService($projectRepository);
 
-        $this->assertEquals($projectService, $projectService->removeProject($uuid));
+        $this->assertEquals($projectService, $projectService->removeProject($uuid, $authenticatedUser));
 
         $this->assertRepositoryDelete($projectRepository, $project);
     }
@@ -104,7 +108,7 @@ final class ProjectServiceTest extends TestCase
         $projectService = $this->getProjectService($projectRepository);
 
         try {
-            $projectService->removeProject($uuid);
+            $projectService->removeProject($uuid, $this->createUserModel());
 
             $this->assertTrue(false);
         } catch (ModelNotFoundException $e) {
@@ -112,6 +116,25 @@ final class ProjectServiceTest extends TestCase
         }
 
         $projectRepository->shouldNotHaveReceived('delete');
+    }
+
+    /**
+     * @return void
+     */
+    public function testRemoveProjectWithInvalidAuthenticatedUser(): void
+    {
+        $authenticatedUser = $this->createUserModel();
+        $this->mockUserModelGetId($authenticatedUser, $this->getFaker()->numberBetween());
+        $uuid = $this->getFaker()->uuid;
+        $project = $this->createProjectModel();
+        $this->mockProjectModelGetUser($project, $this->createUserModel());
+        $projectRepository = $this->createProjectRepository();
+        $this->mockProjectRepositoryFindByUuid($projectRepository, $project, $uuid);
+        $projectService = $this->getProjectService($projectRepository);
+
+        $this->expectException(NotAllowedException::class);
+
+        $projectService->removeProject($uuid, $authenticatedUser);
     }
 
     //endregion

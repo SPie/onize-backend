@@ -2,11 +2,13 @@
 
 namespace App\Services\Project;
 
+use App\Exceptions\Auth\NotAllowedException;
 use App\Exceptions\ModelNotFoundException;
 use App\Models\Project\ProjectModel;
 use App\Models\Project\ProjectModelFactory;
 use App\Models\User\UserModelInterface;
 use App\Repositories\Project\ProjectRepository;
+use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 
 /**
  * Class ProjectService
@@ -71,17 +73,22 @@ final class ProjectService implements ProjectServiceInterface
     }
 
     /**
-     * @param string $uuid
+     * @param string             $uuid
+     * @param UserModelInterface $authenticatedUser
      *
      * @return ProjectServiceInterface
      *
      * @throws ModelNotFoundException
      */
-    public function removeProject(string $uuid): ProjectServiceInterface
+    public function removeProject(string $uuid, UserModelInterface $authenticatedUser): ProjectServiceInterface
     {
         $project = $this->getProjectRepository()->findByUuid($uuid);
         if (!$project) {
             throw new ModelNotFoundException(ProjectModel::class, $uuid);
+        }
+
+        if ($project->getUser()->getId() != $authenticatedUser->getId()) {
+            throw new NotAllowedException();
         }
 
         $this->getProjectRepository()->delete($project);

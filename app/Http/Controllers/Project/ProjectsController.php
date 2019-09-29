@@ -98,7 +98,7 @@ final class ProjectsController extends Controller
      */
     public function remove(Request $request): JsonResponse
     {
-        $this->getProjectService()->removeProject($this->validateUuidFromRequest($request));
+        $this->getProjectService()->removeProject($this->validateUuidFromRequest($request), $this->getAuthenticatedUser());
 
         return $this->createResponse([], Response::HTTP_NO_CONTENT);
     }

@@ -1,6 +1,9 @@
 <?php
 
+use App\Exceptions\Auth\NotAllowedException;
+use App\Exceptions\ModelNotFoundException;
 use App\Http\Controllers\Project\ProjectsController;
+use App\Models\Project\ProjectModel;
 use App\Models\User\UserDoctrineModel;
 use App\Models\User\UserModelInterface;
 use App\Services\Project\ProjectServiceInterface;
@@ -120,13 +123,14 @@ final class ProjectsControllerTest extends TestCase
     {
         $request = $this->createRequest();
         $request->offsetSet('uuid', $this->getFaker()->uuid);
+        $user = $this->createUserModel();
         $projectService = $this->createProjectService();
 
         $this->assertJsonResponse(
             $this->createJsonResponse($this->createJsonResponseData(), 204),
-            $this->getProjectsController($this->createUserModel(), $projectService)->remove($request)
+            $this->getProjectsController($user, $projectService)->remove($request)
         );
-        $this->assertProjectServiceRemoveProject($projectService, $request->get('uuid'));
+        $this->assertProjectServiceRemoveProject($projectService, $request->get('uuid'), $user);
     }
 
     /**
@@ -145,6 +149,48 @@ final class ProjectsControllerTest extends TestCase
         }
 
         $projectService->shouldNotHaveReceived('removeProject');
+    }
+
+    /**
+     * @return void
+     */
+    public function testRemoveWithInvalidAuthenticatedUser(): void
+    {
+        $request = $this->createRequest();
+        $request->offsetSet('uuid', $this->getFaker()->uuid);
+        $user = $this->createUserModel();
+        $projectService = $this->createProjectService();
+        $this->mockProjectServiceRemoveProject(
+            $projectService,
+            new NotAllowedException(),
+            $request->get('uuid'),
+            $user
+        );
+
+        $this->expectException(NotAllowedException::class);
+
+        $this->getProjectsController($user, $projectService)->remove($request);
+    }
+
+    /**
+     * @return void
+     */
+    public function testRemoveWithoutProject(): void
+    {
+        $request = $this->createRequest();
+        $request->offsetSet('uuid', $this->getFaker()->uuid);
+        $user = $this->createUserModel();
+        $projectService = $this->createProjectService();
+        $this->mockProjectServiceRemoveProject(
+            $projectService,
+            new ModelNotFoundException(ProjectModel::class, $request->get('uuid')),
+            $request->get('uuid'),
+            $user
+        );
+
+        $this->expectException(ModelNotFoundException::class);
+
+        $this->getProjectsController($user, $projectService)->remove($request);
     }
 
     //endregion

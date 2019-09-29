@@ -187,6 +187,27 @@ final class ProjectApiCallsTest extends IntegrationTestCase
         $this->assertResponseStatus(404);
     }
 
+    /**
+     * @return void
+     */
+    public function testRemoveProjectWithInvalidAuthenticatedUser(): void
+    {
+        $user = $this->createUsers()->first();
+        $project = $this->createProjects()->first();
+        $this->clearModelCache();
+
+        $this->doApiCall(
+            URL::route('projects.remove'),
+            Request::METHOD_DELETE,
+            ['uuid' => $project->getUuid()],
+            null,
+            $this->createAuthHeader($user)
+        );
+
+        $this->assertResponseStatus(403);
+        $this->assertNotEmpty($this->getProjectRepository()->findByUuid($project->getUuid()));
+    }
+
     //endregion
 
     /**
