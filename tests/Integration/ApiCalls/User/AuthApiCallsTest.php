@@ -3,6 +3,7 @@
 use App\Http\Controllers\User\UsersController;
 use App\Models\User\RefreshTokenModel;
 use App\Models\User\UserModelInterface;
+use App\Repositories\User\LoginAttemptRepository;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Hash;
@@ -61,7 +62,7 @@ class AuthApiCallsTest extends IntegrationTestCase
      *
      * @throws Exception
      */
-    public function testLoginWithoutCredentials(): void
+    public function testLoginWithoutCredentialsAndIpAddress(): void
     {
         $response = $this->doApiCall(
             URL::route(UsersController::ROUTE_NAME_LOGIN),
@@ -135,13 +136,152 @@ class AuthApiCallsTest extends IntegrationTestCase
                     [UserModelInterface::PROPERTY_PASSWORD => Hash::make($password)]
                 )->first()->getEmail(),
                 UserModelInterface::PROPERTY_PASSWORD => $password,
-                'remember' => true
+                'remember'                            => true,
             ]
         );
 
         $this->assertResponseStatus(Response::HTTP_NO_CONTENT);
         $this->assertNotEmpty($this->getAuthorizationHeader($response));
         $this->assertNotEmpty($this->getRefreshTokenCookie($response));
+    }
+
+    /**
+     * @return void
+     */
+    public function testLoginWithBlockedLogin(): void
+    {
+        $ipAddress = '127.0.0.1';
+        $password = $this->getFaker()->password();
+        $user = $this->createUsers(
+            1,
+            [UserModelInterface::PROPERTY_PASSWORD => Hash::make($password)]
+        )->first();
+        $this->createLoginAttempts(
+            3,
+            [
+                'success'     => false,
+                'attemptedAt' => new \DateTime(),
+                'ipAddress'   => $ipAddress,
+                'identifier'  => $user->getEmail(),
+            ]
+        );
+
+        $response = $this->doApiCall(
+            URL::route(UsersController::ROUTE_NAME_LOGIN),
+            Request::METHOD_POST,
+            [
+                UserModelInterface::PROPERTY_EMAIL    => $user->getEmail(),
+                UserModelInterface::PROPERTY_PASSWORD => $password,
+            ]
+        );
+
+        $this->assertResponseStatus(Response::HTTP_UNAUTHORIZED);
+        $this->assertEmpty($this->getAuthorizationHeader($response));
+    }
+
+    /**
+     * @return void
+     *
+     * @throws Exception
+     */
+    public function testLoginWithLogFailedLogin(): void
+    {
+        $email = $this->createUsers()->first()->getEmail();
+        $this->doApiCall(
+            URL::route(UsersController::ROUTE_NAME_LOGIN),
+            Request::METHOD_POST,
+            [
+                UserModelInterface::PROPERTY_EMAIL    => $email,
+                UserModelInterface::PROPERTY_PASSWORD => $this->getFaker()->password(),
+            ]
+        );
+
+        $loginAttempt = $this->getLoginAttemptRepository()->findBy(['ipAddress' => '127.0.0.1', 'identifier' => $email])
+            ->first();
+        $this->assertNotEmpty($loginAttempt);
+        $this->assertFalse($loginAttempt->wasSuccess());
+    }
+
+    /**
+     * @return void
+     *
+     * @throws Exception
+     */
+    public function testLoginWithSuccessfulLoginLog(): void
+    {
+        $password = $this->getFaker()->password();
+        $email = $this->createUsers(
+            1,
+            [UserModelInterface::PROPERTY_PASSWORD => Hash::make($password)]
+        )->first()->getEmail();
+
+        $this->doApiCall(
+            URL::route(UsersController::ROUTE_NAME_LOGIN),
+            Request::METHOD_POST,
+            [
+                UserModelInterface::PROPERTY_EMAIL    => $email,
+                UserModelInterface::PROPERTY_PASSWORD => $password,
+            ]
+        );
+
+        $loginAttempt = $this->getLoginAttemptRepository()->findBy(['ipAddress' => '127.0.0.1', 'identifier' => $email])
+            ->first();
+        $this->assertNotEmpty($loginAttempt);
+        $this->assertTrue($loginAttempt->wasSuccess());
+    }
+
+    /**
+     * @return void
+     *
+     * @throws Exception
+     */
+    public function testLoginWithFailedLoginAttemptsAndOneSuccessfulEvent(): void
+    {
+        $ipAddress = '127.0.0.1';
+        $password = $this->getFaker()->password();
+        $user = $this->createUsers(
+            1,
+            [UserModelInterface::PROPERTY_PASSWORD => Hash::make($password)]
+        )->first();
+        $this->createLoginAttempts(
+            2,
+            [
+                'success'     => false,
+                'attemptedAt' => new \DateTime(),
+                'ipAddress'   => $ipAddress,
+                'identifier'  => $user->getEmail(),
+            ]
+        );
+        $this->createLoginAttempts(
+            1,
+            [
+                'success'     => true,
+                'attemptedAt' => new \DateTime(),
+                'ipAddress'   => $ipAddress,
+                'identifier'  => $user->getEmail(),
+            ]
+        );
+        $this->createLoginAttempts(
+            2,
+            [
+                'success'     => false,
+                'attemptedAt' => new \DateTime(),
+                'ipAddress'   => $ipAddress,
+                'identifier'  => $user->getEmail(),
+            ]
+        );
+
+        $response = $this->doApiCall(
+            URL::route(UsersController::ROUTE_NAME_LOGIN),
+            Request::METHOD_POST,
+            [
+                UserModelInterface::PROPERTY_EMAIL    => $user->getEmail(),
+                UserModelInterface::PROPERTY_PASSWORD => $password,
+            ]
+        );
+
+        $this->assertResponseStatus(Response::HTTP_NO_CONTENT);
+        $this->assertNotEmpty($this->getAuthorizationHeader($response));
     }
 
     /**
@@ -345,4 +485,12 @@ class AuthApiCallsTest extends IntegrationTestCase
     }
 
     //endregion
+
+    /**
+     * @return LoginAttemptRepository
+     */
+    private function getLoginAttemptRepository(): LoginAttemptRepository
+    {
+        return $this->app->get(LoginAttemptRepository::class);
+    }
 }

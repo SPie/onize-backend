@@ -4,13 +4,19 @@ namespace App\Providers;
 
 use App\Http\Controllers\User\PasswordResetController;
 use App\Http\Middleware\ApiSignature;
+use App\Models\User\LoginAttemptDoctrineModel;
+use App\Models\User\LoginAttemptDoctrineModelFactory;
+use App\Models\User\LoginAttemptModel;
+use App\Models\User\LoginAttemptModelFactory;
 use App\Models\User\RefreshTokenDoctrineModel;
 use App\Models\User\RefreshTokenDoctrineModelFactory;
+use App\Models\User\RefreshTokenModel;
 use App\Models\User\RefreshTokenModelFactory;
 use App\Models\User\UserDoctrineModel;
 use App\Models\User\UserDoctrineModelFactory;
 use App\Models\User\UserModelFactoryInterface;
 use App\Models\User\UserModelInterface;
+use App\Repositories\User\LoginAttemptRepository;
 use App\Repositories\User\RefreshTokenRepository;
 use App\Repositories\User\UserRepository;
 use App\Services\Email\EmailService;
@@ -19,6 +25,8 @@ use App\Services\JWT\JWTRefreshTokenRepository;
 use App\Services\JWT\JWTService;
 use App\Services\JWT\SPieJWTRefreshTokenRepository;
 use App\Services\JWT\SPieLaravelJWTService;
+use App\Services\Security\LoginThrottlingService;
+use App\Services\Security\LoginThrottlingServiceInterface;
 use App\Services\User\UsersService;
 use App\Services\User\UsersServiceInterface;
 use Doctrine\ORM\EntityManager;
@@ -58,6 +66,8 @@ class AppServiceProvider extends ServiceProvider
     private function registerModels()
     {
         $this->app->bind(UserModelInterface::class, UserDoctrineModel::class);
+        $this->app->bind(RefreshTokenModel::class, RefreshTokenDoctrineModel::class);
+        $this->app->bind(LoginAttemptModel::class, LoginAttemptDoctrineModel::class);
 
         return $this;
     }
@@ -67,8 +77,7 @@ class AppServiceProvider extends ServiceProvider
      */
     private function registerRepositories()
     {
-        /** @var EntityManager $entityManager */
-        $entityManager = $this->app->get(EntityManager::class);
+        $entityManager = $this->getEntityManager();
 
         $this->app->singleton(UserRepository::class, function () use ($entityManager) {
             return $entityManager->getRepository(UserDoctrineModel::class);
@@ -76,6 +85,10 @@ class AppServiceProvider extends ServiceProvider
 
         $this->app->singleton(RefreshTokenRepository::class, function () use ($entityManager) {
             return $entityManager->getRepository(RefreshTokenDoctrineModel::class);
+        });
+
+        $this->app->singleton(LoginAttemptRepository::class, function () use ($entityManager) {
+            return $entityManager->getRepository(LoginAttemptDoctrineModel::class);
         });
 
         return $this;
@@ -88,6 +101,7 @@ class AppServiceProvider extends ServiceProvider
     {
         $this->app->singleton(UserModelFactoryInterface::class, UserDoctrineModelFactory::class);
         $this->app->singleton(RefreshTokenModelFactory::class, RefreshTokenDoctrineModelFactory::class);
+        $this->app->singleton(LoginAttemptModelFactory::class, LoginAttemptDoctrineModelFactory::class);
 
         return $this;
     }
@@ -117,6 +131,14 @@ class AppServiceProvider extends ServiceProvider
                 $this->getQueueManager()->connection('rabbitmq'),
                 $this->app->make(Factory::class),
                 $this->app['config']['email.templatesDir']
+            );
+        });
+        $this->app->singleton(LoginThrottlingServiceInterface::class, function ($app) {
+            return new LoginThrottlingService(
+                $this->app->get(LoginAttemptRepository::class),
+                $this->app->get(LoginAttemptModelFactory::class),
+                $this->app['config']['security.maxLoginAttempts'],
+                $this->app['config']['security.throttlingTimeInMinutes']
             );
         });
 
@@ -170,5 +192,13 @@ class AppServiceProvider extends ServiceProvider
     private function getQueueManager(): QueueManager
     {
         return  $this->app->get('queue');
+    }
+
+    /**
+     * @return EntityManager
+     */
+    private function getEntityManager(): EntityManager
+    {
+        return $this->app->get(EntityManager::class);
     }
 }

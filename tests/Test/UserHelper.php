@@ -2,9 +2,13 @@
 
 namespace Test;
 
+use App\Models\User\LoginAttemptDoctrineModel;
+use App\Models\User\LoginAttemptModel;
+use App\Models\User\LoginAttemptModelFactory;
 use App\Models\User\UserDoctrineModel;
 use App\Models\User\UserModelFactoryInterface;
 use App\Models\User\UserModelInterface;
+use App\Repositories\User\LoginAttemptRepository;
 use App\Repositories\User\UserRepository;
 use App\Services\JWT\JWTService;
 use App\Services\User\UsersService;
@@ -433,22 +437,6 @@ trait UserHelper
     }
 
     /**
-     * @return UserRepository
-     */
-    protected function getUserRepository(): UserRepository
-    {
-        return $this->app->get(UserRepository::class);
-    }
-
-    /**
-     * @return UsersServiceInterface
-     */
-    protected function getUserService(): UsersServiceInterface
-    {
-        return $this->app->get(UsersServiceInterface::class);
-    }
-
-    /**
      * @return UserModelFactoryInterface
      */
     protected function getUserModelFactory(): UserModelFactoryInterface
@@ -456,9 +444,118 @@ trait UserHelper
         return $this->app->get(UserModelFactoryInterface::class);
     }
 
+    /**
+     * @return string
+     */
     protected function createValidPassword(): string
     {
         return $this->getFaker()->password(8);
+    }
+
+    /**
+     * @param string|null    $ipAddress
+     * @param string|null    $identifier
+     * @param \DateTime|null $attemptedAt
+     * @param bool|null      $success
+     *
+     * @return LoginAttemptDoctrineModel
+     */
+    private function createLoginAttemptDoctrineModel(
+        string $ipAddress = null,
+        string $identifier = null,
+        \DateTime $attemptedAt = null,
+        bool $success = null
+    ): LoginAttemptDoctrineModel {
+        $attemptedAt = $attemptedAt ?: $this->getFaker()->dateTime;
+        return new LoginAttemptDoctrineModel(
+            $ipAddress ?: $this->getFaker()->ipv4,
+            $identifier ?: $this->getFaker()->uuid,
+            new \DateTimeImmutable($attemptedAt->format('Y-m-d H:i:s')),
+            $success ?: $this->getFaker()->boolean
+        );
+    }
+
+    /**
+     * @return LoginAttemptModel|MockInterface
+     */
+    private function createLoginAttemptModel(): LoginAttemptModel
+    {
+        return Mockery::spy(LoginAttemptModel::class);
+    }
+
+    /**
+     * @param MockInterface $loginAttemptModel
+     * @param bool          $wasSuccess
+     *
+     * @return $this
+     */
+    private function mockLoginAttemptModelWasSuccess(MockInterface $loginAttemptModel, bool $wasSuccess)
+    {
+        $loginAttemptModel
+            ->shouldReceive('wasSuccess')
+            ->andReturn($wasSuccess);
+
+        return $this;
+    }
+
+    /**
+     * @return LoginAttemptRepository|MockInterface
+     */
+    private function createLoginAttemptRepository(): LoginAttemptRepository
+    {
+        return Mockery::spy(LoginAttemptRepository::class);
+    }
+
+    /**
+     * @param MockInterface                  $loginAttemptRepository
+     * @param LoginAttemptModel[]|Collection $loginAttempts
+     * @param string                         $ipAddress
+     * @param string                         $identifier
+     * @param \DateTimeImmutable             $since
+     *
+     * @return $this
+     */
+    private function mockLoginAttemptRepositoryGetLoginAttemptsForUserSince(
+        MockInterface $loginAttemptRepository,
+        Collection $loginAttempts,
+        string $ipAddress,
+        string $identifier,
+        \DateTimeImmutable $since
+    ) {
+        $loginAttemptRepository
+            ->shouldReceive('getLoginAttemptsForUserSince')
+            ->with(
+                $ipAddress,
+                $identifier,
+                Mockery::on(function (\DateTimeImmutable $argument) use ($since) {
+                    return (
+                        $argument > $since->sub(new \DateInterval('PT5S'))
+                        && $argument < $since->add(new \DateInterval('PT5S'))
+                    );
+                })
+            )
+            ->andReturn($loginAttempts);
+
+        return $this;
+    }
+
+    /**
+     * @return LoginAttemptModelFactory|MockInterface
+     */
+    private function createLoginAttemptModelFactory(): LoginAttemptModelFactory
+    {
+        return Mockery::spy(LoginAttemptModelFactory::class);
+    }
+
+    /**
+     * @param int   $times
+     * @param array $data
+     *
+     * @return LoginAttemptDoctrineModel[]|Collection
+     */
+    private function createLoginAttempts(int $times = 1, array $data = []): Collection
+    {
+        return $this->createModels(LoginAttemptDoctrineModel::class, $times, $data);
     }
 
     //region Assertions
