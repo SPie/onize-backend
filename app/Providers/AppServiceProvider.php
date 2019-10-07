@@ -9,6 +9,10 @@ use App\Models\Project\ProjectDoctrineModel;
 use App\Models\Project\ProjectDoctrineModelFactory;
 use App\Models\Project\ProjectModel;
 use App\Models\Project\ProjectModelFactory;
+use App\Models\User\LoginAttemptDoctrineModel;
+use App\Models\User\LoginAttemptDoctrineModelFactory;
+use App\Models\User\LoginAttemptModel;
+use App\Models\User\LoginAttemptModelFactory;
 use App\Models\User\RefreshTokenDoctrineModel;
 use App\Models\User\RefreshTokenDoctrineModelFactory;
 use App\Models\User\RefreshTokenModel;
@@ -17,6 +21,7 @@ use App\Models\User\UserDoctrineModel;
 use App\Models\User\UserDoctrineModelFactory;
 use App\Models\User\UserModelFactoryInterface;
 use App\Models\User\UserModelInterface;
+use App\Repositories\User\LoginAttemptRepository;
 use App\Repositories\DatabaseHandler;
 use App\Repositories\DoctrineDatabaseHandler;
 use App\Repositories\Project\ProjectDoctrineRepository;
@@ -31,6 +36,8 @@ use App\Services\JWT\JWTRefreshTokenRepository;
 use App\Services\JWT\JWTService;
 use App\Services\JWT\SPieJWTRefreshTokenRepository;
 use App\Services\JWT\SPieLaravelJWTService;
+use App\Services\Security\LoginThrottlingService;
+use App\Services\Security\LoginThrottlingServiceInterface;
 use App\Services\Project\ProjectService;
 use App\Services\Project\ProjectServiceInterface;
 use App\Services\User\UsersService;
@@ -78,6 +85,7 @@ class AppServiceProvider extends ServiceProvider
         $this->app->bind(UserModelInterface::class, UserDoctrineModel::class);
         $this->app->bind(RefreshTokenModel::class, RefreshTokenDoctrineModel::class);
         $this->app->bind(ProjectModel::class, ProjectDoctrineModel::class);
+        $this->app->bind(LoginAttemptModel::class, LoginAttemptDoctrineModel::class);
 
         return $this;
     }
@@ -101,6 +109,10 @@ class AppServiceProvider extends ServiceProvider
 
         $this->app->singleton(ProjectRepository::class, function () {
             return new ProjectDoctrineRepository($this->makeDatabaseHandler(ProjectDoctrineModel::class));
+        });
+
+        $this->app->singleton(LoginAttemptRepository::class, function () use ($entityManager) {
+            return new LoginAttemptDoctrineRepository($this->makeDatabaseHandler(LoginAttemptDoctrineModel::class));
         });
 
         return $this;
@@ -132,6 +144,7 @@ class AppServiceProvider extends ServiceProvider
         $this->app->singleton(UserModelFactoryInterface::class, UserDoctrineModelFactory::class);
         $this->app->singleton(RefreshTokenModelFactory::class, RefreshTokenDoctrineModelFactory::class);
         $this->app->singleton(ProjectModelFactory::class, ProjectDoctrineModelFactory::class);
+        $this->app->singleton(LoginAttemptModelFactory::class, LoginAttemptDoctrineModelFactory::class);
 
         return $this;
     }
@@ -170,6 +183,14 @@ class AppServiceProvider extends ServiceProvider
         });
         $this->app->singleton(UuidFactory::class, function () {
             return new RamseyUuidFactory(new ExternalUuidFactory());
+        });
+        $this->app->singleton(LoginThrottlingServiceInterface::class, function ($app) {
+            return new LoginThrottlingService(
+                $this->app->get(LoginAttemptRepository::class),
+                $this->app->get(LoginAttemptModelFactory::class),
+                $this->app['config']['security.maxLoginAttempts'],
+                $this->app['config']['security.throttlingTimeInMinutes']
+            );
         });
 
         return $this;

@@ -13,8 +13,8 @@
         "laravel-doctrine/migrations": "^1.2",
         "gedmo/doctrine-extensions": "^2.4",
         "barryvdh/laravel-cors": "^0.11.2",
-        "spie/laravel-jwt": "^1.1",
-        "vladimir-yuldashev/laravel-queue-rabbitmq": "^8.2",
+        "spie/laravel-jwt": ">=1.1.1",
+        "vladimir-yuldashev/laravel-queue-rabbitmq": "^8.2"
         "ramsey/uuid": "^3.8"
     },
     "require-dev": {

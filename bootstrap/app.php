@@ -38,6 +38,7 @@ $app->configure('doctrine');
 $app->configure('email');
 $app->configure('middlewares');
 $app->configure('queue');
+$app->configure('security');
 $app->configure('services');
 
 /*

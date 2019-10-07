@@ -70,7 +70,7 @@ abstract class AbstractDoctrineRepository implements RepositoryInterface
     /**
      * @param array $criteria
      *
-     * @return ModelInterface|null
+     * @return ModelInterface|object|null
      */
     public function findOneBy(array $criteria): ?ModelInterface
     {
