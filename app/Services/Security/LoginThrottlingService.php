@@ -94,15 +94,16 @@ final class LoginThrottlingService implements LoginThrottlingServiceInterface
      */
     public function logLoginAttempt(string $ipAddress, string $identifier, bool $success): LoginThrottlingServiceInterface
     {
-        $this->getLoginAttemptRepository()->save(
-            $this->getLoginAttemptModelFactory()->create(
+        $model = $this->getLoginAttemptModelFactory()->create(
                 [
                     'ipAddress'   => $ipAddress,
                     'identifier'  => $identifier,
                     'attemptedAt' => new \DateTimeImmutable(),
                     'success'     => $success,
                 ]
-            )
+            );
+        $this->getLoginAttemptRepository()->save(
+            $model
         );
 
         return $this;

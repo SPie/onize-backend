@@ -6,6 +6,7 @@ use App\Models\ModelFactoryInterface;
 use App\Models\ModelInterface;
 use App\Repositories\DatabaseHandler;
 use App\Services\Uuid\UuidFactory;
+use Doctrine\Common\Collections\Criteria;
 use Doctrine\ORM\EntityManager;
 use Illuminate\Support\Collection;
 use Mockery;
@@ -165,6 +166,28 @@ trait ModelHelper
             ->shouldReceive('load')
             ->with($criteria)
             ->andReturn($model);
+
+        return $this;
+    }
+
+    /**
+     * @param DatabaseHandler|MockInterface $databaseHandler
+     * @param Collection                    $models
+     * @param Criteria                      $criteria
+     *
+     * @return $this
+     */
+    private function mockDatabaseHandlerLoadByCriteria(
+        MockInterface $databaseHandler,
+        Collection $models,
+        Criteria $criteria
+    ) {
+        $databaseHandler
+            ->shouldReceive('loadByCriteria')
+            ->with(Mockery::on(function ($argument) use ($criteria) {
+                return $argument == $criteria;
+            }))
+            ->andReturn($models);
 
         return $this;
     }

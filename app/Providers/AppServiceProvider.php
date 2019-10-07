@@ -21,6 +21,7 @@ use App\Models\User\UserDoctrineModel;
 use App\Models\User\UserDoctrineModelFactory;
 use App\Models\User\UserModelFactoryInterface;
 use App\Models\User\UserModelInterface;
+use App\Repositories\User\LoginAttemptDoctrineRepository;
 use App\Repositories\User\LoginAttemptRepository;
 use App\Repositories\DatabaseHandler;
 use App\Repositories\DoctrineDatabaseHandler;
@@ -111,7 +112,7 @@ class AppServiceProvider extends ServiceProvider
             return new ProjectDoctrineRepository($this->makeDatabaseHandler(ProjectDoctrineModel::class));
         });
 
-        $this->app->singleton(LoginAttemptRepository::class, function () use ($entityManager) {
+        $this->app->singleton(LoginAttemptRepository::class, function () {
             return new LoginAttemptDoctrineRepository($this->makeDatabaseHandler(LoginAttemptDoctrineModel::class));
         });
 

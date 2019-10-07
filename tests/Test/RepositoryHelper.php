@@ -165,7 +165,7 @@ trait RepositoryHelper
     private function assertRepositorySave(MockInterface $repository, ModelInterface $model, int $times = 1)
     {
         $repository
-            ->shouldReceive('save')
+            ->shouldHaveReceived('save')
             ->with(Mockery::on(function ($argument) use ($model) {
                 return $argument == $model;
             }))
