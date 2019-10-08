@@ -74,4 +74,15 @@ final class TestEmailService implements EmailService
     {
         return $this->queueEmail('passwordReset', $recipient, ['resetToken' => $finishUrl]);
     }
+
+    /**
+     * @param string $recipient
+     * @param string $inviteUrl
+     *
+     * @return EmailService
+     */
+    public function projectInvite(string $recipient, string $inviteUrl): EmailService
+    {
+        return $this->queueEmail('projectInvite', $recipient, ['finishUrl' => $inviteUrl]);
+    }
 }

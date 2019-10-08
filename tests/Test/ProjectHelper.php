@@ -3,11 +3,13 @@
 namespace Test;
 
 use App\Models\Project\ProjectDoctrineModel;
+use App\Models\Project\ProjectInviteModel;
 use App\Models\Project\ProjectModel;
 use App\Models\Project\ProjectModelFactory;
 use App\Models\User\UserModelInterface;
 use App\Repositories\Project\ProjectRepository;
 use App\Services\Project\ProjectServiceInterface;
+use App\Services\User\UsersServiceInterface;
 use Illuminate\Support\Collection;
 use Mockery as m;
 use Mockery\MockInterface;
@@ -131,6 +133,30 @@ trait ProjectHelper
     }
 
     /**
+     * @param ProjectServiceInterface|MockInterface $projectService
+     * @param ProjectInviteModel|\Exception         $projectInvite
+     * @param string                                $uuid
+     * @param string                                $email
+     * @param UsersServiceInterface                 $usersService
+     *
+     * @return $this
+     */
+    private function mockProjectServiceInvite(
+        MockInterface $projectService,
+        $projectInvite,
+        string $uuid,
+        string $email,
+        UsersServiceInterface $usersService
+    ): self {
+        $projectService
+            ->shouldReceive('invite')
+            ->with($uuid, $email, $usersService)
+            ->andThrow($projectInvite);
+
+        return $this;
+    }
+
+    /**
      * @param int   $times
      * @param array $data
      *
@@ -139,6 +165,29 @@ trait ProjectHelper
     private function createProjects(int $times = 1, array $data = []): Collection
     {
         return $this->createModels(ProjectDoctrineModel::class, $times, $data);
+    }
+
+    /**
+     * @return ProjectInviteModel|MockInterface
+     */
+    private function createProjectInviteModel()
+    {
+        return m::spy(ProjectInviteModel::class);
+    }
+
+    /**
+     * @param MockInterface $projectInviteModel
+     * @param string        $token
+     *
+     * @return $this
+     */
+    private function mockProjectInviteModelGetToken(MockInterface $projectInviteModel, string $token): self
+    {
+        $projectInviteModel
+            ->shouldReceive('getToken')
+            ->andReturn($token);
+
+        return $this;
     }
 
     //region Assertions

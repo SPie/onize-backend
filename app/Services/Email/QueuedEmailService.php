@@ -93,4 +93,15 @@ final class QueuedEmailService implements EmailService
 
         return $this;
     }
+
+    /**
+     * @param string $recipient
+     * @param string $inviteUrl
+     *
+     * @return EmailService
+     */
+    public function projectInvite(string $recipient, string $inviteUrl): EmailService
+    {
+        // TODO
+    }
 }

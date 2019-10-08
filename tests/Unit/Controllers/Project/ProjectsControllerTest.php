@@ -3,14 +3,14 @@
 use App\Exceptions\Auth\NotAllowedException;
 use App\Exceptions\ModelNotFoundException;
 use App\Http\Controllers\Project\ProjectsController;
+use App\Models\Project\ProjectInviteModel;
 use App\Models\Project\ProjectModel;
-use App\Models\User\UserDoctrineModel;
 use App\Models\User\UserModelInterface;
 use App\Services\Project\ProjectServiceInterface;
 use Illuminate\Support\Collection;
 use Illuminate\Validation\ValidationException;
 use Test\AuthHelper;
-use Test\ModelHelper;
+use Test\EmailHelper;
 use Test\ProjectHelper;
 use Test\RequestResponseHelper;
 use Test\UserHelper;
@@ -21,6 +21,7 @@ use Test\UserHelper;
 final class ProjectsControllerTest extends TestCase
 {
     use AuthHelper;
+    use EmailHelper;
     use ProjectHelper;
     use RequestResponseHelper;
     use UserHelper;
@@ -193,21 +194,163 @@ final class ProjectsControllerTest extends TestCase
         $this->getProjectsController($user, $projectService)->remove($request);
     }
 
+    /**
+     * @return void
+     */
+    public function testInvite(): void
+    {
+        $tokenPlaceHolder = $this->getFaker()->uuid;
+        $request = $this->createRequest();
+        $request->offsetSet('uuid', $this->getFaker()->uuid);
+        $request->offsetSet('email', $this->getFaker()->safeEmail);
+        $request->offsetSet('inviteUrl', $this->getFaker()->url . '?' . $tokenPlaceHolder);
+        $usersService = $this->createUsersService();
+        $emailService = $this->createEmailService();
+        $token = $this->getFaker()->uuid;
+        $projectInvite = $this->createProjectInviteModel();
+        $this->mockProjectInviteModelGetToken($projectInvite, $token);
+        $projectService = $this->createProjectService();
+        $this->mockProjectServiceInvite(
+            $projectService,
+            $projectInvite,
+            $request->get('uuid'),
+            $request->get('email'),
+            $usersService
+        );
+
+        $response = $this->getProjectsController(null, $projectService, $tokenPlaceHolder)->invite(
+            $request,
+            $usersService,
+            $emailService
+        );
+
+        $this->assertEquals(201, $response->getStatusCode());
+        $this->assertEmailServiceProjectInvite(
+            $emailService,
+            $request->get('email'),
+            \str_replace($tokenPlaceHolder, $token, $request->get('inviteUrl'))
+        );
+    }
+
+    /**
+     * @return void
+     */
+    public function testInviteWithoutProjectUuid(): void
+    {
+        $request = $this->createRequest();
+        $request->offsetSet('email', $this->getFaker()->safeEmail);
+        $request->offsetSet('inviteUrl', $this->getFaker()->url);
+
+        $this->expectException(ValidationException::class);
+
+        $this->getProjectsController()->invite(
+            $request,
+            $this->createUsersService(),
+            $this->createEmailService()
+        );
+    }
+
+    /**
+     * @return void
+     */
+    public function testInviteWithoutEmail(): void
+    {
+        $request = $this->createRequest();
+        $request->offsetSet('uuid', $this->getFaker()->uuid);
+        $request->offsetSet('inviteUrl', $this->getFaker()->url);
+
+        $this->expectException(ValidationException::class);
+
+        $this->getProjectsController()->invite(
+            $request,
+            $this->createUsersService(),
+            $this->createEmailService()
+        );
+    }
+
+    /**
+     * @return void
+     */
+    public function testInviteWithInvalidEmail(): void
+    {
+        $request = $this->createRequest();
+        $request->offsetSet('uuid', $this->getFaker()->uuid);
+        $request->offsetSet('email', $this->getFaker()->word);
+        $request->offsetSet('inviteUrl', $this->getFaker()->url);
+
+        $this->expectException(ValidationException::class);
+
+        $this->getProjectsController()->invite(
+            $request,
+            $this->createUsersService(),
+            $this->createEmailService()
+        );
+    }
+
+    /**
+     * @return void
+     */
+    public function testInviteWithoutInviteUrl(): void
+    {
+        $request = $this->createRequest();
+        $request->offsetSet('uuid', $this->getFaker()->uuid);
+        $request->offsetSet('email', $this->getFaker()->safeEmail);
+
+        $this->expectException(ValidationException::class);
+
+        $this->getProjectsController()->invite(
+            $request,
+            $this->createUsersService(),
+            $this->createEmailService()
+        );
+    }
+
+    /**
+     * @return void
+     */
+    public function testInviteWithInvlidUuid(): void
+    {
+        $request = $this->createRequest();
+        $request->offsetSet('uuid', $this->getFaker()->uuid);
+        $request->offsetSet('email', $this->getFaker()->safeEmail);
+        $request->offsetSet('inviteUrl', $this->getFaker()->url);
+        $usersService = $this->createUsersService();
+        $projectService = $this->createProjectService();
+        $this->mockProjectServiceInvite(
+            $projectService,
+            new ModelNotFoundException(ProjectInviteModel::class, $request->get('uuid')),
+            $request->get('uuid'),
+            $request->get('email'),
+            $usersService
+        );
+
+        $this->expectException(ModelNotFoundException::class);
+
+        $this->getProjectsController(null, $projectService)->invite(
+            $request,
+            $usersService,
+            $this->createEmailService()
+        );
+    }
+
     //endregion
 
     /**
      * @param UserModelInterface|null      $user
      * @param ProjectServiceInterface|null $projectService
+     * @param string|null                  $tokenPlaceHolder
      *
      * @return ProjectsController
      */
     private function getProjectsController(
         UserModelInterface $user = null,
-        ProjectServiceInterface $projectService = null
+        ProjectServiceInterface $projectService = null,
+        string $tokenPlaceHolder = null
     ): ProjectsController {
         return new ProjectsController(
             $user ?: $this->createUserModel(),
-            $projectService ?: $this->createProjectService()
+            $projectService ?: $this->createProjectService(),
+            $tokenPlaceHolder ?: $this->getFaker()->uuid
         );
     }
 }

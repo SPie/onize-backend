@@ -121,5 +121,25 @@ trait EmailHelper
         return $this;
     }
 
+    /**
+     * @param EmailService|MockInterface $emailService
+     * @param string                     $recipient
+     * @param string                     $inviteUrl
+     *
+     * @return $this
+     */
+    private function assertEmailServiceProjectInvite(
+        MockInterface $emailService,
+        string $recipient,
+        string $inviteUrl
+    ) {
+        $emailService
+            ->shouldHaveReceived('projectInvite')
+            ->with($recipient, $inviteUrl)
+            ->once();
+
+        return $this;
+    }
+
     //endregion
 }

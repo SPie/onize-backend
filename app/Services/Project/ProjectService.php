@@ -4,10 +4,12 @@ namespace App\Services\Project;
 
 use App\Exceptions\Auth\NotAllowedException;
 use App\Exceptions\ModelNotFoundException;
+use App\Models\Project\ProjectInviteModel;
 use App\Models\Project\ProjectModel;
 use App\Models\Project\ProjectModelFactory;
 use App\Models\User\UserModelInterface;
 use App\Repositories\Project\ProjectRepository;
+use App\Services\User\UsersServiceInterface;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 
 /**
@@ -94,5 +96,17 @@ final class ProjectService implements ProjectServiceInterface
         $this->getProjectRepository()->delete($project);
 
         return $this;
+    }
+
+    /**
+     * @param string                $uuid
+     * @param string                $email
+     * @param UsersServiceInterface $usersService
+     *
+     * @return ProjectInviteModel
+     */
+    public function invite(string $uuid, string $email, UsersServiceInterface $usersService): ProjectInviteModel
+    {
+        // TODO: Implement invite() method.
     }
 }

@@ -2,9 +2,10 @@
 
 namespace App\Services\Project;
 
-use App\Exceptions\ModelNotFoundException;
+use App\Models\Project\ProjectInviteModel;
 use App\Models\Project\ProjectModel;
 use App\Models\User\UserModelInterface;
+use App\Services\User\UsersServiceInterface;
 
 /**
  * Interface ProjectServiceInterface
@@ -28,4 +29,13 @@ interface ProjectServiceInterface
      * @return $this
      */
     public function removeProject(string $uuid, UserModelInterface $authenticatedUser): self;
+
+    /**
+     * @param string                $uuid
+     * @param string                $email
+     * @param UsersServiceInterface $usersService
+     *
+     * @return ProjectInviteModel
+     */
+    public function invite(string $uuid, string $email, UsersServiceInterface $usersService): ProjectInviteModel;
 }

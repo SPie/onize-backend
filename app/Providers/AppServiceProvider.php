@@ -160,7 +160,11 @@ class AppServiceProvider extends ServiceProvider
         });
 
         $this->app->bind(ProjectsController::class, function () {
-            return new ProjectsController($this->getJWTService()->getAuthenticatedUser(), $this->getProjectService());
+            return new ProjectsController(
+                $this->getJWTService()->getAuthenticatedUser(),
+                $this->getProjectService(),
+                $this->app['config']['app.tokenPlaceHolder']
+            );
         });
 
         return $this;
