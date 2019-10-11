@@ -18,7 +18,14 @@ interface ProjectModelFactory extends ModelFactoryInterface
      *
      * @return ProjectModelFactory
      */
-    public function setUserModelFactory(UserModelFactoryInterface $userModelFactory): ProjectModelFactory;
+    public function setUserModelFactory(UserModelFactoryInterface $userModelFactory): self;
+
+    /**
+     * @param ProjectInviteModelFactory $projectInviteModelFactory
+     *
+     * @return $this
+     */
+    public function setProjectInviteModelFactory(ProjectInviteModelFactory $projectInviteModelFactory): self;
 
     /**
      * @param array $data

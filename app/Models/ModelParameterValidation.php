@@ -149,7 +149,7 @@ trait ModelParameterValidation
      * @param bool   $required
      * @param bool   $allowEmpty
      *
-     * @return array|null
+     * @return array
      *
      * @throws InvalidParameterException
      */
@@ -162,7 +162,7 @@ trait ModelParameterValidation
         $parameter = $this->validateEmptyParameter($data, $parameterName, $required);
 
         if (\is_null($parameter)) {
-            return $parameter;
+            return [];
         }
 
         if (!\is_array($parameter)) {

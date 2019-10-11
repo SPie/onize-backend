@@ -308,7 +308,7 @@ final class ProjectsControllerTest extends TestCase
     /**
      * @return void
      */
-    public function testInviteWithInvlidUuid(): void
+    public function testInviteWithInvalidUuid(): void
     {
         $request = $this->createRequest();
         $request->offsetSet('uuid', $this->getFaker()->uuid);

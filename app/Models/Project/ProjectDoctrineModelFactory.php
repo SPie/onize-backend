@@ -26,6 +26,11 @@ final class ProjectDoctrineModelFactory implements ProjectModelFactory
     private $userModelFactory;
 
     /**
+     * @var ProjectInviteModelFactory
+     */
+    private $projectInviteModelFactory;
+
+    /**
      * ProjectDoctrineModelFactory constructor.
      *
      * @param UuidFactory $uuidFactory
@@ -56,6 +61,26 @@ final class ProjectDoctrineModelFactory implements ProjectModelFactory
     }
 
     /**
+     * @param ProjectInviteModelFactory $projectInviteModelFactory
+     *
+     * @return ProjectModelFactory
+     */
+    public function setProjectInviteModelFactory(ProjectInviteModelFactory $projectInviteModelFactory): ProjectModelFactory
+    {
+        $this->projectInviteModelFactory =  $projectInviteModelFactory;
+
+        return $this;
+    }
+
+    /**
+     * @return ProjectInviteModelFactory
+     */
+    private function getProjectInviteModelFactory(): ProjectInviteModelFactory
+    {
+        return $this->projectInviteModelFactory;
+    }
+
+    /**
      * @param array $data
      *
      * @return ProjectModel|ModelInterface
@@ -69,7 +94,8 @@ final class ProjectDoctrineModelFactory implements ProjectModelFactory
             $this->validateStringParameter($data, ProjectModel::PROPERTY_DESCRIPTION, false, true),
             $this->validateDateTimeParameter($data, ProjectModel::PROPERTY_CREATED_AT, false),
             $this->validateDateTimeParameter($data, ProjectModel::PROPERTY_UPDATED_AT, false),
-            $this->validateDateTimeParameter($data, ProjectModel::PROPERTY_DELETED_AT, false)
+            $this->validateDateTimeParameter($data, ProjectModel::PROPERTY_DELETED_AT, false),
+            $this->validateProjectInvites($data)
         ))->setId($this->validateIntegerParameter($data, ProjectModel::PROPERTY_ID, false));
     }
 
@@ -116,6 +142,11 @@ final class ProjectDoctrineModelFactory implements ProjectModelFactory
             $model->setDeletedAt($deletedAt);
         }
 
+        $projectInvites = $this->validateProjectInvites($data);
+        if (!empty($projectInvites)) {
+            $model->setProjectInvites($projectInvites);
+        }
+
         $id = $this->validateIntegerParameter($data, ProjectModel::PROPERTY_ID, false);
         if (!empty($id)) {
             $model->setId($id);
@@ -141,5 +172,39 @@ final class ProjectDoctrineModelFactory implements ProjectModelFactory
             UserModelInterface::class,
             $required
         );
+    }
+
+    /**
+     * @param array $data
+     *
+     * @return ProjectModel[]
+     *
+     * @throws InvalidParameterException
+     */
+    private function validateProjectInvites(array $data): array
+    {
+        $projectInvites = $this->validateArrayParameter(
+            $data,
+            ProjectModel::PROPERTY_PROJECT_INVITES,
+            false,
+            true
+        );
+
+        return \is_array($projectInvites)
+            ? \array_map(
+                function ($projectInvite) {
+                    if ($projectInvite instanceof ProjectInviteModel) {
+                        return $projectInvite;
+                    }
+
+                    if (\is_array($projectInvite)) {
+                        return $this->getProjectInviteModelFactory()->create($projectInvite);
+                    }
+
+                    throw new InvalidParameterException();
+                },
+                $projectInvites
+            )
+            : [];
     }
 }

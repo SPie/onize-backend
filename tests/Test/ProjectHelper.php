@@ -4,6 +4,7 @@ namespace Test;
 
 use App\Models\Project\ProjectDoctrineModel;
 use App\Models\Project\ProjectInviteModel;
+use App\Models\Project\ProjectInviteModelFactory;
 use App\Models\Project\ProjectModel;
 use App\Models\Project\ProjectModelFactory;
 use App\Models\User\UserModelInterface;
@@ -188,6 +189,14 @@ trait ProjectHelper
             ->andReturn($token);
 
         return $this;
+    }
+
+    /**
+     * @return ProjectInviteModelFactory|MockInterface
+     */
+    private function createProjectInviteModelFactory(): ProjectInviteModelFactory
+    {
+        return m::spy(ProjectInviteModelFactory::class);
     }
 
     //region Assertions

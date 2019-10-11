@@ -13,7 +13,7 @@ use Doctrine\ORM\Mapping as ORM;
  *
  * @package App\Models\User
  */
-final class LoginAttemptDoctrineModel extends AbstractDoctrineModel implements LoginAttemptModel
+class LoginAttemptDoctrineModel extends AbstractDoctrineModel implements LoginAttemptModel
 {
     /**
      * @ORM\Column(name="ip_address", type="string", length=255, nullable=false)

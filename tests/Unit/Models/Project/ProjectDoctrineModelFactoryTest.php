@@ -3,6 +3,8 @@
 use App\Exceptions\InvalidParameterException;
 use App\Models\Project\ProjectDoctrineModel;
 use App\Models\Project\ProjectDoctrineModelFactory;
+use App\Models\Project\ProjectInviteModel;
+use App\Models\Project\ProjectInviteModelFactory;
 use App\Models\Project\ProjectModelFactory;
 use App\Models\User\UserModelFactoryInterface;
 use App\Models\User\UserModelInterface;
@@ -29,13 +31,16 @@ final class ProjectDoctrineModelFactoryTest extends TestCase
     {
         $uuid = $this->getFaker()->uuid;
         $data = [
-            'id'          => $this->getFaker()->numberBetween(),
-            'label'       => $this->getFaker()->word,
-            'user'        => $this->createUserModel(),
-            'description' => $this->getFaker()->text,
-            'createdAt'   => $this->getFaker()->dateTime,
-            'updatedAt'   => $this->getFaker()->dateTime,
-            'deletedAt'   => $this->getFaker()->dateTime,
+            'id'             => $this->getFaker()->numberBetween(),
+            'label'          => $this->getFaker()->word,
+            'user'           => $this->createUserModel(),
+            'description'    => $this->getFaker()->text,
+            'createdAt'      => $this->getFaker()->dateTime,
+            'updatedAt'      => $this->getFaker()->dateTime,
+            'deletedAt'      => $this->getFaker()->dateTime,
+            'projectInvites' => [
+                $this->createProjectInviteModel(),
+            ],
         ];
 
         $this->assertEquals(
@@ -47,7 +52,8 @@ final class ProjectDoctrineModelFactoryTest extends TestCase
                 $data['createdAt'],
                 $data['updatedAt'],
                 $data['deletedAt'],
-                $data['id']
+                $data['id'],
+                $data['projectInvites']
             ),
             $this->getProjectDoctrineModelFactory($this->createUuidFactoryWithUuid($uuid))->create($data)
         );
@@ -97,6 +103,43 @@ final class ProjectDoctrineModelFactoryTest extends TestCase
             $this->getProjectDoctrineModelFactory(
                 $this->createUuidFactoryWithUuid($uuid),
                 $userModelFactory
+            )->create($data)
+        );
+    }
+
+    /**
+     * @return void
+     */
+    public function testCreateWithProjectInviteDataArray(): void
+    {
+        $projectInviteData = [
+            $this->getFaker()->uuid => $this->getFaker()->word,
+        ];
+        $projectInvite = $this->createProjectInviteModel();
+        $projectInviteModelFactory = $this->createProjectInviteModelFactory();
+        $this->mockModelFactoryCreate($projectInviteModelFactory, $projectInvite, $projectInviteData);
+        $uuid = $this->getFaker()->uuid;
+        $data = [
+            'label'       => $this->getFaker()->word,
+            'user'        => $this->createUserModel(),
+            'projectInvites' => [$projectInviteData]
+        ];
+
+        $this->assertEquals(
+            new ProjectDoctrineModel(
+                $uuid,
+                $data['label'],
+                $data['user'],
+                null,
+                null,
+                null,
+                null,
+                [$projectInvite]
+            ),
+            $this->getProjectDoctrineModelFactory(
+                $this->createUuidFactoryWithUuid($uuid),
+                null,
+                $projectInviteModelFactory
             )->create($data)
         );
     }
@@ -281,16 +324,73 @@ final class ProjectDoctrineModelFactoryTest extends TestCase
     /**
      * @return void
      */
+    public function testCreateWithInvalidProjectInvitesArray(): void
+    {
+        $this->expectException(InvalidParameterException::class);
+
+        $this->getProjectDoctrineModelFactory()->create(
+            [
+                'label'          => $this->getFaker()->word,
+                'user'           => $this->createUserModel(),
+                'projectInvites' => $this->createProjectInviteModel(),
+            ]
+        );
+    }
+
+    /**
+     * @return void
+     */
+    public function testCreateWithInvalidProjectInvites(): void
+    {
+        $this->expectException(InvalidParameterException::class);
+
+        $this->getProjectDoctrineModelFactory()->create(
+            [
+                'label'          => $this->getFaker()->word,
+                'user'           => $this->createUserModel(),
+                'projectInvites' => [$this->getFaker()->word],
+            ]
+        );
+    }
+
+    /**
+     * @return void
+     */
+    public function testCreateWithInvalidProjectInviteDataArray(): void
+    {
+        $projectInviteData = [
+            $this->getFaker()->uuid => $this->getFaker()->word,
+        ];
+        $projectInviteModelFactory = $this->createProjectInviteModelFactory();
+        $this->mockModelFactoryCreate($projectInviteModelFactory, new InvalidParameterException(), $projectInviteData);
+
+        $this->expectException(InvalidParameterException::class);
+
+        $this->getProjectDoctrineModelFactory(
+            null,
+            null,
+            $projectInviteModelFactory
+        )->create([
+            'label'       => $this->getFaker()->word,
+            'user'        => $this->createUserModel(),
+            'projectInvites' => [$projectInviteData]
+        ]);
+    }
+
+    /**
+     * @return void
+     */
     public function testFill(): void
     {
         $data = [
-            'id'          => $this->getFaker()->numberBetween(),
-            'label'       => $this->getFaker()->word,
-            'user'        => $this->createUserModel(),
-            'description' => $this->getFaker()->text,
-            'createdAt'   => $this->getFaker()->dateTime,
-            'updatedAt'   => $this->getFaker()->dateTime,
-            'deletedAt'   => $this->getFaker()->dateTime,
+            'id'             => $this->getFaker()->numberBetween(),
+            'label'          => $this->getFaker()->word,
+            'user'           => $this->createUserModel(),
+            'description'    => $this->getFaker()->text,
+            'createdAt'      => $this->getFaker()->dateTime,
+            'updatedAt'      => $this->getFaker()->dateTime,
+            'deletedAt'      => $this->getFaker()->dateTime,
+            'projectInvites' => [$this->createProjectInviteModel()],
         ];
         $project = $this->createProjectDoctrineModel();
 
@@ -302,7 +402,8 @@ final class ProjectDoctrineModelFactoryTest extends TestCase
                 $data['description'],
                 $data['createdAt'],
                 $data['updatedAt'],
-                $data['deletedAt']
+                $data['deletedAt'],
+                $data['projectInvites']
             ))->setId($data['id']),
             $this->getProjectDoctrineModelFactory()->fill($project, $data)
         );
@@ -316,6 +417,41 @@ final class ProjectDoctrineModelFactoryTest extends TestCase
         $project = $this->createProjectDoctrineModel();
 
         $this->assertEquals($project, $this->getProjectDoctrineModelFactory()->fill($project, []));
+    }
+
+    /**
+     * @return void
+     */
+    public function testFillWithProjectInviteData(): void
+    {
+        $data = [
+            'projectInvites' => [[$this->getFaker()->uuid => $this->getFaker()->word]],
+        ];
+        $projectInvite = $this->createProjectInviteModel();
+        $projectInviteModelFactory = $this->createProjectInviteModelFactory();
+        $this->mockModelFactoryCreate($projectInviteModelFactory, $projectInvite, $data['projectInvites'][0]);
+        $project = $this->createProjectDoctrineModel();
+
+        $this->assertEquals(
+            $project->setProjectInvites([$projectInvite]),
+            $this->getProjectDoctrineModelFactory(null, null, $projectInviteModelFactory)->fill(
+                clone $project,
+                $data
+            )
+        );
+    }
+
+    /**
+     * @return void
+     */
+    public function testFillWithEmptyProjectInvites(): void
+    {
+        $project = $this->createProjectDoctrineModel()->setProjectInvites([$this->createProjectInviteModel()]);
+
+        $this->assertEquals(
+            clone $project->setProjectInvites([]),
+            $this->getProjectDoctrineModelFactory()->fill($project, ['projectInvites' => []])
+        );
     }
 
     /**
@@ -429,6 +565,40 @@ final class ProjectDoctrineModelFactoryTest extends TestCase
     /**
      * @return void
      */
+    public function testFillWithInvalidProjectInvites(): void
+    {
+        $this->expectException(InvalidParameterException::class);
+
+        $this->getProjectDoctrineModelFactory()->fill(
+            $this->createProjectDoctrineModel(),
+            [
+                'projectInvites' => $this->getFaker()->word,
+            ]
+        );
+    }
+
+    /**
+     * @return void
+     */
+    public function testFillWithInvalidProjectInvitesData(): void
+    {
+        $projectData = [$this->getFaker()->uuid => $this->getFaker()->word];
+        $projectInviteModelFactory = $this->createProjectInviteModelFactory();
+        $this->mockModelFactoryCreate($projectInviteModelFactory, new InvalidParameterException(), $projectData);
+
+        $this->expectException(InvalidParameterException::class);
+
+        $this->getProjectDoctrineModelFactory(null, null, $projectInviteModelFactory)->fill(
+            $this->createProjectDoctrineModel(),
+            [
+                'projectInvites' => [$projectData],
+            ]
+        );
+    }
+
+    /**
+     * @return void
+     */
     public function testFillWithInvalidId(): void
     {
         $this->expectException(InvalidParameterException::class);
@@ -459,16 +629,22 @@ final class ProjectDoctrineModelFactoryTest extends TestCase
     /**
      * @param UuidFactory|null               $uuidFactory
      * @param UserModelFactoryInterface|null $userModelFactory
+     * @param ProjectInviteModelFactory|null $projectInviteModelFactory
      *
      * @return ProjectDoctrineModelFactory|ProjectModelFactory
      */
     private function getProjectDoctrineModelFactory(
         UuidFactory $uuidFactory = null,
-        UserModelFactoryInterface $userModelFactory = null
+        UserModelFactoryInterface $userModelFactory = null,
+        ProjectInviteModelFactory $projectInviteModelFactory = null
     ): ProjectDoctrineModelFactory {
-        return (new ProjectDoctrineModelFactory($uuidFactory ?: $this->createUuidFactory()))->setUserModelFactory(
-            $userModelFactory ?: $this->createUserModelFactory()
-        );
+        return (new ProjectDoctrineModelFactory($uuidFactory ?: $this->createUuidFactory()))
+            ->setUserModelFactory(
+                $userModelFactory ?: $this->createUserModelFactory()
+            )
+            ->setProjectInviteModelFactory(
+                $projectInviteModelFactory ?: $this->createProjectInviteModelFactory()
+            );
     }
 
     /**
@@ -480,6 +656,7 @@ final class ProjectDoctrineModelFactoryTest extends TestCase
      * @param DateTime|null           $updatedAt
      * @param DateTime|null           $deletedAt
      * @param int|null                $id
+     * @param ProjectInviteModel[]    $projectInvites
      *
      * @return ProjectDoctrineModel
      */
@@ -491,7 +668,8 @@ final class ProjectDoctrineModelFactoryTest extends TestCase
         \DateTime $createdAt = null,
         \DateTime $updatedAt = null,
         \DateTime $deletedAt = null,
-        int $id = null
+        int $id = null,
+        array $projectInvites = []
     ): ProjectDoctrineModel {
         return (new ProjectDoctrineModel(
             $uuid ?: $this->getFaker()->uuid,
@@ -500,7 +678,8 @@ final class ProjectDoctrineModelFactoryTest extends TestCase
             $description ?: $this->getFaker()->text,
             $createdAt ?: $this->getFaker()->dateTime,
             $updatedAt ?: $this->getFaker()->dateTime,
-            $deletedAt ?: $this->getFaker()->dateTime
+            $deletedAt ?: $this->getFaker()->dateTime,
+            $projectInvites
         ))->setId($id ?: $this->getFaker()->numberBetween());
     }
 }

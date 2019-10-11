@@ -26,7 +26,8 @@ class Version00000000000000 extends AbstractMigration
             ->createUsersTable($schema)
             ->createRefreshTokensTable($schema)
             ->createProjectsTable($schema)
-            ->createLoginAttemptsTable($schema);
+            ->createLoginAttemptsTable($schema)
+            ->createProjectInvitesTable($schema);
     }
 
     /**
@@ -93,6 +94,34 @@ class Version00000000000000 extends AbstractMigration
         return $this;
     }
 
+    /**
+     * @param Schema $schema
+     *
+     * @return $this
+     */
+    private function createProjectInvitesTable(Schema $schema)
+    {
+        (new Builder($schema))->create('project_invites', function (Table $table) {
+            $table->increments('id');
+            $table->string('uuid');
+            $table->unique('uuid');
+            $table->string('token');
+            $table->unique('token');
+            $table->string('email');
+            $table->integer('project_id', false, true);
+            $table->foreign('projects', 'project_id', 'id');
+            $table->unique(['email', 'project_id']);
+            $table->timestamps();
+        });
+
+        return $this;
+    }
+
+    /**
+     * @param Schema $schema
+     *
+     * @return $this
+     */
     private function createLoginAttemptsTable(Schema $schema)
     {
         (new Builder($schema))->create('login_attempts', function (Table $table) {
@@ -102,6 +131,8 @@ class Version00000000000000 extends AbstractMigration
             $table->dateTime('attempted_at');
             $table->boolean('success');
         });
+
+        return $this;
     }
 
     //endregion

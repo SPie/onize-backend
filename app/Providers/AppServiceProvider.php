@@ -7,6 +7,10 @@ use App\Http\Controllers\User\PasswordResetController;
 use App\Http\Middleware\ApiSignature;
 use App\Models\Project\ProjectDoctrineModel;
 use App\Models\Project\ProjectDoctrineModelFactory;
+use App\Models\Project\ProjectInviteDoctrineModel;
+use App\Models\Project\ProjectInviteDoctrineModelFactory;
+use App\Models\Project\ProjectInviteModel;
+use App\Models\Project\ProjectInviteModelFactory;
 use App\Models\Project\ProjectModel;
 use App\Models\Project\ProjectModelFactory;
 use App\Models\User\LoginAttemptDoctrineModel;
@@ -21,6 +25,8 @@ use App\Models\User\UserDoctrineModel;
 use App\Models\User\UserDoctrineModelFactory;
 use App\Models\User\UserModelFactoryInterface;
 use App\Models\User\UserModelInterface;
+use App\Repositories\Project\ProjectInviteDoctrineRepository;
+use App\Repositories\Project\ProjectInviteRepository;
 use App\Repositories\User\LoginAttemptDoctrineRepository;
 use App\Repositories\User\LoginAttemptRepository;
 use App\Repositories\DatabaseHandler;
@@ -87,6 +93,7 @@ class AppServiceProvider extends ServiceProvider
         $this->app->bind(RefreshTokenModel::class, RefreshTokenDoctrineModel::class);
         $this->app->bind(ProjectModel::class, ProjectDoctrineModel::class);
         $this->app->bind(LoginAttemptModel::class, LoginAttemptDoctrineModel::class);
+        $this->app->bind(ProjectInviteModel::class, ProjectInviteDoctrineModel::class);
 
         return $this;
     }
@@ -114,6 +121,10 @@ class AppServiceProvider extends ServiceProvider
 
         $this->app->singleton(LoginAttemptRepository::class, function () {
             return new LoginAttemptDoctrineRepository($this->makeDatabaseHandler(LoginAttemptDoctrineModel::class));
+        });
+
+        $this->app->singleton(ProjectInviteRepository::class, function () {
+            return new ProjectInviteDoctrineRepository($this->makeDatabaseHandler(ProjectInviteDoctrineModel::class));
         });
 
         return $this;
@@ -146,6 +157,7 @@ class AppServiceProvider extends ServiceProvider
         $this->app->singleton(RefreshTokenModelFactory::class, RefreshTokenDoctrineModelFactory::class);
         $this->app->singleton(ProjectModelFactory::class, ProjectDoctrineModelFactory::class);
         $this->app->singleton(LoginAttemptModelFactory::class, LoginAttemptDoctrineModelFactory::class);
+        $this->app->singleton(ProjectInviteModelFactory::class, ProjectInviteDoctrineModelFactory::class);
 
         return $this;
     }
@@ -262,6 +274,11 @@ class AppServiceProvider extends ServiceProvider
         $projectModelFactory->setUserModelFactory($userModelFactory);
         $userModelFactory->setProjectModelFactory($projectModelFactory);
 
+        $projectInviteModelFactory = $this->getProjectInviteModelFactory();
+
+        $projectInviteModelFactory->setProjectModelFactory($projectModelFactory);
+        $projectModelFactory->setProjectInviteModelFactory($projectInviteModelFactory);
+
         return $this;
     }
 
@@ -287,6 +304,14 @@ class AppServiceProvider extends ServiceProvider
     private function getProjectModelFactory(): ProjectModelFactory
     {
         return $this->app->get(ProjectModelFactory::class);
+    }
+
+    /**
+     * @return ProjectInviteModelFactory
+     */
+    private function getProjectInviteModelFactory(): ProjectInviteModelFactory
+    {
+        return $this->app->get(ProjectInviteModelFactory::class);
     }
 
     //endregion

@@ -7,6 +7,7 @@ use App\Models\SoftDeletable;
 use App\Models\Timestampable;
 use App\Models\User\UserModelInterface;
 use App\Models\Uuidable;
+use Illuminate\Support\Collection;
 
 /**
  * Interface ProjectModel
@@ -15,16 +16,17 @@ use App\Models\Uuidable;
  */
 interface ProjectModel extends ModelInterface, Timestampable, SoftDeletable, Uuidable
 {
-    const PROPERTY_LABEL       = 'label';
-    const PROPERTY_USER        = 'user';
-    const PROPERTY_DESCRIPTION = 'description';
+    const PROPERTY_LABEL           = 'label';
+    const PROPERTY_USER            = 'user';
+    const PROPERTY_DESCRIPTION     = 'description';
+    const PROPERTY_PROJECT_INVITES = 'projectInvites';
 
     /**
      * @param string $label
      *
      * @return ProjectModel
      */
-    public function setLabel(string $label): ProjectModel;
+    public function setLabel(string $label): self;
 
     /**
      * @return string
@@ -36,7 +38,7 @@ interface ProjectModel extends ModelInterface, Timestampable, SoftDeletable, Uui
      *
      * @return ProjectModel
      */
-    public function setUser(UserModelInterface $user): ProjectModel;
+    public function setUser(UserModelInterface $user): self;
 
     /**
      * @return UserModelInterface
@@ -48,10 +50,29 @@ interface ProjectModel extends ModelInterface, Timestampable, SoftDeletable, Uui
      *
      * @return ProjectModel
      */
-    public function setDescription(?string $description): ProjectModel;
+    public function setDescription(?string $description): self;
 
     /**
      * @return string|null
      */
     public function getDescription(): ?string;
+
+    /**
+     * @param ProjectInviteModel[] $projectInvites
+     *
+     * @return $this
+     */
+    public function setProjectInvites(array $projectInvites): self;
+
+    /**
+     * @param ProjectInviteModel $projectInvite
+     *
+     * @return $this
+     */
+    public function addProjectInvite(ProjectInviteModel $projectInvite): self;
+
+    /**
+     * @return ProjectInviteModel[]|Collection
+     */
+    public function getProjectInvites(): Collection;
 }

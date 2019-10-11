@@ -7,8 +7,10 @@ use App\Models\SoftDelete;
 use App\Models\Timestamps;
 use App\Models\User\UserModelInterface;
 use App\Models\Uuid;
+use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Mapping as ORM;
 use Gedmo\Mapping\Annotation as Gedmo;
+use Illuminate\Support\Collection;
 
 /**
  * Class ProjectDoctrineModel
@@ -47,15 +49,23 @@ class ProjectDoctrineModel extends AbstractDoctrineModel implements ProjectModel
     private $description;
 
     /**
+     * @ORM\OneToMany(targetEntity="App\Models\Project\ProjectInviteDoctrineModel", mappedBy="project", cascade={"persist"})
+     *
+     * @var ArrayCollection|ProjectInviteModel[]
+     */
+    private $projectInvites;
+
+    /**
      * ProjectDoctrineModel constructor.
      *
-     * @param string             $uuid
-     * @param string             $label
-     * @param UserModelInterface $user
-     * @param string|null        $description
-     * @param \DateTime|null     $createdAt
-     * @param \DateTime|null     $updatedAt
-     * @param \DateTime|null     $deletedAt
+     * @param string               $uuid
+     * @param string               $label
+     * @param UserModelInterface   $user
+     * @param string|null          $description
+     * @param \DateTime|null       $createdAt
+     * @param \DateTime|null       $updatedAt
+     * @param \DateTime|null       $deletedAt
+     * @param ProjectInviteModel[] $projectInvites
      */
     public function __construct(
         string $uuid,
@@ -64,7 +74,8 @@ class ProjectDoctrineModel extends AbstractDoctrineModel implements ProjectModel
         string $description = null,
         \DateTime $createdAt = null,
         \DateTime $updatedAt = null,
-        \DateTime $deletedAt = null
+        \DateTime $deletedAt = null,
+        array $projectInvites = []
     ) {
         $this->uuid = $uuid;
         $this->label = $label;
@@ -73,6 +84,7 @@ class ProjectDoctrineModel extends AbstractDoctrineModel implements ProjectModel
         $this->createdAt = $createdAt;
         $this->updatedAt = $updatedAt;
         $this->deletedAt = $deletedAt;
+        $this->projectInvites = new ArrayCollection($projectInvites);
     }
 
     /**
@@ -135,6 +147,43 @@ class ProjectDoctrineModel extends AbstractDoctrineModel implements ProjectModel
         return $this->description;
     }
 
+    /**
+     * @param ProjectInviteModel[] $projectInvites
+     *
+     * @return $this
+     */
+    public function setProjectInvites(array $projectInvites): ProjectModel
+    {
+        $this->projectInvites = new ArrayCollection($projectInvites);
+
+        return $this;
+    }
+
+    /**
+     * @param ProjectInviteModel $projectInvite
+     *
+     * @return $this
+     */
+    public function addProjectInvite(ProjectInviteModel $projectInvite): ProjectModel
+    {
+        if (!$this->projectInvites->contains($projectInvite)) {
+            $this->projectInvites->add($projectInvite);
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return ProjectInviteModel[]|Collection
+     */
+    public function getProjectInvites(): Collection
+    {
+        return new Collection($this->projectInvites->toArray());
+    }
+
+    /**
+     * @return array
+     */
     public function toArray(): array
     {
         return [
