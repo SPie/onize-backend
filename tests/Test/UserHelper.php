@@ -128,6 +128,19 @@ trait UserHelper
     }
 
     /**
+     * @param UserModelInterface|MockInterface $user
+     * @param string                           $email
+     *
+     * @return $this
+     */
+    private function mockUserModelGetEmail(MockInterface $user, string $email): self
+    {
+        $user
+            ->shouldReceive('getEmail')
+            ->andReturn($email);
+    }
+
+    /**
      * @return UserModelFactoryInterface|Mockery\MockInterface
      */
     protected function createUserModelFactory(): UserModelFactoryInterface

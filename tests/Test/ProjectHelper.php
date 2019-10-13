@@ -8,6 +8,7 @@ use App\Models\Project\ProjectInviteModelFactory;
 use App\Models\Project\ProjectModel;
 use App\Models\Project\ProjectModelFactory;
 use App\Models\User\UserModelInterface;
+use App\Repositories\Project\ProjectInviteRepository;
 use App\Repositories\Project\ProjectRepository;
 use App\Services\Project\ProjectServiceInterface;
 use App\Services\User\UsersServiceInterface;
@@ -41,6 +42,26 @@ trait ProjectHelper
         $project
             ->shouldReceive('getUser')
             ->andReturn($user);
+
+        return $this;
+    }
+
+    /**
+     * @param ProjectModel|MockInterface $project
+     * @param bool                       $hasMemberWithEmail
+     * @param string                     $email
+     *
+     * @return $this
+     */
+    private function mockProjectModelHasMemberWithEmail(
+        MockInterface $project,
+        bool $hasMemberWithEmail,
+        string $email
+    ): self {
+        $project
+            ->shouldReceive('hasMemberWithEmail')
+            ->with($email)
+            ->andReturn($hasMemberWithEmail);
 
         return $this;
     }
@@ -138,7 +159,6 @@ trait ProjectHelper
      * @param ProjectInviteModel|\Exception         $projectInvite
      * @param string                                $uuid
      * @param string                                $email
-     * @param UsersServiceInterface                 $usersService
      *
      * @return $this
      */
@@ -146,12 +166,11 @@ trait ProjectHelper
         MockInterface $projectService,
         $projectInvite,
         string $uuid,
-        string $email,
-        UsersServiceInterface $usersService
+        string $email
     ): self {
         $projectService
             ->shouldReceive('invite')
-            ->with($uuid, $email, $usersService)
+            ->with($uuid, $email)
             ->andThrow($projectInvite);
 
         return $this;
@@ -197,6 +216,36 @@ trait ProjectHelper
     private function createProjectInviteModelFactory(): ProjectInviteModelFactory
     {
         return m::spy(ProjectInviteModelFactory::class);
+    }
+
+    /**
+     * @return ProjectInviteRepository|MockInterface
+     */
+    private function createProjectInviteRepository(): ProjectInviteRepository
+    {
+        return m::spy(ProjectInviteRepository::class);
+    }
+
+    /**
+     * @param ProjectInviteRepository|MockInterface $projectInviteRepository
+     * @param ProjectInviteModel|null               $projectInvite
+     * @param string                                $email
+     * @param ProjectModel                          $project
+     *
+     * @return $this
+     */
+    private function mockProjectInviteRepositoryFindByEmailAndProject(
+        MockInterface $projectInviteRepository,
+        ?ProjectInviteModel $projectInvite,
+        string $email,
+        ProjectModel $project
+    ): self {
+        $projectInviteRepository
+            ->shouldReceive('findByEmailAndProject')
+            ->with($email, $project)
+            ->andReturn($projectInvite);
+
+        return $this;
     }
 
     //region Assertions

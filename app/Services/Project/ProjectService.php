@@ -4,13 +4,15 @@ namespace App\Services\Project;
 
 use App\Exceptions\Auth\NotAllowedException;
 use App\Exceptions\ModelNotFoundException;
+use App\Exceptions\Project\UserAlreadyMemberException;
+use App\Models\ModelInterface;
 use App\Models\Project\ProjectInviteModel;
+use App\Models\Project\ProjectInviteModelFactory;
 use App\Models\Project\ProjectModel;
 use App\Models\Project\ProjectModelFactory;
 use App\Models\User\UserModelInterface;
+use App\Repositories\Project\ProjectInviteRepository;
 use App\Repositories\Project\ProjectRepository;
-use App\Services\User\UsersServiceInterface;
-use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 
 /**
  * Class ProjectService
@@ -30,15 +32,33 @@ final class ProjectService implements ProjectServiceInterface
     private $projectModelFactory;
 
     /**
+     * @var ProjectInviteRepository
+     */
+    private $projectInviteRepository;
+
+    /**
+     * @var ProjectInviteModelFactory
+     */
+    private $projectInviteModelFactory;
+
+    /**
      * ProjectService constructor.
      *
-     * @param ProjectRepository   $projectRepository
-     * @param ProjectModelFactory $projectModelFactory
+     * @param ProjectRepository         $projectRepository
+     * @param ProjectModelFactory       $projectModelFactory
+     * @param ProjectInviteRepository   $projectInviteRepository
+     * @param ProjectInviteModelFactory $projectInviteModelFactory
      */
-    public function __construct(ProjectRepository $projectRepository, ProjectModelFactory $projectModelFactory)
-    {
+    public function __construct(
+        ProjectRepository $projectRepository,
+        ProjectModelFactory $projectModelFactory,
+        ProjectInviteRepository $projectInviteRepository,
+        ProjectInviteModelFactory $projectInviteModelFactory
+    ) {
         $this->projectRepository = $projectRepository;
         $this->projectModelFactory = $projectModelFactory;
+        $this->projectInviteRepository = $projectInviteRepository;
+        $this->projectInviteModelFactory = $projectInviteModelFactory;
     }
 
     /**
@@ -56,6 +76,38 @@ final class ProjectService implements ProjectServiceInterface
     {
         return $this->projectModelFactory;
     }
+
+    /**
+     * @return ProjectInviteRepository
+     */
+    private function getProjectInviteRepository(): ProjectInviteRepository
+    {
+        return $this->projectInviteRepository;
+    }
+
+    /**
+     * @return ProjectInviteModelFactory
+     */
+    private function getProjectInviteModelFactory(): ProjectInviteModelFactory
+    {
+        return $this->projectInviteModelFactory;
+    }
+
+    /**
+     * @param string $uuid
+     *
+     * @return ProjectModel
+     */
+    public function getProject(string $uuid): ProjectModel
+    {
+        $project = $this->getProjectRepository()->findByUuid($uuid);
+        if (!$project) {
+            throw new ModelNotFoundException(ProjectModel::class, $uuid);
+        }
+
+        return $project;
+    }
+
     /**
      * @param array              $projectData
      * @param UserModelInterface $user
@@ -99,14 +151,63 @@ final class ProjectService implements ProjectServiceInterface
     }
 
     /**
-     * @param string                $uuid
-     * @param string                $email
-     * @param UsersServiceInterface $usersService
+     * @param string $uuid
+     * @param string $email
+     *
+     * @return ProjectInviteModel|ModelInterface
+     */
+    public function invite(string $uuid, string $email): ProjectInviteModel
+    {
+        $project = $this->getProject($uuid);
+        if ($project->hasMemberWithEmail($email)) {
+            throw new UserAlreadyMemberException();
+        }
+
+        $projectInvite = $this->getProjectInviteRepository()->findByEmailAndProject($email, $project);
+
+        return $this->getProjectInviteRepository()->save(
+            $projectInvite
+                ? $this->updateProjectInvite($projectInvite, $email)
+                : $this->createNewProjectInvite($email, $project)
+        );
+    }
+
+    /**
+     * @param string       $email
+     * @param ProjectModel $project
      *
      * @return ProjectInviteModel
      */
-    public function invite(string $uuid, string $email, UsersServiceInterface $usersService): ProjectInviteModel
+    private function createNewProjectInvite(string $email, ProjectModel $project): ProjectInviteModel
     {
-        // TODO: Implement invite() method.
+        return $this->getProjectInviteModelFactory()->create([
+            ProjectInviteModel::PROPERTY_TOKEN   => $this->createToken($email),
+            ProjectInviteModel::PROPERTY_EMAIL   => $email,
+            ProjectInviteModel::PROPERTY_PROJECT => $project,
+        ]);
+    }
+
+    /**
+     * @param ProjectInviteModel $projectInvite
+     * @param string             $email
+     *
+     * @return ProjectInviteModel
+     */
+    private function updateProjectInvite(ProjectInviteModel $projectInvite, string $email): ProjectInviteModel
+    {
+        return $this->getProjectInviteModelFactory()->fill(
+            $projectInvite,
+            [ProjectInviteModel::PROPERTY_TOKEN => $this->createToken($email)]
+        );
+    }
+
+    /**
+     * @param string $email
+     *
+     * @return string
+     */
+    private function createToken(string $email): string
+    {
+        return \md5(\time() . $email . \mt_rand());
     }
 }

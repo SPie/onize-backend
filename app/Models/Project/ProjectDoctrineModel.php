@@ -148,6 +148,44 @@ class ProjectDoctrineModel extends AbstractDoctrineModel implements ProjectModel
     }
 
     /**
+     * @param UserModelInterface[] $members
+     *
+     * @return ProjectModel
+     */
+    public function setMembers(array $members): ProjectModel
+    {
+        // TODO: Implement setMembers() method.
+    }
+
+    /**
+     * @param UserModelInterface $member
+     *
+     * @return ProjectModel
+     */
+    public function addMember(UserModelInterface $member): ProjectModel
+    {
+        // TODO: Implement addMember() method.
+    }
+
+    /**
+     * @return UserModelInterface[]|Collection
+     */
+    public function getMembers(): Collection
+    {
+        // TODO: Implement getMembers() method.
+    }
+
+    /**
+     * @param string $email
+     *
+     * @return bool
+     */
+    public function hasMemberWithEmail(string $email): bool
+    {
+        // TODO: Implement hasMemberWithEmail() method.
+    }
+
+    /**
      * @param ProjectInviteModel[] $projectInvites
      *
      * @return $this

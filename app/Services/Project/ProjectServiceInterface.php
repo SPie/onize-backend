@@ -5,7 +5,6 @@ namespace App\Services\Project;
 use App\Models\Project\ProjectInviteModel;
 use App\Models\Project\ProjectModel;
 use App\Models\User\UserModelInterface;
-use App\Services\User\UsersServiceInterface;
 
 /**
  * Interface ProjectServiceInterface
@@ -14,6 +13,13 @@ use App\Services\User\UsersServiceInterface;
  */
 interface ProjectServiceInterface
 {
+    /**
+     * @param string $uuid
+     *
+     * @return ProjectModel
+     */
+    public function getProject(string $uuid): ProjectModel;
+
     /**
      * @param array              $projectData
      * @param UserModelInterface $user
@@ -31,11 +37,10 @@ interface ProjectServiceInterface
     public function removeProject(string $uuid, UserModelInterface $authenticatedUser): self;
 
     /**
-     * @param string                $uuid
-     * @param string                $email
-     * @param UsersServiceInterface $usersService
+     * @param string $uuid
+     * @param string $email
      *
      * @return ProjectInviteModel
      */
-    public function invite(string $uuid, string $email, UsersServiceInterface $usersService): ProjectInviteModel;
+    public function invite(string $uuid, string $email): ProjectInviteModel;
 }

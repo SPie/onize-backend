@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Project;
 
 use App\Http\Controllers\Controller;
+use App\Models\Project\ProjectInviteModel;
 use App\Models\Project\ProjectModel;
 use App\Models\User\UserModelInterface;
 use App\Services\Email\EmailService;
@@ -124,24 +125,22 @@ final class ProjectsController extends Controller
     }
 
     /**
-     * @param Request               $request
-     * @param UsersServiceInterface $usersService
-     * @param EmailService          $emailService
+     * @param Request      $request
+     * @param EmailService $emailService
      *
      * @return JsonResponse
      */
-    public function invite(Request $request, UsersServiceInterface $usersService, EmailService $emailService): JsonResponse
+    public function invite(Request $request, EmailService $emailService): JsonResponse
     {
         $parameters = $this->validateDataForInvite($request);
 
         $projectInvite = $this->getProjectService()->invite(
             $parameters[ProjectModel::PROPERTY_UUID],
-            $parameters[self::REQUEST_PARAMETER_EMAIL],
-            $usersService
+            $parameters[ProjectInviteModel::PROPERTY_EMAIL]
         );
 
         $emailService->projectInvite(
-            $parameters[self::REQUEST_PARAMETER_EMAIL],
+            $parameters[ProjectInviteModel::PROPERTY_EMAIL],
             $this->parseInviteUrl($parameters[self::REQUEST_PARAMETER_INVITE_URL], $projectInvite->getToken())
         );
 

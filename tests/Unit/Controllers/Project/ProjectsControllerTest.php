@@ -204,7 +204,6 @@ final class ProjectsControllerTest extends TestCase
         $request->offsetSet('uuid', $this->getFaker()->uuid);
         $request->offsetSet('email', $this->getFaker()->safeEmail);
         $request->offsetSet('inviteUrl', $this->getFaker()->url . '?' . $tokenPlaceHolder);
-        $usersService = $this->createUsersService();
         $emailService = $this->createEmailService();
         $token = $this->getFaker()->uuid;
         $projectInvite = $this->createProjectInviteModel();
@@ -214,13 +213,11 @@ final class ProjectsControllerTest extends TestCase
             $projectService,
             $projectInvite,
             $request->get('uuid'),
-            $request->get('email'),
-            $usersService
+            $request->get('email')
         );
 
         $response = $this->getProjectsController(null, $projectService, $tokenPlaceHolder)->invite(
             $request,
-            $usersService,
             $emailService
         );
 
@@ -243,11 +240,7 @@ final class ProjectsControllerTest extends TestCase
 
         $this->expectException(ValidationException::class);
 
-        $this->getProjectsController()->invite(
-            $request,
-            $this->createUsersService(),
-            $this->createEmailService()
-        );
+        $this->getProjectsController()->invite($request, $this->createEmailService());
     }
 
     /**
@@ -263,7 +256,6 @@ final class ProjectsControllerTest extends TestCase
 
         $this->getProjectsController()->invite(
             $request,
-            $this->createUsersService(),
             $this->createEmailService()
         );
     }
@@ -280,11 +272,7 @@ final class ProjectsControllerTest extends TestCase
 
         $this->expectException(ValidationException::class);
 
-        $this->getProjectsController()->invite(
-            $request,
-            $this->createUsersService(),
-            $this->createEmailService()
-        );
+        $this->getProjectsController()->invite($request, $this->createEmailService());
     }
 
     /**
@@ -298,11 +286,7 @@ final class ProjectsControllerTest extends TestCase
 
         $this->expectException(ValidationException::class);
 
-        $this->getProjectsController()->invite(
-            $request,
-            $this->createUsersService(),
-            $this->createEmailService()
-        );
+        $this->getProjectsController()->invite($request, $this->createEmailService());
     }
 
     /**
@@ -314,23 +298,17 @@ final class ProjectsControllerTest extends TestCase
         $request->offsetSet('uuid', $this->getFaker()->uuid);
         $request->offsetSet('email', $this->getFaker()->safeEmail);
         $request->offsetSet('inviteUrl', $this->getFaker()->url);
-        $usersService = $this->createUsersService();
         $projectService = $this->createProjectService();
         $this->mockProjectServiceInvite(
             $projectService,
             new ModelNotFoundException(ProjectInviteModel::class, $request->get('uuid')),
             $request->get('uuid'),
-            $request->get('email'),
-            $usersService
+            $request->get('email')
         );
 
         $this->expectException(ModelNotFoundException::class);
 
-        $this->getProjectsController(null, $projectService)->invite(
-            $request,
-            $usersService,
-            $this->createEmailService()
-        );
+        $this->getProjectsController(null, $projectService)->invite($request, $this->createEmailService());
     }
 
     //endregion

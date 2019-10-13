@@ -58,6 +58,32 @@ interface ProjectModel extends ModelInterface, Timestampable, SoftDeletable, Uui
     public function getDescription(): ?string;
 
     /**
+     * @param UserModelInterface[] $members
+     *
+     * @return $this
+     */
+    public function setMembers(array $members): self;
+
+    /**
+     * @param UserModelInterface $member
+     *
+     * @return $this
+     */
+    public function addMember(UserModelInterface $member): self;
+
+    /**
+     * @return UserModelInterface[]|Collection
+     */
+    public function getMembers(): Collection;
+
+    /**
+     * @param string $email
+     *
+     * @return bool
+     */
+    public function hasMemberWithEmail(string $email): bool;
+
+    /**
      * @param ProjectInviteModel[] $projectInvites
      *
      * @return $this
