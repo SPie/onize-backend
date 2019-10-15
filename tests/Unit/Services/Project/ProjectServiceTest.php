@@ -6,7 +6,9 @@ use App\Exceptions\ModelNotFoundException;
 use App\Exceptions\Project\UserAlreadyMemberException;
 use App\Models\Project\ProjectInviteModel;
 use App\Models\Project\ProjectInviteModelFactory;
+use App\Models\Project\ProjectModel;
 use App\Models\Project\ProjectModelFactory;
+use App\Models\User\UserModelInterface;
 use App\Repositories\Project\ProjectInviteRepository;
 use App\Repositories\Project\ProjectRepository;
 use App\Services\Project\ProjectService;
@@ -180,7 +182,7 @@ final class ProjectServiceTest extends TestCase
     {
         $uuid = $this->getFaker()->uuid;
         $email = $this->getFaker()->safeEmail;
-        $project = $this->createProjectModel();
+        $project = $this->createProjectModelForInvite();
         $projectRepository = $this->createProjectRepository();
         $this->mockProjectRepositoryFindByUuid($projectRepository, $project, $uuid);
         $projectInviteRepository = $this->createProjectInviteRepository();
@@ -229,7 +231,7 @@ final class ProjectServiceTest extends TestCase
     {
         $uuid = $this->getFaker()->uuid;
         $email = $this->getFaker()->safeEmail;
-        $project = $this->createProjectModel();
+        $project = $this->createProjectModelForInvite();
         $projectRepository = $this->createProjectRepository();
         $this->mockProjectRepositoryFindByUuid($projectRepository, $project, $uuid);
         $initialProjectInviteModel = $this->createProjectInviteModel();
@@ -269,11 +271,30 @@ final class ProjectServiceTest extends TestCase
     {
         $uuid = $this->getFaker()->uuid;
         $email = $this->getFaker()->email;
-        $project = $this->createProjectModel();
+        $project = $this->createProjectModelForInvite();
         $projectRepository = $this->createProjectRepository();
         $this
             ->mockProjectRepositoryFindByUuid($projectRepository, $project, $uuid)
             ->mockProjectModelHasMemberWithEmail($project, true, $email);
+
+        $this->expectException(UserAlreadyMemberException::class);
+
+        $this->getProjectService($projectRepository)->invite($uuid, $email);
+    }
+
+    /**
+     * @return void
+     */
+    public function testInviteWithProjectOwner(): void
+    {
+        $uuid = $this->getFaker()->uuid;
+        $email = $this->getFaker()->email;
+        $user = $this->createUserModel();
+        $project = $this->createProjectModelForInvite($user);
+        $projectRepository = $this->createProjectRepository();
+        $this
+            ->mockProjectRepositoryFindByUuid($projectRepository, $project, $uuid)
+            ->mockUserModelGetEmail($user, $email);
 
         $this->expectException(UserAlreadyMemberException::class);
 
@@ -302,6 +323,19 @@ final class ProjectServiceTest extends TestCase
             $projectInviteRepository ?: $this->createProjectInviteRepository(),
             $projectInviteModelFactory ?: $this->createProjectInviteModelFactory()
         );
+    }
+
+    /**
+     * @param UserModelInterface|null $user
+     *
+     * @return ProjectModel
+     */
+    private function createProjectModelForInvite(UserModelInterface $user = null): ProjectModel
+    {
+        $project = $this->createProjectModel();
+        $this->mockProjectModelGetUser($project, $user ?: $this->createUserModel());
+
+        return $project;
     }
 
     /**

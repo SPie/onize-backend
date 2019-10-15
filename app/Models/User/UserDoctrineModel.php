@@ -53,6 +53,17 @@ class UserDoctrineModel extends AbstractDoctrineModel implements UserModelInterf
     private $projects;
 
     /**
+     * @ORM\ManyToMany(targetEntity="App\Models\Project\ProjectDoctrineModel", inversedBy="members")
+     * @ORM\JoinTable(name="project_members",
+     *     joinColumns={@ORM\JoinColumn(name="user_id", referencedColumnName="id")},
+     *     inverseJoinColumns={@ORM\JoinColumn(name="project_id", referencedColumnName="id")}
+     *     )
+     *
+     * @var ProjectModel[]|ArrayCollection
+     */
+    private $joinedProjects;
+
+    /**
      * UserDoctrineModel constructor.
      *
      * @param string         $uuid
@@ -63,6 +74,7 @@ class UserDoctrineModel extends AbstractDoctrineModel implements UserModelInterf
      * @param \DateTime|null $deletedAt
      * @param RefreshToken[] $refreshTokens
      * @param ProjectModel[] $projects
+     * @param ProjectModel[] $joinedProjects
      */
     public function __construct(
         string $uuid,
@@ -72,7 +84,8 @@ class UserDoctrineModel extends AbstractDoctrineModel implements UserModelInterf
         \DateTime $updatedAt = null,
         \DateTime $deletedAt = null,
         array $refreshTokens = [],
-        array $projects = []
+        array $projects = [],
+        array $joinedProjects = []
     ) {
         $this->uuid = $uuid;
         $this->email = $email;
@@ -82,6 +95,7 @@ class UserDoctrineModel extends AbstractDoctrineModel implements UserModelInterf
         $this->deletedAt = $deletedAt;
         $this->refreshTokens = new ArrayCollection($refreshTokens);
         $this->projects = new ArrayCollection($projects);
+        $this->joinedProjects = new ArrayCollection($joinedProjects);
     }
 
     /**
@@ -170,6 +184,40 @@ class UserDoctrineModel extends AbstractDoctrineModel implements UserModelInterf
     public function getProjects(): Collection
     {
         return new Collection($this->projects->toArray());
+    }
+
+    /**
+     * @param ProjectModel[] $joinedProjects
+     *
+     * @return UserModelInterface
+     */
+    public function setJoinedProjects(array $joinedProjects): UserModelInterface
+    {
+        $this->joinedProjects = new ArrayCollection($joinedProjects);
+
+        return $this;
+    }
+
+    /**
+     * @param ProjectModel $joinedProject
+     *
+     * @return UserModelInterface
+     */
+    public function addJoinedProject(ProjectModel $joinedProject): UserModelInterface
+    {
+        if (!$this->joinedProjects->contains($joinedProject)) {
+            $this->joinedProjects->add($joinedProject);
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return ProjectModel[]|Collection
+     */
+    public function getJoinedProjects(): Collection
+    {
+        return new Collection($this->joinedProjects->toArray());
     }
 
     /**

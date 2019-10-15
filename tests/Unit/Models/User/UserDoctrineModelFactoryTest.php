@@ -5,8 +5,10 @@ use App\Models\Project\ProjectModelFactory;
 use App\Models\User\UserDoctrineModelFactory;
 use App\Models\User\UserModelInterface;
 use App\Services\Uuid\UuidFactory;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Hash;
 use Mockery\MockInterface;
+use PharIo\Version\InvalidVersionException;
 use Test\AuthHelper;
 use Test\ModelHelper;
 use Test\ProjectHelper;
@@ -412,6 +414,76 @@ class UserDoctrineModelFactoryTest extends TestCase
 
     /**
      * @return void
+     */
+    public function testCreateWithJoinedProjects(): void
+    {
+        $data = [
+            'email' => $this->getFaker()->safeEmail,
+            'password' => $this->getFaker()->password(),
+            'joinedProjects' => [$this->createProjectModel()],
+        ];
+
+        $this->assertEquals(
+            $data['joinedProjects'],
+            $this->getUserModelFactory()->create($data)->getJoinedProjects()->all()
+        );
+    }
+
+    /**
+     * @return void
+     */
+    public function testCreateWithJoinedProjectsData(): void
+    {
+        $projectsData = [$this->getFaker()->uuid => $this->getFaker()->word];
+        $data = [
+            'email'          => $this->getFaker()->safeEmail,
+            'password'       => $this->getFaker()->password(),
+            'joinedProjects' => [$projectsData],
+        ];
+        $project = $this->createProjectModel();
+        $projectModelFactory = $this->createProjectModelFactory();
+        $this->mockModelFactoryCreate($projectModelFactory, $project, $projectsData);
+
+        $this->assertEquals(
+            [$project],
+            $this->getUserModelFactory(null, $projectModelFactory)->create($data)->getJoinedProjects()->all()
+        );
+    }
+
+    /**
+     * @return void
+     */
+    public function testCreateWithInvalidJoinedProjects(): void
+    {
+        $this->expectException(InvalidParameterException::class);
+
+        $this->getUserModelFactory()->create([
+            'email'          => $this->getFaker()->safeEmail,
+            'password'       => $this->getFaker()->password(),
+            'joinedProjects' => $this->getFaker()->word,
+        ]);
+    }
+
+    /**
+     * @return void
+     */
+    public function testCreateWithInvalidJoinedProjectsData(): void
+    {
+        $projectsData = [$this->getFaker()->uuid => $this->getFaker()->word];
+        $projectModelFactory = $this->createProjectModelFactory();
+        $this->mockModelFactoryCreate($projectModelFactory, new InvalidVersionException(), $projectsData);
+
+        $this->expectException(InvalidParameterException::class);
+
+        $this->getUserModelFactory(null, $projectModelFactory)->create([
+            'email'          => $this->getFaker()->safeEmail,
+            'password'       => $this->getFaker()->password(),
+            'joinedProjects' => $this->getFaker()->word,
+        ]);
+    }
+
+    /**
+     * @return void
      *
      * @throws InvalidParameterException
      */
@@ -464,6 +536,37 @@ class UserDoctrineModelFactoryTest extends TestCase
         $user = $this->getUserModelFactory()->fill($this->createUserDoctrineModel(), $data);
 
         $this->assertEquals($data['projects'], $user->getProjects()->all());
+    }
+
+    /**
+     * @return void
+     */
+    public function testFillWithJoinedProjects(): void
+    {
+        $data = [
+            'joinedProjects' => [$this->createProjectModel()]
+        ];
+
+        $user = $this->getUserModelFactory()->fill($this->createUserDoctrineModel(), $data);
+
+        $this->assertEquals($data['joinedProjects'], $user->getJoinedProjects()->all());
+    }
+
+    /**
+     * @return void
+     */
+    public function testFillWithEmptyJoinedProjects(): void
+    {
+        $data = [
+            'joinedProjects' => []
+        ];
+
+        $user = $this->getUserModelFactory()->fill(
+            $this->createUserDoctrineModel()->setJoinedProjects([$this->createProjectModel()]),
+            $data
+        );
+
+        $this->assertEquals([], $user->getJoinedProjects()->all());
     }
 
     //endregion

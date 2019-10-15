@@ -159,7 +159,7 @@ final class ProjectService implements ProjectServiceInterface
     public function invite(string $uuid, string $email): ProjectInviteModel
     {
         $project = $this->getProject($uuid);
-        if ($project->hasMemberWithEmail($email)) {
+        if ($this->isUserAlreadyMember($project, $email)) {
             throw new UserAlreadyMemberException();
         }
 
@@ -170,6 +170,17 @@ final class ProjectService implements ProjectServiceInterface
                 ? $this->updateProjectInvite($projectInvite, $email)
                 : $this->createNewProjectInvite($email, $project)
         );
+    }
+
+    /**
+     * @param ProjectModel $project
+     * @param string       $email
+     *
+     * @return bool
+     */
+    private function isUserAlreadyMember(ProjectModel $project, string $email): bool
+    {
+        return $project->hasMemberWithEmail($email) || $project->getUser()->getEmail() == $email;
     }
 
     /**

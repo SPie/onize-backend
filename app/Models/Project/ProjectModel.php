@@ -20,6 +20,7 @@ interface ProjectModel extends ModelInterface, Timestampable, SoftDeletable, Uui
     const PROPERTY_USER            = 'user';
     const PROPERTY_DESCRIPTION     = 'description';
     const PROPERTY_PROJECT_INVITES = 'projectInvites';
+    const PROPERTY_MEMBERS         = 'members';
 
     /**
      * @param string $label

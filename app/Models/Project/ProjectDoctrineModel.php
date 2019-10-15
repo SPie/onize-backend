@@ -56,6 +56,17 @@ class ProjectDoctrineModel extends AbstractDoctrineModel implements ProjectModel
     private $projectInvites;
 
     /**
+     * @ORM\ManyToMany(targetEntity="App\Models\User\UserDoctrineModel", inversedBy="joinedProjects")
+     * @ORM\JoinTable(name="project_members",
+     *     joinColumns={@ORM\JoinColumn(name="project_id", referencedColumnName="id")},
+     *     inverseJoinColumns={@ORM\JoinColumn(name="user_id", referencedColumnName="id")}
+     *     )
+     *
+     * @var ArrayCollection|UserModelInterface[]
+     */
+    private $members;
+
+    /**
      * ProjectDoctrineModel constructor.
      *
      * @param string               $uuid
@@ -66,6 +77,7 @@ class ProjectDoctrineModel extends AbstractDoctrineModel implements ProjectModel
      * @param \DateTime|null       $updatedAt
      * @param \DateTime|null       $deletedAt
      * @param ProjectInviteModel[] $projectInvites
+     * @param UserModelInterface[] $members
      */
     public function __construct(
         string $uuid,
@@ -75,7 +87,8 @@ class ProjectDoctrineModel extends AbstractDoctrineModel implements ProjectModel
         \DateTime $createdAt = null,
         \DateTime $updatedAt = null,
         \DateTime $deletedAt = null,
-        array $projectInvites = []
+        array $projectInvites = [],
+        array $members = []
     ) {
         $this->uuid = $uuid;
         $this->label = $label;
@@ -85,6 +98,7 @@ class ProjectDoctrineModel extends AbstractDoctrineModel implements ProjectModel
         $this->updatedAt = $updatedAt;
         $this->deletedAt = $deletedAt;
         $this->projectInvites = new ArrayCollection($projectInvites);
+        $this->members = new ArrayCollection($members);
     }
 
     /**
@@ -154,7 +168,7 @@ class ProjectDoctrineModel extends AbstractDoctrineModel implements ProjectModel
      */
     public function setMembers(array $members): ProjectModel
     {
-        // TODO: Implement setMembers() method.
+        $this->members = new ArrayCollection($members);
     }
 
     /**
@@ -164,7 +178,11 @@ class ProjectDoctrineModel extends AbstractDoctrineModel implements ProjectModel
      */
     public function addMember(UserModelInterface $member): ProjectModel
     {
-        // TODO: Implement addMember() method.
+        if (!$this->members->contains($member)) {
+            $this->members->add($member);
+        }
+
+        return $this;
     }
 
     /**
@@ -172,7 +190,7 @@ class ProjectDoctrineModel extends AbstractDoctrineModel implements ProjectModel
      */
     public function getMembers(): Collection
     {
-        // TODO: Implement getMembers() method.
+        return new Collection($this->members->toArray());
     }
 
     /**
@@ -182,7 +200,9 @@ class ProjectDoctrineModel extends AbstractDoctrineModel implements ProjectModel
      */
     public function hasMemberWithEmail(string $email): bool
     {
-        // TODO: Implement hasMemberWithEmail() method.
+        return $this->getMembers()->contains(function (UserModelInterface $user) use ($email) {
+            return $user->getEmail() == $email;
+        });
     }
 
     /**

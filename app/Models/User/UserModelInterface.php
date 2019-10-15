@@ -17,10 +17,11 @@ use SPie\LaravelJWT\Contracts\JWTAuthenticatable;
  */
 interface UserModelInterface extends ModelInterface, Timestampable, SoftDeletable, JWTAuthenticatable, Uuidable
 {
-    const PROPERTY_EMAIL          = 'email';
-    const PROPERTY_PASSWORD       = 'password';
-    const PROPERTY_REFRESH_TOKENS = 'refreshTokens';
-    const PROPERTY_PROJECTS       = 'projects';
+    const PROPERTY_EMAIL           = 'email';
+    const PROPERTY_PASSWORD        = 'password';
+    const PROPERTY_REFRESH_TOKENS  = 'refreshTokens';
+    const PROPERTY_PROJECTS        = 'projects';
+    const PROPERTY_JOINED_PROJECTS = 'joinedProjects';
 
     /**
      * @param string $email
@@ -83,4 +84,23 @@ interface UserModelInterface extends ModelInterface, Timestampable, SoftDeletabl
      * @return ProjectModel[]|Collection
      */
     public function getProjects(): Collection;
+
+    /**
+     * @param ProjectModel[] $joinedProjects
+     *
+     * @return $this
+     */
+    public function setJoinedProjects(array $joinedProjects): self;
+
+    /**
+     * @param ProjectModel $joinedProject
+     *
+     * @return $this
+     */
+    public function addJoinedProject(ProjectModel $joinedProject): self;
+
+    /**
+     * @return ProjectModel[]|Collection
+     */
+    public function getJoinedProjects(): Collection;
 }

@@ -64,10 +64,10 @@ class UserDoctrineModel extends \App\Models\User\UserDoctrineModel implements \D
     public function __sleep()
     {
         if ($this->__isInitialized__) {
-            return ['__isInitialized__', '' . "\0" . 'App\\Models\\User\\UserDoctrineModel' . "\0" . 'email', '' . "\0" . 'App\\Models\\User\\UserDoctrineModel' . "\0" . 'refreshTokens', '' . "\0" . 'App\\Models\\User\\UserDoctrineModel' . "\0" . 'projects', 'id', 'password', 'createdAt', 'updatedAt', 'deletedAt', '' . "\0" . 'App\\Models\\User\\UserDoctrineModel' . "\0" . 'uuid'];
+            return ['__isInitialized__', '' . "\0" . 'App\\Models\\User\\UserDoctrineModel' . "\0" . 'email', '' . "\0" . 'App\\Models\\User\\UserDoctrineModel' . "\0" . 'refreshTokens', '' . "\0" . 'App\\Models\\User\\UserDoctrineModel' . "\0" . 'projects', '' . "\0" . 'App\\Models\\User\\UserDoctrineModel' . "\0" . 'joinedProjects', 'id', 'password', 'createdAt', 'updatedAt', 'deletedAt', '' . "\0" . 'App\\Models\\User\\UserDoctrineModel' . "\0" . 'uuid'];
         }
 
-        return ['__isInitialized__', '' . "\0" . 'App\\Models\\User\\UserDoctrineModel' . "\0" . 'email', '' . "\0" . 'App\\Models\\User\\UserDoctrineModel' . "\0" . 'refreshTokens', '' . "\0" . 'App\\Models\\User\\UserDoctrineModel' . "\0" . 'projects', 'id', 'password', 'createdAt', 'updatedAt', 'deletedAt', '' . "\0" . 'App\\Models\\User\\UserDoctrineModel' . "\0" . 'uuid'];
+        return ['__isInitialized__', '' . "\0" . 'App\\Models\\User\\UserDoctrineModel' . "\0" . 'email', '' . "\0" . 'App\\Models\\User\\UserDoctrineModel' . "\0" . 'refreshTokens', '' . "\0" . 'App\\Models\\User\\UserDoctrineModel' . "\0" . 'projects', '' . "\0" . 'App\\Models\\User\\UserDoctrineModel' . "\0" . 'joinedProjects', 'id', 'password', 'createdAt', 'updatedAt', 'deletedAt', '' . "\0" . 'App\\Models\\User\\UserDoctrineModel' . "\0" . 'uuid'];
     }
 
     /**
@@ -259,6 +259,39 @@ class UserDoctrineModel extends \App\Models\User\UserDoctrineModel implements \D
         $this->__initializer__ && $this->__initializer__->__invoke($this, 'getProjects', []);
 
         return parent::getProjects();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function setJoinedProjects(array $joinedProjects): \App\Models\User\UserModelInterface
+    {
+
+        $this->__initializer__ && $this->__initializer__->__invoke($this, 'setJoinedProjects', [$joinedProjects]);
+
+        return parent::setJoinedProjects($joinedProjects);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function addJoinedProject(\App\Models\Project\ProjectModel $joinedProject): \App\Models\User\UserModelInterface
+    {
+
+        $this->__initializer__ && $this->__initializer__->__invoke($this, 'addJoinedProject', [$joinedProject]);
+
+        return parent::addJoinedProject($joinedProject);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function getJoinedProjects(): \Illuminate\Support\Collection
+    {
+
+        $this->__initializer__ && $this->__initializer__->__invoke($this, 'getJoinedProjects', []);
+
+        return parent::getJoinedProjects();
     }
 
     /**

@@ -95,7 +95,8 @@ final class ProjectDoctrineModelFactory implements ProjectModelFactory
             $this->validateDateTimeParameter($data, ProjectModel::PROPERTY_CREATED_AT, false),
             $this->validateDateTimeParameter($data, ProjectModel::PROPERTY_UPDATED_AT, false),
             $this->validateDateTimeParameter($data, ProjectModel::PROPERTY_DELETED_AT, false),
-            $this->validateProjectInvites($data)
+            $this->validateProjectInvites($data),
+            $this->validateMembers($data)
         ))->setId($this->validateIntegerParameter($data, ProjectModel::PROPERTY_ID, false));
     }
 
@@ -204,6 +205,40 @@ final class ProjectDoctrineModelFactory implements ProjectModelFactory
                     throw new InvalidParameterException();
                 },
                 $projectInvites
+            )
+            : [];
+    }
+
+    /**
+     * @param array $data
+     *
+     * @return UserModelInterface[]
+     *
+     * @throws InvalidParameterException
+     */
+    private function validateMembers(array $data): array
+    {
+        $members = $this->validateArrayParameter(
+            $data,
+            ProjectModel::PROPERTY_MEMBERS,
+            false,
+            true
+        );
+
+        return \is_array($members)
+            ? \array_map(
+                function ($member) {
+                    if ($member instanceof UserModelInterface) {
+                        return $member;
+                    }
+
+                    if (\is_array($member)) {
+                        return $this->getUserModelFactory()->create($member);
+                    }
+
+                    throw new InvalidParameterException();
+                },
+                $members
             )
             : [];
     }

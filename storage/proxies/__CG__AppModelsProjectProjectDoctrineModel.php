@@ -64,10 +64,10 @@ class ProjectDoctrineModel extends \App\Models\Project\ProjectDoctrineModel impl
     public function __sleep()
     {
         if ($this->__isInitialized__) {
-            return ['__isInitialized__', '' . "\0" . 'App\\Models\\Project\\ProjectDoctrineModel' . "\0" . 'label', '' . "\0" . 'App\\Models\\Project\\ProjectDoctrineModel' . "\0" . 'user', '' . "\0" . 'App\\Models\\Project\\ProjectDoctrineModel' . "\0" . 'description', '' . "\0" . 'App\\Models\\Project\\ProjectDoctrineModel' . "\0" . 'projectInvites', 'id', 'deletedAt', 'createdAt', 'updatedAt', '' . "\0" . 'App\\Models\\Project\\ProjectDoctrineModel' . "\0" . 'uuid'];
+            return ['__isInitialized__', '' . "\0" . 'App\\Models\\Project\\ProjectDoctrineModel' . "\0" . 'label', '' . "\0" . 'App\\Models\\Project\\ProjectDoctrineModel' . "\0" . 'user', '' . "\0" . 'App\\Models\\Project\\ProjectDoctrineModel' . "\0" . 'description', '' . "\0" . 'App\\Models\\Project\\ProjectDoctrineModel' . "\0" . 'projectInvites', '' . "\0" . 'App\\Models\\Project\\ProjectDoctrineModel' . "\0" . 'members', 'id', 'deletedAt', 'createdAt', 'updatedAt', '' . "\0" . 'App\\Models\\Project\\ProjectDoctrineModel' . "\0" . 'uuid'];
         }
 
-        return ['__isInitialized__', '' . "\0" . 'App\\Models\\Project\\ProjectDoctrineModel' . "\0" . 'label', '' . "\0" . 'App\\Models\\Project\\ProjectDoctrineModel' . "\0" . 'user', '' . "\0" . 'App\\Models\\Project\\ProjectDoctrineModel' . "\0" . 'description', '' . "\0" . 'App\\Models\\Project\\ProjectDoctrineModel' . "\0" . 'projectInvites', 'id', 'deletedAt', 'createdAt', 'updatedAt', '' . "\0" . 'App\\Models\\Project\\ProjectDoctrineModel' . "\0" . 'uuid'];
+        return ['__isInitialized__', '' . "\0" . 'App\\Models\\Project\\ProjectDoctrineModel' . "\0" . 'label', '' . "\0" . 'App\\Models\\Project\\ProjectDoctrineModel' . "\0" . 'user', '' . "\0" . 'App\\Models\\Project\\ProjectDoctrineModel' . "\0" . 'description', '' . "\0" . 'App\\Models\\Project\\ProjectDoctrineModel' . "\0" . 'projectInvites', '' . "\0" . 'App\\Models\\Project\\ProjectDoctrineModel' . "\0" . 'members', 'id', 'deletedAt', 'createdAt', 'updatedAt', '' . "\0" . 'App\\Models\\Project\\ProjectDoctrineModel' . "\0" . 'uuid'];
     }
 
     /**
@@ -237,6 +237,50 @@ class ProjectDoctrineModel extends \App\Models\Project\ProjectDoctrineModel impl
         $this->__initializer__ && $this->__initializer__->__invoke($this, 'getDescription', []);
 
         return parent::getDescription();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function setMembers(array $members): \App\Models\Project\ProjectModel
+    {
+
+        $this->__initializer__ && $this->__initializer__->__invoke($this, 'setMembers', [$members]);
+
+        return parent::setMembers($members);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function addMember(\App\Models\User\UserModelInterface $member): \App\Models\Project\ProjectModel
+    {
+
+        $this->__initializer__ && $this->__initializer__->__invoke($this, 'addMember', [$member]);
+
+        return parent::addMember($member);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function getMembers(): \Illuminate\Support\Collection
+    {
+
+        $this->__initializer__ && $this->__initializer__->__invoke($this, 'getMembers', []);
+
+        return parent::getMembers();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function hasMemberWithEmail(string $email): bool
+    {
+
+        $this->__initializer__ && $this->__initializer__->__invoke($this, 'hasMemberWithEmail', [$email]);
+
+        return parent::hasMemberWithEmail($email);
     }
 
     /**

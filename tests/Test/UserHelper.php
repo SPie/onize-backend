@@ -138,6 +138,8 @@ trait UserHelper
         $user
             ->shouldReceive('getEmail')
             ->andReturn($email);
+
+        return $this;
     }
 
     /**

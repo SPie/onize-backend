@@ -38,9 +38,8 @@ final class ProjectDoctrineModelFactoryTest extends TestCase
             'createdAt'      => $this->getFaker()->dateTime,
             'updatedAt'      => $this->getFaker()->dateTime,
             'deletedAt'      => $this->getFaker()->dateTime,
-            'projectInvites' => [
-                $this->createProjectInviteModel(),
-            ],
+            'projectInvites' => [$this->createProjectInviteModel(),],
+            'members'        => [$this->createUserModel()],
         ];
 
         $this->assertEquals(
@@ -53,7 +52,8 @@ final class ProjectDoctrineModelFactoryTest extends TestCase
                 $data['updatedAt'],
                 $data['deletedAt'],
                 $data['id'],
-                $data['projectInvites']
+                $data['projectInvites'],
+                $data['members']
             ),
             $this->getProjectDoctrineModelFactory($this->createUuidFactoryWithUuid($uuid))->create($data)
         );
@@ -112,9 +112,7 @@ final class ProjectDoctrineModelFactoryTest extends TestCase
      */
     public function testCreateWithProjectInviteDataArray(): void
     {
-        $projectInviteData = [
-            $this->getFaker()->uuid => $this->getFaker()->word,
-        ];
+        $projectInviteData = [$this->getFaker()->uuid => $this->getFaker()->word];
         $projectInvite = $this->createProjectInviteModel();
         $projectInviteModelFactory = $this->createProjectInviteModelFactory();
         $this->mockModelFactoryCreate($projectInviteModelFactory, $projectInvite, $projectInviteData);
@@ -147,15 +145,32 @@ final class ProjectDoctrineModelFactoryTest extends TestCase
     /**
      * @return void
      */
+    public function testCreateWithMembersDataArray(): void
+    {
+        $membersData = [$this->getFaker()->uuid => $this->getFaker()->word];
+        $member = $this->createUserModel();
+        $userModelFactory = $this->createUserModelFactory();
+        $this->mockModelFactoryCreate($userModelFactory, $member, $membersData);
+        $data = [
+            'label'   => $this->getFaker()->word,
+            'user'    => $this->createUserModel(),
+            'members' => [$membersData],
+        ];
+
+        $this->assertEquals(
+            [$member],
+            $this->getProjectDoctrineModelFactory(null, $userModelFactory)->create($data)->getMembers()->all()
+        );
+    }
+
+    /**
+     * @return void
+     */
     public function testCreateWithMissingLabel(): void
     {
         $this->expectException(InvalidParameterException::class);
 
-        $this->getProjectDoctrineModelFactory()->create(
-            [
-                'user'        => $this->createUserModel(),
-            ]
-        );
+        $this->getProjectDoctrineModelFactory()->create(['user' => $this->createUserModel()]);
     }
 
     /**
@@ -167,8 +182,8 @@ final class ProjectDoctrineModelFactoryTest extends TestCase
 
         $this->getProjectDoctrineModelFactory()->create(
             [
-                'label'       => $this->getFaker()->numberBetween(),
-                'user'        => $this->createUserModel(),
+                'label' => $this->getFaker()->numberBetween(),
+                'user'  => $this->createUserModel(),
             ]
         );
     }
@@ -180,11 +195,7 @@ final class ProjectDoctrineModelFactoryTest extends TestCase
     {
         $this->expectException(InvalidParameterException::class);
 
-        $this->getProjectDoctrineModelFactory()->create(
-            [
-                'label'       => $this->getFaker()->word,
-            ]
-        );
+        $this->getProjectDoctrineModelFactory()->create(['label' => $this->getFaker()->word]);
     }
 
     /**
@@ -196,8 +207,8 @@ final class ProjectDoctrineModelFactoryTest extends TestCase
 
         $this->getProjectDoctrineModelFactory()->create(
             [
-                'label'       => $this->getFaker()->word,
-                'user'        => $this->getFaker()->word,
+                'label' => $this->getFaker()->word,
+                'user'  => $this->getFaker()->word,
             ]
         );
     }
@@ -211,9 +222,9 @@ final class ProjectDoctrineModelFactoryTest extends TestCase
 
         $this->getProjectDoctrineModelFactory()->create(
             [
-                'label'       => $this->getFaker()->word,
-                'user'        => $this->createUserModel(),
-                'createdAt'   => $this->getFaker()->word,
+                'label'     => $this->getFaker()->word,
+                'user'      => $this->createUserModel(),
+                'createdAt' => $this->getFaker()->word,
             ]
         );
     }
@@ -227,9 +238,9 @@ final class ProjectDoctrineModelFactoryTest extends TestCase
 
         $this->getProjectDoctrineModelFactory()->create(
             [
-                'label'       => $this->getFaker()->word,
-                'user'        => $this->createUserModel(),
-                'updatedAt'   => $this->getFaker()->word,
+                'label'     => $this->getFaker()->word,
+                'user'      => $this->createUserModel(),
+                'updatedAt' => $this->getFaker()->word,
             ]
         );
     }
@@ -243,9 +254,9 @@ final class ProjectDoctrineModelFactoryTest extends TestCase
 
         $this->getProjectDoctrineModelFactory()->create(
             [
-                'label'       => $this->getFaker()->word,
-                'user'        => $this->createUserModel(),
-                'deletedAt'   => $this->getFaker()->word,
+                'label'     => $this->getFaker()->word,
+                'user'      => $this->createUserModel(),
+                'deletedAt' => $this->getFaker()->word,
             ]
         );
     }
@@ -259,9 +270,9 @@ final class ProjectDoctrineModelFactoryTest extends TestCase
 
         $this->getProjectDoctrineModelFactory()->create(
             [
-                'label'       => $this->getFaker()->word,
-                'user'        => $this->createUserModel(),
-                'id'          => $this->getFaker()->word,
+                'label' => $this->getFaker()->word,
+                'user'  => $this->createUserModel(),
+                'id'    => $this->getFaker()->word,
             ]
         );
     }
@@ -375,6 +386,57 @@ final class ProjectDoctrineModelFactoryTest extends TestCase
             'user'        => $this->createUserModel(),
             'projectInvites' => [$projectInviteData]
         ]);
+    }
+
+    /**
+     * @return void
+     */
+    public function testCreateWithInvalidMembersArray(): void
+    {
+        $this->expectException(InvalidParameterException::class);
+
+        $this->getProjectDoctrineModelFactory()->create(
+            [
+                'label'   => $this->getFaker()->word,
+                'user'    => $this->createUserModel(),
+                'members' => $this->getFaker()->word,
+            ]
+        );
+    }
+
+    /**
+     * @return void
+     */
+    public function testCreateWithInvalidMembers(): void
+    {
+        $this->expectException(InvalidParameterException::class);
+
+        $this->getProjectDoctrineModelFactory()->create(
+            [
+                'label'   => $this->getFaker()->word,
+                'user'    => $this->createUserModel(),
+                'members' => [$this->getFaker()->word],
+            ]
+        );
+    }
+
+    /**
+     * @return void
+     */
+    public function testCreateWithInvalidMembersData(): void
+    {
+        $membersData = [$this->getFaker()->uuid => $this->getFaker()->word];
+        $userModelFactory = $this->createUserModelFactory();
+        $this->mockModelFactoryCreate($userModelFactory, new InvalidParameterException(), $membersData);
+        $this->expectException(InvalidParameterException::class);
+
+        $this->getProjectDoctrineModelFactory(null, $userModelFactory)->create(
+            [
+                'label'   => $this->getFaker()->word,
+                'user'    => $this->createUserModel(),
+                'members' => [$membersData],
+            ]
+        );
     }
 
     /**
@@ -657,6 +719,7 @@ final class ProjectDoctrineModelFactoryTest extends TestCase
      * @param DateTime|null           $deletedAt
      * @param int|null                $id
      * @param ProjectInviteModel[]    $projectInvites
+     * @param UserModelInterface[]    $members
      *
      * @return ProjectDoctrineModel
      */
@@ -669,7 +732,8 @@ final class ProjectDoctrineModelFactoryTest extends TestCase
         \DateTime $updatedAt = null,
         \DateTime $deletedAt = null,
         int $id = null,
-        array $projectInvites = []
+        array $projectInvites = [],
+        array $members = []
     ): ProjectDoctrineModel {
         return (new ProjectDoctrineModel(
             $uuid ?: $this->getFaker()->uuid,
@@ -679,7 +743,8 @@ final class ProjectDoctrineModelFactoryTest extends TestCase
             $createdAt ?: $this->getFaker()->dateTime,
             $updatedAt ?: $this->getFaker()->dateTime,
             $deletedAt ?: $this->getFaker()->dateTime,
-            $projectInvites
+            $projectInvites,
+            $members
         ))->setId($id ?: $this->getFaker()->numberBetween());
     }
 }

@@ -98,7 +98,8 @@ class UserDoctrineModelFactory implements UserModelFactoryInterface
             $this->validateDateTimeParameter($data, UserModelInterface::PROPERTY_UPDATED_AT, false),
             $this->validateDateTimeParameter($data, UserModelInterface::PROPERTY_DELETED_AT, false),
             $this->validateRefreshTokens($data),
-            $this->validateProjects($data)
+            $this->validateProjects($data),
+            $this->validateJoinedProjects($data)
         ))->setId($this->validateIntegerParameter($data, UserModelInterface::PROPERTY_ID, false));
     }
 
@@ -162,6 +163,10 @@ class UserDoctrineModelFactory implements UserModelFactoryInterface
             $model->setProjects($projects);
         }
 
+        if (isset($data[UserModelInterface::PROPERTY_JOINED_PROJECTS])) {
+            $model->setJoinedProjects($this->validateJoinedProjects($data));
+        }
+
         return $model;
     }
 
@@ -208,6 +213,40 @@ class UserDoctrineModelFactory implements UserModelFactoryInterface
     private function validateProjects(array $data): array
     {
         $projects = $this->validateArrayParameter($data, UserModelInterface::PROPERTY_PROJECTS, false);
+
+        return \is_array($projects)
+            ? \array_map(
+                function ($project) {
+                    if ($project instanceof ProjectModel) {
+                        return $project;
+                    }
+
+                    if (\is_array($project)) {
+                        return $this->getProjectModelFactory()->create($project);
+                    }
+
+                    throw new InvalidParameterException();
+                },
+                $projects
+            )
+            : [];
+    }
+
+    /**
+     * @param array $data
+     *
+     * @return ProjectModel[]
+     *
+     * @throws InvalidParameterException
+     */
+    private function validateJoinedProjects(array $data): array
+    {
+        $projects = $this->validateArrayParameter(
+            $data,
+            UserModelInterface::PROPERTY_JOINED_PROJECTS,
+            false,
+            true
+        );
 
         return \is_array($projects)
             ? \array_map(

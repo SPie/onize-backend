@@ -25,9 +25,10 @@ class Version00000000000000 extends AbstractMigration
         $this
             ->createUsersTable($schema)
             ->createRefreshTokensTable($schema)
-            ->createProjectsTable($schema)
             ->createLoginAttemptsTable($schema)
-            ->createProjectInvitesTable($schema);
+            ->createProjectsTable($schema)
+            ->createProjectInvitesTable($schema)
+            ->createProjectMembersTable($schema);
     }
 
     /**
@@ -35,7 +36,7 @@ class Version00000000000000 extends AbstractMigration
      *
      * @return $this
      */
-    private function createUsersTable(Schema $schema)
+    private function createUsersTable(Schema $schema): self
     {
         (new Builder($schema))->create('users', function (Table $table) {
             $table->increments('id');
@@ -56,7 +57,7 @@ class Version00000000000000 extends AbstractMigration
      *
      * @return $this
      */
-    private function createRefreshTokensTable(Schema $schema)
+    private function createRefreshTokensTable(Schema $schema): self
     {
         (new Builder($schema))->create('refresh_tokens', function (Table $table) {
             $table->increments('id');
@@ -77,7 +78,25 @@ class Version00000000000000 extends AbstractMigration
      *
      * @return $this
      */
-    private function createProjectsTable(Schema $schema)
+    private function createLoginAttemptsTable(Schema $schema): self
+    {
+        (new Builder($schema))->create('login_attempts', function (Table $table) {
+            $table->increments('id');
+            $table->string('ip_address');
+            $table->string('identifier');
+            $table->dateTime('attempted_at');
+            $table->boolean('success');
+        });
+
+        return $this;
+    }
+
+    /**
+     * @param Schema $schema
+     *
+     * @return $this
+     */
+    private function createProjectsTable(Schema $schema): self
     {
         (new Builder($schema))->create('projects', function (Table $table) {
             $table->increments('id');
@@ -99,7 +118,7 @@ class Version00000000000000 extends AbstractMigration
      *
      * @return $this
      */
-    private function createProjectInvitesTable(Schema $schema)
+    private function createProjectInvitesTable(Schema $schema): self
     {
         (new Builder($schema))->create('project_invites', function (Table $table) {
             $table->increments('id');
@@ -122,14 +141,16 @@ class Version00000000000000 extends AbstractMigration
      *
      * @return $this
      */
-    private function createLoginAttemptsTable(Schema $schema)
+    private function createProjectMembersTable(Schema $schema): self
     {
-        (new Builder($schema))->create('login_attempts', function (Table $table) {
+        (new Builder($schema))->create('project_members', function (Table $table) {
             $table->increments('id');
-            $table->string('ip_address');
-            $table->string('identifier');
-            $table->dateTime('attempted_at');
-            $table->boolean('success');
+            $table->integer('user_id', false, true);
+            $table->foreign('users', 'user_id', 'id');
+            $table->integer('project_id', false, true);
+            $table->foreign('projects', 'project_id', 'id');
+            $table->unique(['user_id', 'project_id']);
+            $table->timestamps();
         });
 
         return $this;
