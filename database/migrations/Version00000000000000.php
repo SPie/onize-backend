@@ -150,7 +150,6 @@ class Version00000000000000 extends AbstractMigration
             $table->integer('project_id', false, true);
             $table->foreign('projects', 'project_id', 'id');
             $table->unique(['user_id', 'project_id']);
-            $table->timestamps();
         });
 
         return $this;

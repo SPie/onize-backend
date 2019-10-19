@@ -3,6 +3,7 @@
 namespace Test;
 
 use App\Models\Project\ProjectDoctrineModel;
+use App\Models\Project\ProjectInviteDoctrineModel;
 use App\Models\Project\ProjectInviteModel;
 use App\Models\Project\ProjectInviteModelFactory;
 use App\Models\Project\ProjectModel;
@@ -246,6 +247,17 @@ trait ProjectHelper
             ->andReturn($projectInvite);
 
         return $this;
+    }
+
+    /**
+     * @param int   $times
+     * @param array $data
+     *
+     * @return ProjectInviteDoctrineModel[]|Collection
+     */
+    private function createProjectInvites(int $times = 1, array $data = []): Collection
+    {
+        return $this->createModels(ProjectInviteDoctrineModel::class, $times, $data);
     }
 
     //region Assertions

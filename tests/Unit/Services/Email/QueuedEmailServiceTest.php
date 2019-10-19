@@ -50,6 +50,35 @@ final class QueuedEmailServiceTest extends \PHPUnit\Framework\TestCase
         );
     }
 
+    /**
+     * @return void
+     */
+    public function testProjectInvite(): void
+    {
+        $recipient = $this->getFaker()->safeEmail;
+        $inviteUrl = $this->getFaker()->url;
+        $messageQueueService = $this->createQueueService();
+        $templatesDir = $this->getFaker()->word;
+        $content = $this->getFaker()->text;
+        $view = $this->createView();
+        $viewFactory = $this->createViewFactory();
+        $this
+            ->mockViewFactoryMake($viewFactory, $view, $templatesDir . '/projectInvite', ['inviteUrl' => $inviteUrl])
+            ->mockViewRender($view, $content);
+        $queuedEmailService = $this->createQueuedEmailService($messageQueueService, $viewFactory, $templatesDir);
+
+        $this->assertEquals($queuedEmailService, $queuedEmailService->projectInvite($recipient, $inviteUrl));
+        $this->assertQueuePush(
+            $messageQueueService,
+            'projectInvite',
+            [
+                'recipient' => $recipient,
+                'content'   => $content,
+            ],
+            'email'
+        );
+    }
+
     //endregion
 
     //region Mocks

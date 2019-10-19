@@ -8,7 +8,6 @@ use App\Models\Project\ProjectModel;
 use App\Models\User\UserModelInterface;
 use App\Services\Email\EmailService;
 use App\Services\Project\ProjectServiceInterface;
-use App\Services\User\UsersServiceInterface;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
@@ -21,11 +20,11 @@ use Illuminate\Validation\ValidationException;
  */
 final class ProjectsController extends Controller
 {
-    const ROUTE_NAME_LIST = 'projects.list';
-    const ROUTE_NAME_ADD  = 'projects.add';
-    const ROUTE_NAME_REMOVE = 'projects.remove';
+    const ROUTE_NAME_LIST    = 'projects.list';
+    const ROUTE_NAME_ADD     = 'projects.add';
+    const ROUTE_NAME_REMOVE  = 'projects.remove';
+    const ROUTE_NAME_INVITES = 'projects.invites';
 
-    const REQUEST_PARAMETER_EMAIL      = 'email';
     const REQUEST_PARAMETER_INVITE_URL = 'inviteUrl';
 
     const RESPONSE_PARAMETER_PROJECT  = 'project';
@@ -41,6 +40,9 @@ final class ProjectsController extends Controller
      */
     private $projectService;
 
+    /**
+     * @var string
+     */
     private $tokenPlaceholder;
 
     /**

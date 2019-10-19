@@ -83,6 +83,6 @@ final class TestEmailService implements EmailService
      */
     public function projectInvite(string $recipient, string $inviteUrl): EmailService
     {
-        return $this->queueEmail('projectInvite', $recipient, ['finishUrl' => $inviteUrl]);
+        return $this->queueEmail('projectInvite', $recipient, ['inviteUrl' => $inviteUrl]);
     }
 }

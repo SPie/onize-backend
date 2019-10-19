@@ -13,6 +13,7 @@ use Illuminate\Contracts\View\Factory;
 final class QueuedEmailService implements EmailService
 {
     const EMAIL_IDENTIFIER_PASSWORD_RESET = 'passwordReset';
+    const EMAIL_IDENTIFIER_PROJECT_INVITE = 'projectInvite';
 
     const QUEUE_NAME_EMAIL = 'email';
 
@@ -20,6 +21,7 @@ final class QueuedEmailService implements EmailService
     const CONTEXT_PARAMETER_CONTENT   = 'content';
 
     const VIEW_DATA_FINISH_URL = 'finishUrl';
+    const VIEW_DATA_INVITE_URL = 'inviteUrl';
 
     /**
      * @var Queue
@@ -31,6 +33,9 @@ final class QueuedEmailService implements EmailService
      */
     private $viewFactory;
 
+    /**
+     * @var string
+     */
     private $templatesDir;
 
     /**
@@ -102,6 +107,18 @@ final class QueuedEmailService implements EmailService
      */
     public function projectInvite(string $recipient, string $inviteUrl): EmailService
     {
-        // TODO
+        $this->getQueue()->push(
+            self::EMAIL_IDENTIFIER_PROJECT_INVITE,
+            [
+                self::CONTEXT_PARAMETER_RECIPIENT => $recipient,
+                self::CONTEXT_PARAMETER_CONTENT => $this->getViewFactory()->make(
+                    $this->getTemplatesDir() . '/' . self::EMAIL_IDENTIFIER_PROJECT_INVITE,
+                    [self::VIEW_DATA_INVITE_URL => $inviteUrl]
+                )->render(),
+            ],
+            self::QUEUE_NAME_EMAIL
+        );
+
+        return $this;
     }
 }

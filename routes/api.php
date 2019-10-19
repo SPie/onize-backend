@@ -71,6 +71,8 @@ $router->group(
             $router->get('', ['as' => ProjectsController::ROUTE_NAME_LIST, 'uses' => 'Project\ProjectsController@projects']);
             $router->post('', ['as' => ProjectsController::ROUTE_NAME_ADD, 'uses' => 'Project\ProjectsController@add']);
             $router->delete('', ['as' => ProjectsController::ROUTE_NAME_REMOVE, 'uses' => 'Project\ProjectsController@remove']);
+
+            $router->post('invites', ['as' => ProjectsController::ROUTE_NAME_INVITES, 'uses' => 'Project\ProjectsController@invite']);
         });
 
         //endregion

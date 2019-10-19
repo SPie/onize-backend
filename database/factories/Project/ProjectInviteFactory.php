@@ -9,7 +9,7 @@ use LaravelDoctrine\ORM\Testing\Factory;
  * @var Factory $factory
  */
 
-$factory->define(ProjectDoctrineModel::class, function (Faker $faker, array $attributes = []) {
+$factory->define(ProjectInviteDoctrineModel::class, function (Faker $faker, array $attributes = []) {
     return [
         ProjectInviteDoctrineModel::PROPERTY_UUID    => $attributes[ProjectInviteDoctrineModel::PROPERTY_UUID] ?? $faker->uuid,
         ProjectInviteDoctrineModel::PROPERTY_TOKEN   => $attributes[ProjectInviteDoctrineModel::PROPERTY_TOKEN] ?? $faker->uuid,

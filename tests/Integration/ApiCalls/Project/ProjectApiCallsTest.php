@@ -1,6 +1,7 @@
 <?php
 
 use App\Models\Project\ProjectModel;
+use App\Repositories\Project\ProjectInviteRepository;
 use App\Repositories\Project\ProjectRepository;
 use App\Repositories\User\UserRepository;
 use Illuminate\Http\Request;
@@ -208,6 +209,188 @@ final class ProjectApiCallsTest extends IntegrationTestCase
         $this->assertNotEmpty($this->getProjectRepository()->findByUuid($project->getUuid()));
     }
 
+    /**
+     * @return void
+     */
+    public function testInitiateProjectInvite(): void
+    {
+        $users = $this->createUsers(2);
+        $project = $this->createProjects(1, ['user' => $users->first()])->first();
+        $this->clearModelCache();
+
+        $this->doApiCall(
+            URL::route('projects.invites'),
+            Request::METHOD_POST,
+            [
+                'uuid'      => $project->getUuid(),
+                'email'     => $users->get(1)->getEmail(),
+                'inviteUrl' => $this->getFaker()->url,
+            ],
+            null,
+            $this->createAuthHeader($users->first())
+        );
+
+        $this->assertResponseStatus(201);
+        $this->assertNotEmpty($this->getProjectInviteRepository()->findByEmailAndProject(
+            $users->get(1)->getEmail(),
+            $project
+        ));
+    }
+
+    /**
+     * @return void
+     */
+    public function testInitiateProjectInviteWithMissingParameters(): void
+    {
+        $user = $this->createUsers()->first();
+        $this->createProjects(1, ['user' => $user])->first();
+        $this->clearModelCache();
+
+        $response = $this->doApiCall(
+            URL::route('projects.invites'),
+            Request::METHOD_POST,
+            [],
+            null,
+            $this->createAuthHeader($user)
+        );
+
+        $this->assertResponseStatus(422);
+        $responseData = $response->getData(true);
+        $this->assertEquals('validation.required', $responseData['email'][0]);
+        $this->assertEquals('validation.required', $responseData['uuid'][0]);
+        $this->assertEquals('validation.required', $responseData['inviteUrl'][0]);
+    }
+
+    /**
+     * @return void
+     */
+    public function testInitiateProjectInviteWithInvalidEmail(): void
+    {
+        $user = $this->createUsers()->first();
+        $project = $this->createProjects(1, ['user' => $user])->first();
+        $this->clearModelCache();
+
+        $response = $this->doApiCall(
+            URL::route('projects.invites'),
+            Request::METHOD_POST,
+            [
+                'uuid'      => $project->getUuid(),
+                'inviteUrl' => $this->getFaker()->url,
+                'email'     => $this->getFaker()->word,
+            ],
+            null,
+            $this->createAuthHeader($user)
+        );
+
+        $this->assertResponseStatus(422);
+        $responseData = $response->getData(true);
+        $this->assertEquals('validation.email', $responseData['email'][0]);
+    }
+
+    /**
+     * @return void
+     */
+    public function testProjectInviteWithAlreadyInvitedUser(): void
+    {
+        $users = $this->createUsers(2);
+        $project = $this->createProjects(1, ['user' => $users->first()])->first();
+        $projectInvite = $this->createProjectInvites(1, ['email' => $users->get(1)->getEmail(), 'project' => $project])->first();
+        $this->clearModelCache();
+
+        $this->doApiCall(
+            URL::route('projects.invites'),
+            Request::METHOD_POST,
+            [
+                'uuid'      => $project->getUuid(),
+                'email'     => $users->get(1)->getEmail(),
+                'inviteUrl' => $this->getFaker()->url,
+            ],
+            null,
+            $this->createAuthHeader($users->first())
+        );
+
+        $this->assertResponseStatus(201);
+        $updatedProjectInvite = $this->getProjectInviteRepository()->find($projectInvite->getId());
+        $this->assertNotEquals($projectInvite->getToken(), $updatedProjectInvite->getToken());
+    }
+
+    /**
+     * @return void
+     */
+    public function testProjectInviteForMember(): void
+    {
+        $users = $this->createUsers(2);
+        $project = $this->createProjects(1, ['user' => $users->first()])->first();
+        $project->addMember($users->get(1));
+        $this->getProjectRepository()->save($project);
+        $this->clearModelCache();
+
+        $this->doApiCall(
+            URL::route('projects.invites'),
+            Request::METHOD_POST,
+            [
+                'uuid'      => $project->getUuid(),
+                'email'     => $users->get(1)->getEmail(),
+                'inviteUrl' => $this->getFaker()->url,
+            ],
+            null,
+            $this->createAuthHeader($users->first())
+        );
+
+        $this->assertResponseStatus(409);
+        $this->assertEmpty($this->getProjectInviteRepository()->findByEmailAndProject(
+            $users->get(1)->getEmail(),
+            $project
+        ));
+    }
+
+    /**
+     * @return void
+     */
+    public function testProjectInviteForOwner(): void
+    {
+        $user = $this->createUsers()->first();
+        $project = $this->createProjects(1, ['user' => $user])->first();
+        $this->clearModelCache();
+
+        $this->doApiCall(
+            URL::route('projects.invites'),
+            Request::METHOD_POST,
+            [
+                'uuid'      => $project->getUuid(),
+                'email'     => $user->getEmail(),
+                'inviteUrl' => $this->getFaker()->url,
+            ],
+            null,
+            $this->createAuthHeader($user)
+        );
+
+        $this->assertResponseStatus(409);
+        $this->assertEmpty($this->getProjectInviteRepository()->findByEmailAndProject($user->getEmail(), $project));
+    }
+
+    /**
+     * @return void
+     */
+    public function testProjectInviteWithoutExistingProject(): void
+    {
+        $users = $this->createUsers(2);
+
+        $this->doApiCall(
+            URL::route('projects.invites'),
+            Request::METHOD_POST,
+            [
+                'uuid'      => $this->getFaker()->uuid,
+                'email'     => $users->get(1)->getEmail(),
+                'inviteUrl' => $this->getFaker()->url,
+            ],
+            null,
+            $this->createAuthHeader($users->first())
+        );
+
+        $this->assertResponseStatus(404);
+    }
+
     //endregion
 
     /**
@@ -224,5 +407,27 @@ final class ProjectApiCallsTest extends IntegrationTestCase
     private function getUserRepository(): UserRepository
     {
         return $this->app->get(UserRepository::class);
+    }
+
+    /**
+     * @return ProjectInviteRepository
+     */
+    private function getProjectInviteRepository(): ProjectInviteRepository
+    {
+        return $this->app->get(ProjectInviteRepository::class);
+    }
+
+    /**
+     * @param string $email
+     *
+     * @return $this
+     */
+    private function assertQueuedEmail(string $email): self
+    {
+        $queuedEmails = $this->getEmailService()->getQueuedEmailsByIdentifier('projectInvite');
+        $this->assertEquals($email, $queuedEmails[0]['recipient']);
+        $this->assertNotEmpty($queuedEmails[0]['context']['inviteUrl']);
+
+        return $this;
     }
 }
