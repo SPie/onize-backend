@@ -264,6 +264,17 @@ class LoginAttemptDoctrineModel extends \App\Models\User\LoginAttemptDoctrineMod
     /**
      * {@inheritDoc}
      */
+    public function toArray(int $depth = 1): array
+    {
+
+        $this->__initializer__ && $this->__initializer__->__invoke($this, 'toArray', [$depth]);
+
+        return parent::toArray($depth);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
     public function setId(?int $id)
     {
 
@@ -285,17 +296,6 @@ class LoginAttemptDoctrineModel extends \App\Models\User\LoginAttemptDoctrineMod
         $this->__initializer__ && $this->__initializer__->__invoke($this, 'getId', []);
 
         return parent::getId();
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public function toArray(): array
-    {
-
-        $this->__initializer__ && $this->__initializer__->__invoke($this, 'toArray', []);
-
-        return parent::toArray();
     }
 
 }

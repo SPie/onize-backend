@@ -126,4 +126,26 @@ class ProjectInviteDoctrineModel extends AbstractDoctrineModel implements Projec
     {
         return $this->project;
     }
+
+    /**
+     * @param int $depth
+     *
+     * @return array
+     */
+    public function toArray(int $depth = 1): array
+    {
+        $array = [
+            self::PROPERTY_UUID => $this->getUuid(),
+            self::PROPERTY_TOKEN => $this->getToken(),
+            self::PROPERTY_EMAIL => $this->getEmail(),
+        ];
+
+        if ($depth > 0) {
+            --$depth;
+
+            $array[self::PROPERTY_PROJECT] = $this->getProject()->toArray($depth);
+        }
+
+        return $array;
+    }
 }

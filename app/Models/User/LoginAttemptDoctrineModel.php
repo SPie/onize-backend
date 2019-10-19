@@ -138,4 +138,19 @@ class LoginAttemptDoctrineModel extends AbstractDoctrineModel implements LoginAt
     {
         return $this->success;
     }
+
+    /**
+     * @param int $depth
+     *
+     * @return array
+     */
+    public function toArray(int $depth = 1): array
+    {
+        return [
+            self::PROPERTY_IP_ADDRESS   => $this->getIpAddress(),
+            self::PROPERTY_IDENTIFIER   => $this->getIdentifier(),
+            self::PROPERTY_ATTEMPTED_AT => (array)new \DateTime($this->getAttemptedAt()->format('Y-m-d H:i:s')),
+            self::PROPERTY_SUCCESS      => $this->wasSuccess(),
+        ];
+    }
 }

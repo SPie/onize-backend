@@ -33,13 +33,14 @@ final class ProjectDoctrineModelTest extends TestCase
 
         $this->assertEquals(
             [
-                'uuid'        => $project->getUuid(),
-                'label'       => $project->getLabel(),
-                'user'        => $project->getUser()->toArray(),
-                'description' => $project->getDescription(),
-                'createdAt'   => (array)$project->getCreatedAt(),
-                'updatedAt'   => (array)$project->getUpdatedAt(),
-                'deletedAt'   => (array)$project->getDeletedAt(),
+                'uuid'           => $project->getUuid(),
+                'label'          => $project->getLabel(),
+                'user'           => $project->getUser()->toArray(),
+                'description'    => $project->getDescription(),
+                'createdAt'      => (array)$project->getCreatedAt(),
+                'updatedAt'      => (array)$project->getUpdatedAt(),
+                'deletedAt'      => (array)$project->getDeletedAt(),
+                'projectInvites' => [],
             ],
             $project->toArray()
         );
@@ -62,13 +63,14 @@ final class ProjectDoctrineModelTest extends TestCase
 
         $this->assertEquals(
             [
-                'uuid'        => $project->getUuid(),
-                'label'       => $project->getLabel(),
-                'user'        => $project->getUser()->toArray(),
-                'description' => null,
-                'createdAt'   => null,
-                'updatedAt'   => null,
-                'deletedAt'   => null,
+                'uuid'           => $project->getUuid(),
+                'label'          => $project->getLabel(),
+                'user'           => $project->getUser()->toArray(),
+                'description'    => null,
+                'createdAt'      => null,
+                'updatedAt'      => null,
+                'deletedAt'      => null,
+                'projectInvites' => [],
             ],
             $project->toArray()
         );

@@ -319,12 +319,12 @@ class ProjectDoctrineModel extends \App\Models\Project\ProjectDoctrineModel impl
     /**
      * {@inheritDoc}
      */
-    public function toArray(): array
+    public function toArray(int $depth = 1): array
     {
 
-        $this->__initializer__ && $this->__initializer__->__invoke($this, 'toArray', []);
+        $this->__initializer__ && $this->__initializer__->__invoke($this, 'toArray', [$depth]);
 
-        return parent::toArray();
+        return parent::toArray($depth);
     }
 
     /**

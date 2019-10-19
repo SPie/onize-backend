@@ -97,6 +97,16 @@ final class ProjectsController extends Controller
     }
 
     /**
+     * @param string $uuid
+     *
+     * @return JsonResponse
+     */
+    public function details(string $uuid): JsonResponse
+    {
+        // TODO
+    }
+
+    /**
      * @param Request $request
      *
      * @return JsonResponse

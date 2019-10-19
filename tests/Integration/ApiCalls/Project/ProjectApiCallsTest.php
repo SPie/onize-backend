@@ -44,7 +44,13 @@ final class ProjectApiCallsTest extends IntegrationTestCase
 
         $this->assertResponseOk();
         $responseData = $response->getData(true);
-        $this->assertEquals($projects->toArray(), $responseData['projects']);
+        $this->assertEquals(
+            $projects->map(function (ProjectModel $project) {
+                return $project->toArray();
+            })
+            ->all(),
+            $responseData['projects']
+        );
     }
 
     /**
@@ -233,6 +239,35 @@ final class ProjectApiCallsTest extends IntegrationTestCase
         $this->assertResponseStatus(201);
         $this->assertNotEmpty($this->getProjectInviteRepository()->findByEmailAndProject(
             $users->get(1)->getEmail(),
+            $project
+        ));
+    }
+
+    /**
+     * @return void
+     */
+    public function testInitiateProjectInviteForNonExistingUser(): void
+    {
+        $user = $this->createUsers()->first();
+        $email = $this->getFaker()->safeEmail;
+        $project = $this->createProjects(1, ['user' => $user])->first();
+        $this->clearModelCache();
+
+        $this->doApiCall(
+            URL::route('projects.invites'),
+            Request::METHOD_POST,
+            [
+                'uuid'      => $project->getUuid(),
+                'email'     => $email,
+                'inviteUrl' => $this->getFaker()->url,
+            ],
+            null,
+            $this->createAuthHeader($user)
+        );
+
+        $this->assertResponseStatus(201);
+        $this->assertNotEmpty($this->getProjectInviteRepository()->findByEmailAndProject(
+            $email,
             $project
         ));
     }

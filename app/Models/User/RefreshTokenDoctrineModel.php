@@ -121,4 +121,27 @@ class RefreshTokenDoctrineModel extends AbstractDoctrineModel implements Refresh
     {
         return $this->validUntil;
     }
+
+    /**
+     * @param int $depth
+     *
+     * @return array
+     */
+    public function toArray(int $depth = 1): array
+    {
+        $array = [
+            self::PROPERTY_IDENTIFIER => $this->getIdentifier(),
+            self::PROPERTY_VALID_UNTIL => $this->getValidUntil()
+                ? (array) new \DateTime($this->getValidUntil()->format('Y-m-d H:i:s'))
+                : null,
+        ];
+
+        if ($depth > 0) {
+            --$depth;
+
+            $array[self::PROPERTY_USER] = $this->getUser()->toArray($depth);
+        }
+
+        return $array;
+    }
 }

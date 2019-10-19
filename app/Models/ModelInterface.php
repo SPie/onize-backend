@@ -2,8 +2,6 @@
 
 namespace App\Models;
 
-use Illuminate\Contracts\Support\Arrayable;
-
 /**
  * Interface ModelInterface
  *

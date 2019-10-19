@@ -240,14 +240,15 @@ class ProjectDoctrineModel extends AbstractDoctrineModel implements ProjectModel
     }
 
     /**
+     * @param int $depth
+     *
      * @return array
      */
-    public function toArray(): array
+    public function toArray(int $depth = 1): array
     {
-        return [
+        $array = [
             self::PROPERTY_UUID        => $this->getUuid(),
             self::PROPERTY_LABEL       => $this->getLabel(),
-            self::PROPERTY_USER        => $this->getUser()->toArray(),
             self::PROPERTY_DESCRIPTION => $this->getDescription(),
             self::PROPERTY_CREATED_AT  => $this->getCreatedAt()
                 ? (array)new \DateTime($this->getCreatedAt()->format('Y-m-d H:i:s'))
@@ -259,5 +260,19 @@ class ProjectDoctrineModel extends AbstractDoctrineModel implements ProjectModel
                 ? (array)new \DateTime($this->getDeletedAt()->format('Y-m-d H:i:s'))
                 : null,
         ];
+
+        if ($depth > 0) {
+            --$depth;
+
+            $array[self::PROPERTY_USER] = $this->getUser()->toArray($depth);
+
+            $array[self::PROPERTY_PROJECT_INVITES] = $this->getProjectInvites()
+                ->map(function (ProjectInviteModel $projectInviteModel) use ($depth) {
+                    return $projectInviteModel->toArray($depth);
+                })
+                ->all();
+        }
+
+        return $array;
     }
 }

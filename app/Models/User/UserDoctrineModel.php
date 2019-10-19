@@ -239,11 +239,13 @@ class UserDoctrineModel extends AbstractDoctrineModel implements UserModelInterf
     }
 
     /**
+     * @param int $depth
+     *
      * @return array
      */
-    public function toArray(): array
+    public function toArray(int $depth = 1): array
     {
-        return [
+        $array = [
             self::PROPERTY_UUID       => $this->getUuid(),
             self::PROPERTY_EMAIL      => $this->getEmail(),
             self::PROPERTY_CREATED_AT => $this->getCreatedAt()
@@ -256,5 +258,17 @@ class UserDoctrineModel extends AbstractDoctrineModel implements UserModelInterf
                 ? (array)new \DateTime($this->getDeletedAt()->format('Y-m-d H:i:s'))
                 : null,
         ];
+
+        if ($depth > 0) {
+            --$depth;
+
+            $array[self::PROPERTY_PROJECTS] = $this->getProjects()
+                ->map(function (ProjectModel $project) use ($depth) {
+                    return $project->toArray($depth);
+                })
+                ->all();
+        }
+
+        return $array;
     }
 }

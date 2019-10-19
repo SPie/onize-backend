@@ -42,12 +42,12 @@ class AbstractDoctrineModel implements ModelInterface
     }
 
     /**
+     * @param int $depth
+     *
      * @return array
      */
-    public function toArray(): array
+    public function toArray(int $depth = 1): array
     {
-        return [
-            self::PROPERTY_ID => $this->getId(),
-        ];
+        return [];
     }
 }

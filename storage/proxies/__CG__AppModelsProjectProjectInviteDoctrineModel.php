@@ -242,6 +242,17 @@ class ProjectInviteDoctrineModel extends \App\Models\Project\ProjectInviteDoctri
     /**
      * {@inheritDoc}
      */
+    public function toArray(int $depth = 1): array
+    {
+
+        $this->__initializer__ && $this->__initializer__->__invoke($this, 'toArray', [$depth]);
+
+        return parent::toArray($depth);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
     public function setId(?int $id)
     {
 
@@ -263,17 +274,6 @@ class ProjectInviteDoctrineModel extends \App\Models\Project\ProjectInviteDoctri
         $this->__initializer__ && $this->__initializer__->__invoke($this, 'getId', []);
 
         return parent::getId();
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public function toArray(): array
-    {
-
-        $this->__initializer__ && $this->__initializer__->__invoke($this, 'toArray', []);
-
-        return parent::toArray();
     }
 
     /**
