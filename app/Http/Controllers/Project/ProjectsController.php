@@ -21,6 +21,7 @@ use Illuminate\Validation\ValidationException;
 final class ProjectsController extends Controller
 {
     const ROUTE_NAME_LIST    = 'projects.list';
+    const ROUTE_NAME_DETAILS = 'projects.details';
     const ROUTE_NAME_ADD     = 'projects.add';
     const ROUTE_NAME_REMOVE  = 'projects.remove';
     const ROUTE_NAME_INVITES = 'projects.invites';
@@ -103,7 +104,7 @@ final class ProjectsController extends Controller
      */
     public function details(string $uuid): JsonResponse
     {
-        // TODO
+        return $this->createResponse([self::RESPONSE_PARAMETER_PROJECT => $this->getProjectService()->getProject($uuid)]);
     }
 
     /**

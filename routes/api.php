@@ -69,6 +69,7 @@ $router->group(
 
         $router->group(['prefix' => 'projects', 'middleware' => ['token']], function (Router $router) {
             $router->get('', ['as' => ProjectsController::ROUTE_NAME_LIST, 'uses' => 'Project\ProjectsController@projects']);
+            $router->get('{uuid}', ['as' => ProjectsController::ROUTE_NAME_DETAILS, 'uses' => 'Project\ProjectsController@details']);
             $router->post('', ['as' => ProjectsController::ROUTE_NAME_ADD, 'uses' => 'Project\ProjectsController@add']);
             $router->delete('', ['as' => ProjectsController::ROUTE_NAME_REMOVE, 'uses' => 'Project\ProjectsController@remove']);
 

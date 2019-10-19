@@ -178,6 +178,23 @@ trait ProjectHelper
     }
 
     /**
+     * @param ProjectServiceInterface|MockInterface $projectService
+     * @param ProjectModel|\Exception               $project
+     * @param string                                $uuid
+     *
+     * @return $this
+     */
+    private function mockProjectServiceGetProject(MockInterface $projectService, $project, string $uuid): self
+    {
+        $projectService
+            ->shouldReceive('getProject')
+            ->with($uuid)
+            ->andThrow($project);
+
+        return $this;
+    }
+
+    /**
      * @param int   $times
      * @param array $data
      *

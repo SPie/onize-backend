@@ -311,6 +311,40 @@ final class ProjectsControllerTest extends TestCase
         $this->getProjectsController(null, $projectService)->invite($request, $this->createEmailService());
     }
 
+    /**
+     * @return void
+     */
+    public function testDetails(): void
+    {
+        $uuid = $this->getFaker()->uuid;
+        $projectModel = $this->createProjectModel();
+        $projectService = $this->createProjectService();
+        $this->mockProjectServiceGetProject($projectService, $projectModel, $uuid);
+
+        $this->assertEquals(
+            $this->createJsonResponse($this->createJsonResponseData(['project' => $projectModel])),
+            $this->getProjectsController(null, $projectService)->details($uuid)
+        );
+    }
+
+    /**
+     * @return void
+     */
+    public function testDetailsWithoutProject(): void
+    {
+        $uuid = $this->getFaker()->uuid;
+        $projectService = $this->createProjectService();
+        $this->mockProjectServiceGetProject(
+            $projectService,
+            new ModelNotFoundException(ProjectModel::class, $uuid),
+            $uuid
+        );
+
+        $this->expectException(ModelNotFoundException::class);
+
+        $this->getProjectsController(null, $projectService)->details($uuid);
+    }
+
     //endregion
 
     /**

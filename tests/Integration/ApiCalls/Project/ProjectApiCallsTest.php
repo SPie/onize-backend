@@ -241,6 +241,7 @@ final class ProjectApiCallsTest extends IntegrationTestCase
             $users->get(1)->getEmail(),
             $project
         ));
+        $this->assertQueuedEmail($users->get(1)->getEmail());
     }
 
     /**
@@ -424,6 +425,46 @@ final class ProjectApiCallsTest extends IntegrationTestCase
         );
 
         $this->assertResponseStatus(404);
+    }
+
+    /**
+     * @return void
+     */
+    public function testProjectDetails(): void
+    {
+        $user = $this->createUsers()->first();
+        $project = $this->createProjects()->first();
+
+        $response = $this->doApiCall(
+            URL::route('projects.details', ['uuid' => $project->getUuid()]),
+            Request::METHOD_GET,
+            [],
+            null,
+            $this->createAuthHeader($user)
+        );
+
+        $this->assertResponseOk();
+        $responseData = $response->getData(true);
+        $this->assertEquals($project->toArray(), $responseData['project']);
+    }
+
+    /**
+     * @return void
+     */
+    public function testProjectDetailsWithoutProject(): void
+    {
+        $user = $this->createUsers()->first();
+
+        $response = $this->doApiCall(
+            URL::route('projects.details', ['uuid' => $this->getFaker()->uuid]),
+            Request::METHOD_GET,
+            [],
+            null,
+            $this->createAuthHeader($user)
+        );
+
+        $this->assertResponseStatus(404);
+        $this->assertEmpty($response->getData(true));
     }
 
     //endregion
