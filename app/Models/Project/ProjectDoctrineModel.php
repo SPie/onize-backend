@@ -271,6 +271,11 @@ class ProjectDoctrineModel extends AbstractDoctrineModel implements ProjectModel
                     return $projectInviteModel->toArray($depth);
                 })
                 ->all();
+            $array[self::PROPERTY_MEMBERS] = $this->getMembers()
+                ->map(function (UserModelInterface $user) use ($depth) {
+                    return $user->toArray($depth);
+                })
+                ->all();
         }
 
         return $array;
