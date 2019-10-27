@@ -67,17 +67,25 @@ class ProjectDoctrineModel extends AbstractDoctrineModel implements ProjectModel
     private $members;
 
     /**
+     * @ORM\OneToMany(targetEntity="App\Models\Project\MetaDataElementDoctrineModel", mappedBy="project", cascade={"persist"})
+     *
+     * @var ArrayCollection|MetaDataElementModel[]
+     */
+    private $metaDataElements;
+
+    /**
      * ProjectDoctrineModel constructor.
      *
-     * @param string               $uuid
-     * @param string               $label
-     * @param UserModelInterface   $user
-     * @param string|null          $description
-     * @param \DateTime|null       $createdAt
-     * @param \DateTime|null       $updatedAt
-     * @param \DateTime|null       $deletedAt
-     * @param ProjectInviteModel[] $projectInvites
-     * @param UserModelInterface[] $members
+     * @param string                 $uuid
+     * @param string                 $label
+     * @param UserModelInterface     $user
+     * @param string|null            $description
+     * @param \DateTime|null         $createdAt
+     * @param \DateTime|null         $updatedAt
+     * @param \DateTime|null         $deletedAt
+     * @param ProjectInviteModel[]   $projectInvites
+     * @param UserModelInterface[]   $members
+     * @param MetaDataElementModel[] $metaDataElements
      */
     public function __construct(
         string $uuid,
@@ -88,7 +96,8 @@ class ProjectDoctrineModel extends AbstractDoctrineModel implements ProjectModel
         \DateTime $updatedAt = null,
         \DateTime $deletedAt = null,
         array $projectInvites = [],
-        array $members = []
+        array $members = [],
+        array $metaDataElements = []
     ) {
         $this->uuid = $uuid;
         $this->label = $label;
@@ -99,6 +108,7 @@ class ProjectDoctrineModel extends AbstractDoctrineModel implements ProjectModel
         $this->deletedAt = $deletedAt;
         $this->projectInvites = new ArrayCollection($projectInvites);
         $this->members = new ArrayCollection($members);
+        $this->metaDataElements = new ArrayCollection($metaDataElements);
     }
 
     /**
@@ -169,6 +179,8 @@ class ProjectDoctrineModel extends AbstractDoctrineModel implements ProjectModel
     public function setMembers(array $members): ProjectModel
     {
         $this->members = new ArrayCollection($members);
+
+        return $this;
     }
 
     /**
@@ -240,6 +252,40 @@ class ProjectDoctrineModel extends AbstractDoctrineModel implements ProjectModel
     }
 
     /**
+     * @param MetaDataElementModel[] $metaDataElements
+     *
+     * @return ProjectModel
+     */
+    public function setMetaDataElements(array $metaDataElements): ProjectModel
+    {
+        $this->metaDataElements = new ArrayCollection($metaDataElements);
+
+        return $this;
+    }
+
+    /**
+     * @param MetaDataElementModel $metaDataElement
+     *
+     * @return ProjectModel
+     */
+    public function addMetaDataElement(MetaDataElementModel $metaDataElement): ProjectModel
+    {
+        if (!$this->metaDataElements->contains($metaDataElement)) {
+            $this->metaDataElements->add($metaDataElement);
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return MetaDataElementModel[]|Collection
+     */
+    public function getMetaDataElements(): Collection
+    {
+        return new Collection($this->metaDataElements->toArray());
+    }
+
+    /**
      * @param int $depth
      *
      * @return array
@@ -274,6 +320,11 @@ class ProjectDoctrineModel extends AbstractDoctrineModel implements ProjectModel
             $array[self::PROPERTY_MEMBERS] = $this->getMembers()
                 ->map(function (UserModelInterface $user) use ($depth) {
                     return $user->toArray($depth);
+                })
+                ->all();
+            $array[self::PROPERTY_META_DATA_ELEMENTS] = $this->getMetaDataElements()
+                ->map(function (MetaDataElementModel $metaDataElement) use ($depth) {
+                    return $metaDataElement->toArray($depth);
                 })
                 ->all();
         }

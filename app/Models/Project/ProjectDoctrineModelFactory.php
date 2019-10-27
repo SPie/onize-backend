@@ -31,6 +31,11 @@ final class ProjectDoctrineModelFactory implements ProjectModelFactory
     private $projectInviteModelFactory;
 
     /**
+     * @var MetaDataElementModelFactory
+     */
+    private $metaDataElementModelFactory;
+
+    /**
      * ProjectDoctrineModelFactory constructor.
      *
      * @param UuidFactory $uuidFactory
@@ -81,6 +86,27 @@ final class ProjectDoctrineModelFactory implements ProjectModelFactory
     }
 
     /**
+     * @param MetaDataElementModelFactory $metaDataElementModelFactory
+     *
+     * @return ProjectModelFactory
+     */
+    public function setMetaDataElementModelFactory(
+        MetaDataElementModelFactory $metaDataElementModelFactory
+    ): ProjectModelFactory {
+        $this->metaDataElementModelFactory = $metaDataElementModelFactory;
+
+        return $this;
+    }
+
+    /**
+     * @return MetaDataElementModelFactory
+     */
+    private function getMetaDataElementModelFactory(): MetaDataElementModelFactory
+    {
+        return $this->metaDataElementModelFactory;
+    }
+
+    /**
      * @param array $data
      *
      * @return ProjectModel|ModelInterface
@@ -96,7 +122,8 @@ final class ProjectDoctrineModelFactory implements ProjectModelFactory
             $this->validateDateTimeParameter($data, ProjectModel::PROPERTY_UPDATED_AT, false),
             $this->validateDateTimeParameter($data, ProjectModel::PROPERTY_DELETED_AT, false),
             $this->validateProjectInvites($data),
-            $this->validateMembers($data)
+            $this->validateMembers($data),
+            $this->validateMetaDataElements($data)
         ))->setId($this->validateIntegerParameter($data, ProjectModel::PROPERTY_ID, false));
     }
 
@@ -146,6 +173,16 @@ final class ProjectDoctrineModelFactory implements ProjectModelFactory
         $projectInvites = $this->validateProjectInvites($data);
         if (!empty($projectInvites)) {
             $model->setProjectInvites($projectInvites);
+        }
+
+        $members = $this->validateMembers($data);
+        if (!empty($members)) {
+            $model->setMembers($members);
+        }
+
+        $metaDataElements = $this->validateMetaDataElements($data);
+        if (!empty($metaDataElements)) {
+            $model->setMetaDataElements($metaDataElements);
         }
 
         $id = $this->validateIntegerParameter($data, ProjectModel::PROPERTY_ID, false);
@@ -239,6 +276,40 @@ final class ProjectDoctrineModelFactory implements ProjectModelFactory
                     throw new InvalidParameterException();
                 },
                 $members
+            )
+            : [];
+    }
+
+    /**
+     * @param array $data
+     *
+     * @return MetaDataElementModel[]
+     *
+     * @throws InvalidParameterException
+     */
+    private function validateMetaDataElements(array $data): array
+    {
+        $metaDataElements = $this->validateArrayParameter(
+            $data,
+            ProjectModel::PROPERTY_META_DATA_ELEMENTS,
+            false,
+            true
+        );
+
+        return \is_array($metaDataElements)
+            ? \array_map(
+                function ($metaDataElement) {
+                    if ($metaDataElement instanceof MetaDataElementModel) {
+                        return $metaDataElement;
+                    }
+
+                    if (\is_array($metaDataElement)) {
+                        return $this->getMetaDataElementModelFactory()->create($metaDataElement);
+                    }
+
+                    throw new InvalidParameterException();
+                },
+                $metaDataElements
             )
             : [];
     }

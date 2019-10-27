@@ -2,6 +2,8 @@
 
 namespace Test;
 
+use App\Models\Project\MetaDataElementModel;
+use App\Models\Project\MetaDataElementModelFactory;
 use App\Models\Project\ProjectDoctrineModel;
 use App\Models\Project\ProjectInviteDoctrineModel;
 use App\Models\Project\ProjectInviteModel;
@@ -12,7 +14,6 @@ use App\Models\User\UserModelInterface;
 use App\Repositories\Project\ProjectInviteRepository;
 use App\Repositories\Project\ProjectRepository;
 use App\Services\Project\ProjectServiceInterface;
-use App\Services\User\UsersServiceInterface;
 use Illuminate\Support\Collection;
 use Mockery as m;
 use Mockery\MockInterface;
@@ -275,6 +276,22 @@ trait ProjectHelper
     private function createProjectInvites(int $times = 1, array $data = []): Collection
     {
         return $this->createModels(ProjectInviteDoctrineModel::class, $times, $data);
+    }
+
+    /**
+     * @return MetaDataElementModel|MockInterface
+     */
+    private function createMetaDataElementModel(): MetaDataElementModel
+    {
+        return m::spy(MetaDataElementModel::class);
+    }
+
+    /**
+     * @return MetaDataElementModelFactory
+     */
+    private function createMetaDataElementModelFactory(): MetaDataElementModelFactory
+    {
+        return m::spy(MetaDataElementModelFactory::class);
     }
 
     //region Assertions

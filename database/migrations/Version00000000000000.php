@@ -28,7 +28,8 @@ class Version00000000000000 extends AbstractMigration
             ->createLoginAttemptsTable($schema)
             ->createProjectsTable($schema)
             ->createProjectInvitesTable($schema)
-            ->createProjectMembersTable($schema);
+            ->createProjectMembersTable($schema)
+            ->createMetaDataElements($schema);
     }
 
     /**
@@ -150,6 +151,27 @@ class Version00000000000000 extends AbstractMigration
             $table->integer('project_id', false, true);
             $table->foreign('projects', 'project_id', 'id');
             $table->unique(['user_id', 'project_id']);
+        });
+
+        return $this;
+    }
+
+    /**
+     * @param Schema $schema
+     *
+     * @return $this
+     */
+    private function createMetaDataElements(Schema $schema): self
+    {
+        (new Builder($schema))->create('meta_data_elements', function (Table $table) {
+            $table->increments('id');
+            $table->string('name');
+            $table->integer('project_id', false, true);
+            $table->foreign('projects', 'project_id', 'id');
+            $table->boolean('required');
+            $table->boolean('in_list');
+            $table->smallInteger('position');
+            $table->unique(['project_id', 'name']);
         });
 
         return $this;

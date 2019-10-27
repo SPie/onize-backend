@@ -5,6 +5,10 @@ namespace App\Providers;
 use App\Http\Controllers\Project\ProjectsController;
 use App\Http\Controllers\User\PasswordResetController;
 use App\Http\Middleware\ApiSignature;
+use App\Models\Project\MetaDataElementDoctrineModel;
+use App\Models\Project\MetaDataElementDoctrineModelFactory;
+use App\Models\Project\MetaDataElementModel;
+use App\Models\Project\MetaDataElementModelFactory;
 use App\Models\Project\ProjectDoctrineModel;
 use App\Models\Project\ProjectDoctrineModelFactory;
 use App\Models\Project\ProjectInviteDoctrineModel;
@@ -25,6 +29,8 @@ use App\Models\User\UserDoctrineModel;
 use App\Models\User\UserDoctrineModelFactory;
 use App\Models\User\UserModelFactoryInterface;
 use App\Models\User\UserModelInterface;
+use App\Repositories\Project\MetaDataElementDoctrineRepository;
+use App\Repositories\Project\MetaDataElementRepository;
 use App\Repositories\Project\ProjectInviteDoctrineRepository;
 use App\Repositories\Project\ProjectInviteRepository;
 use App\Repositories\User\LoginAttemptDoctrineRepository;
@@ -94,6 +100,7 @@ class AppServiceProvider extends ServiceProvider
         $this->app->bind(ProjectModel::class, ProjectDoctrineModel::class);
         $this->app->bind(LoginAttemptModel::class, LoginAttemptDoctrineModel::class);
         $this->app->bind(ProjectInviteModel::class, ProjectInviteDoctrineModel::class);
+        $this->app->bind(MetaDataElementModel::class, MetaDataElementDoctrineModel::class);
 
         return $this;
     }
@@ -127,6 +134,10 @@ class AppServiceProvider extends ServiceProvider
             return new ProjectInviteDoctrineRepository($this->makeDatabaseHandler(ProjectInviteDoctrineModel::class));
         });
 
+        $this->app->singleton(MetaDataElementRepository::class, function () {
+            return new MetaDataElementDoctrineRepository($this->makeDatabaseHandler(MetaDataElementDoctrineModel::class));
+        });
+
         return $this;
     }
 
@@ -158,6 +169,7 @@ class AppServiceProvider extends ServiceProvider
         $this->app->singleton(ProjectModelFactory::class, ProjectDoctrineModelFactory::class);
         $this->app->singleton(LoginAttemptModelFactory::class, LoginAttemptDoctrineModelFactory::class);
         $this->app->singleton(ProjectInviteModelFactory::class, ProjectInviteDoctrineModelFactory::class);
+        $this->app->singleton(MetaDataElementModelFactory::class, MetaDataElementDoctrineModelFactory::class);
 
         return $this;
     }
@@ -279,6 +291,11 @@ class AppServiceProvider extends ServiceProvider
         $projectInviteModelFactory->setProjectModelFactory($projectModelFactory);
         $projectModelFactory->setProjectInviteModelFactory($projectInviteModelFactory);
 
+        $metaDataElementModelFactory = $this->getMetaDataElementModelFactory();
+
+        $metaDataElementModelFactory->setProjectModelFactory($projectModelFactory);
+        $projectModelFactory->setMetaDataElementModelFactory($metaDataElementModelFactory);
+
         return $this;
     }
 
@@ -312,6 +329,14 @@ class AppServiceProvider extends ServiceProvider
     private function getProjectInviteModelFactory(): ProjectInviteModelFactory
     {
         return $this->app->get(ProjectInviteModelFactory::class);
+    }
+
+    /**
+     * @return MetaDataElementModelFactory
+     */
+    private function getMetaDataElementModelFactory(): MetaDataElementModelFactory
+    {
+        return $this->app->get(MetaDataElementModelFactory::class);
     }
 
     //endregion

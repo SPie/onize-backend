@@ -221,4 +221,14 @@ final class ProjectService implements ProjectServiceInterface
     {
         return \md5(\time() . $email . \mt_rand());
     }
+
+    /**
+     * @param array $metaDataElements
+     *
+     * @return array
+     */
+    public function createMetaDataElements(array $metaDataElements): array
+    {
+        // TODO: Implement createMetaDataElements() method.
+    }
 }

@@ -2,6 +2,7 @@
 
 namespace App\Services\Project;
 
+use App\Models\Project\MetaDataElementModel;
 use App\Models\Project\ProjectInviteModel;
 use App\Models\Project\ProjectModel;
 use App\Models\User\UserModelInterface;
@@ -43,4 +44,11 @@ interface ProjectServiceInterface
      * @return ProjectInviteModel
      */
     public function invite(string $uuid, string $email): ProjectInviteModel;
+
+    /**
+     * @param array $metaDataElements
+     *
+     * @return MetaDataElementModel[]
+     */
+    public function createMetaDataElements(array $metaDataElements): array;
 }

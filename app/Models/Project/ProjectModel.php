@@ -16,11 +16,12 @@ use Illuminate\Support\Collection;
  */
 interface ProjectModel extends ModelInterface, Timestampable, SoftDeletable, Uuidable
 {
-    const PROPERTY_LABEL           = 'label';
-    const PROPERTY_USER            = 'user';
-    const PROPERTY_DESCRIPTION     = 'description';
-    const PROPERTY_PROJECT_INVITES = 'projectInvites';
-    const PROPERTY_MEMBERS         = 'members';
+    const PROPERTY_LABEL              = 'label';
+    const PROPERTY_USER               = 'user';
+    const PROPERTY_DESCRIPTION        = 'description';
+    const PROPERTY_PROJECT_INVITES    = 'projectInvites';
+    const PROPERTY_MEMBERS            = 'members';
+    const PROPERTY_META_DATA_ELEMENTS = 'metaDataElements';
 
     /**
      * @param string $label
@@ -102,4 +103,23 @@ interface ProjectModel extends ModelInterface, Timestampable, SoftDeletable, Uui
      * @return ProjectInviteModel[]|Collection
      */
     public function getProjectInvites(): Collection;
+
+    /**
+     * @param MetaDataElementModel[] $metaDataElements
+     *
+     * @return $this
+     */
+    public function setMetaDataElements(array $metaDataElements): self;
+
+    /**
+     * @param MetaDataElementModel $metaDataElement
+     *
+     * @return $this
+     */
+    public function addMetaDataElement(MetaDataElementModel $metaDataElement): self;
+
+    /**
+     * @return MetaDataElementModel[]|Collection
+     */
+    public function getMetaDataElements(): Collection;
 }

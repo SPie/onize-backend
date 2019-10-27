@@ -1,6 +1,7 @@
 <?php
 
 use App\Models\Project\ProjectDoctrineModel;
+use Test\ProjectHelper;
 use Test\UserHelper;
 
 /**
@@ -8,6 +9,7 @@ use Test\UserHelper;
  */
 final class ProjectDoctrineModelTest extends TestCase
 {
+    use ProjectHelper;
     use UserHelper;
 
     //region Tests
@@ -21,6 +23,18 @@ final class ProjectDoctrineModelTest extends TestCase
         $user
             ->shouldReceive('toArray')
             ->andReturn([$this->getFaker()->uuid => $this->getFaker()->uuid]);
+        $projectInvite = $this->createProjectInviteModel();
+        $projectInvite
+            ->shouldReceive('toArray')
+            ->andReturn([$this->getFaker()->uuid => $this->getFaker()->word]);
+        $member = $this->createUserModel();
+        $member
+            ->shouldReceive('toArray')
+            ->andReturn([$this->getFaker()->uuid => $this->getFaker()->word]);
+        $metaDataElement = $this->createMetaDataElementModel();
+        $metaDataElement
+            ->shouldReceive('toArray')
+            ->andReturn([$this->getFaker()->uuid => $this->getFaker()->word]);
         $project = (new ProjectDoctrineModel(
             $this->getFaker()->uuid,
             $this->getFaker()->word,
@@ -28,19 +42,24 @@ final class ProjectDoctrineModelTest extends TestCase
             $this->getFaker()->text,
             $this->getFaker()->dateTime,
             $this->getFaker()->dateTime,
-            $this->getFaker()->dateTime
+            $this->getFaker()->dateTime,
+            [$projectInvite],
+            [$member],
+            [$metaDataElement]
         ))->setId($this->getFaker()->numberBetween());
 
         $this->assertEquals(
             [
-                'uuid'           => $project->getUuid(),
-                'label'          => $project->getLabel(),
-                'user'           => $project->getUser()->toArray(),
-                'description'    => $project->getDescription(),
-                'createdAt'      => (array)$project->getCreatedAt(),
-                'updatedAt'      => (array)$project->getUpdatedAt(),
-                'deletedAt'      => (array)$project->getDeletedAt(),
-                'projectInvites' => [],
+                'uuid'             => $project->getUuid(),
+                'label'            => $project->getLabel(),
+                'user'             => $project->getUser()->toArray(),
+                'description'      => $project->getDescription(),
+                'createdAt'        => (array)$project->getCreatedAt(),
+                'updatedAt'        => (array)$project->getUpdatedAt(),
+                'deletedAt'        => (array)$project->getDeletedAt(),
+                'projectInvites'   => [$projectInvite->toArray()],
+                'members'          => [$member->toArray()],
+                'metaDataElements' => [$metaDataElement->toArray()],
             ],
             $project->toArray()
         );
@@ -63,14 +82,16 @@ final class ProjectDoctrineModelTest extends TestCase
 
         $this->assertEquals(
             [
-                'uuid'           => $project->getUuid(),
-                'label'          => $project->getLabel(),
-                'user'           => $project->getUser()->toArray(),
-                'description'    => null,
-                'createdAt'      => null,
-                'updatedAt'      => null,
-                'deletedAt'      => null,
-                'projectInvites' => [],
+                'uuid'             => $project->getUuid(),
+                'label'            => $project->getLabel(),
+                'user'             => $project->getUser()->toArray(),
+                'description'      => null,
+                'createdAt'        => null,
+                'updatedAt'        => null,
+                'deletedAt'        => null,
+                'projectInvites'   => [],
+                'members'          => [],
+                'metaDataElements' => [],
             ],
             $project->toArray()
         );

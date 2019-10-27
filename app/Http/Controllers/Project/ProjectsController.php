@@ -160,6 +160,16 @@ final class ProjectsController extends Controller
         return $this->createResponse([], Response::HTTP_CREATED);
     }
 
+    /**
+     * @param Request $request
+     *
+     * @return JsonResponse
+     */
+    public function createMetaDataElements(Request $request): JsonResponse
+    {
+
+    }
+
     //endregion
 
     /**
