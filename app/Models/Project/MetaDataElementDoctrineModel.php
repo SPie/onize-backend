@@ -59,7 +59,7 @@ final class MetaDataElementDoctrineModel extends AbstractDoctrineModel implement
      * @param bool         $inList
      * @param int          $position
      */
-    public function __construct(string $name, ProjectModel $project, bool $required, bool $inList, int $position )
+    public function __construct(string $name, ProjectModel $project, bool $required, bool $inList, int $position)
     {
         $this->name = $name;
         $this->project = $project;

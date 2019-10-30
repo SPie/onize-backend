@@ -46,9 +46,10 @@ interface ProjectServiceInterface
     public function invite(string $uuid, string $email): ProjectInviteModel;
 
     /**
-     * @param array $metaDataElements
+     * @param string $uuid
+     * @param array  $metaDataElements
      *
      * @return MetaDataElementModel[]
      */
-    public function createMetaDataElements(array $metaDataElements): array;
+    public function createMetaDataElements(string $uuid, array $metaDataElements): array;
 }

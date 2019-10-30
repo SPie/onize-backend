@@ -3,12 +3,15 @@
 use App\Exceptions\Auth\NotAllowedException;
 use App\Exceptions\InvalidParameterException;
 use App\Exceptions\ModelNotFoundException;
+use App\Exceptions\Project\MetaDataElementExistsException;
 use App\Exceptions\Project\UserAlreadyMemberException;
+use App\Models\Project\MetaDataElementModelFactory;
 use App\Models\Project\ProjectInviteModel;
 use App\Models\Project\ProjectInviteModelFactory;
 use App\Models\Project\ProjectModel;
 use App\Models\Project\ProjectModelFactory;
 use App\Models\User\UserModelInterface;
+use App\Repositories\Project\MetaDataElementRepository;
 use App\Repositories\Project\ProjectInviteRepository;
 use App\Repositories\Project\ProjectRepository;
 use App\Services\Project\ProjectService;
@@ -301,13 +304,140 @@ final class ProjectServiceTest extends TestCase
         $this->getProjectService($projectRepository)->invite($uuid, $email);
     }
 
+    /**
+     * @return void
+     */
+    public function testCreateMetaDataElements(): void
+    {
+        $uuid = $this->getFaker()->uuid;
+        $metaDataElementData = [
+            'name'     => $this->getFaker()->uuid,
+            'required' => $this->getFaker()->boolean,
+            'inList'   => $this->getFaker()->boolean,
+            'position' => $this->getFaker()->numberBetween(),
+        ];
+        $project = $this->createProjectModel();
+        $metaDataElement = $this->createMetaDataElementModel();
+        $projectRepository = $this->createProjectRepository();
+        $metaDataElementModelFactory = $this->createMetaDataElementModelFactory();
+        $metaDataElementRepository = $this->createMetaDataElementRepository();
+        $this
+            ->mockProjectRepositoryFindByUuid($projectRepository, $project, $uuid)
+            ->mockModelFactoryCreate(
+                $metaDataElementModelFactory,
+                $metaDataElement,
+                \array_merge($metaDataElementData, ['project' => $project])
+            )
+            ->mockRepositorySave($metaDataElementRepository, $metaDataElement, false);
+
+        $this->assertEquals(
+            [$metaDataElement],
+            $this->getProjectServiceForCreateMetaDataElements(
+                $projectRepository,
+                $metaDataElementRepository,
+                $metaDataElementModelFactory
+            )->createMetaDataElements($uuid, [$metaDataElementData])
+        );
+        $this
+            ->assertRepositorySaveWithFlush($metaDataElementRepository, $metaDataElement, false)
+            ->assertRepositoryFlush($metaDataElementRepository);
+    }
+
+    /**
+     * @return void
+     */
+    public function testCreateMetaDataElementsWithoutProject(): void
+    {
+        $uuid = $this->getFaker()->uuid;
+        $projectRepository = $this->createProjectRepository();
+        $this->mockProjectRepositoryFindByUuid($projectRepository, null, $uuid);
+
+        $this->expectException(ModelNotFoundException::class);
+
+        $this->getProjectServiceForCreateMetaDataElements($projectRepository)->createMetaDataElements(
+            $uuid,
+            [
+                [
+                    'name'     => $this->getFaker()->uuid,
+                    'required' => $this->getFaker()->boolean,
+                    'inList'   => $this->getFaker()->boolean,
+                    'position' => $this->getFaker()->numberBetween(),
+                ]
+            ]
+        );
+    }
+
+    /**
+     * @return void
+     */
+    public function testCreateMetaDataElementsWitInvalidMetaDataElementParameter(): void
+    {
+        $uuid = $this->getFaker()->uuid;
+        $metaDataElementData = [
+            'name'     => $this->getFaker()->uuid,
+            'required' => $this->getFaker()->boolean,
+            'inList'   => $this->getFaker()->boolean,
+            'position' => $this->getFaker()->numberBetween(),
+        ];
+        $project = $this->createProjectModel();
+        $projectRepository = $this->createProjectRepository();
+        $metaDataElementModelFactory = $this->createMetaDataElementModelFactory();
+        $this
+            ->mockProjectRepositoryFindByUuid($projectRepository, $project, $uuid)
+            ->mockModelFactoryCreate(
+                $metaDataElementModelFactory,
+                new InvalidParameterException(),
+                \array_merge($metaDataElementData, ['project' => $project])
+            );
+
+        $this->expectException(InvalidParameterException::class);
+
+        $this->getProjectServiceForCreateMetaDataElements(
+            $projectRepository,
+            null,
+            $metaDataElementModelFactory
+        )->createMetaDataElements($uuid, [$metaDataElementData]);
+    }
+
+    /**
+     * @return void
+     */
+    public function testCreateMetaDataElementsWithAlreadyExistingMetaDataElement(): void
+    {
+        $uuid = $this->getFaker()->uuid;
+        $metaDataElementData = [
+            'name'     => $this->getFaker()->uuid,
+            'required' => $this->getFaker()->boolean,
+            'inList'   => $this->getFaker()->boolean,
+            'position' => $this->getFaker()->numberBetween(),
+        ];
+        $project = $this->createProjectModel();
+        $projectRepository = $this->createProjectRepository();
+        $metaDataElementRepository = $this->createMetaDataElementRepository();
+        $this
+            ->mockProjectRepositoryFindByUuid($projectRepository, $project, $uuid)
+            ->mockMetaDataElementRepositoryFindByNameAndProject(
+                $metaDataElementRepository,
+                $this->createMetaDataElementModel(),
+                $metaDataElementData['name'],
+                $project
+            );
+
+        $this->expectException(MetaDataElementExistsException::class);
+
+        $this->getProjectServiceForCreateMetaDataElements($projectRepository,$metaDataElementRepository)
+            ->createMetaDataElements($uuid, [$metaDataElementData]);
+    }
+
     //endregion
 
     /**
-     * @param ProjectRepository|null         $projectRepository
-     * @param ProjectModelFactory|null       $projectModelFactory
-     * @param ProjectInviteRepository|null   $projectInviteRepository
-     * @param ProjectInviteModelFactory|null $projectInviteModelFactory
+     * @param ProjectRepository|null           $projectRepository
+     * @param ProjectModelFactory|null         $projectModelFactory
+     * @param ProjectInviteRepository|null     $projectInviteRepository
+     * @param ProjectInviteModelFactory|null   $projectInviteModelFactory
+     * @param MetaDataElementRepository|null   $metaDataElementRepository
+     * @param MetaDataElementModelFactory|null $metaDataElementModelFactory
      *
      * @return ProjectService
      */
@@ -315,13 +445,39 @@ final class ProjectServiceTest extends TestCase
         ProjectRepository $projectRepository = null,
         ProjectModelFactory $projectModelFactory = null,
         ProjectInviteRepository $projectInviteRepository = null,
-        ProjectInviteModelFactory $projectInviteModelFactory = null
+        ProjectInviteModelFactory $projectInviteModelFactory = null,
+        MetaDataElementRepository $metaDataElementRepository = null,
+        MetaDataElementModelFactory $metaDataElementModelFactory = null
     ): ProjectService {
         return new ProjectService(
             $projectRepository ?: $this->createProjectRepository(),
             $projectModelFactory ?: $this->createProjectModelFactory(),
             $projectInviteRepository ?: $this->createProjectInviteRepository(),
-            $projectInviteModelFactory ?: $this->createProjectInviteModelFactory()
+            $projectInviteModelFactory ?: $this->createProjectInviteModelFactory(),
+            $metaDataElementRepository ?: $this->createMetaDataElementRepository(),
+            $metaDataElementModelFactory ?: $this->createMetaDataElementModelFactory()
+        );
+    }
+
+    /**
+     * @param ProjectRepository|null           $projectRepository
+     * @param MetaDataElementRepository|null   $metaDataElementRepository
+     * @param MetaDataElementModelFactory|null $metaDataElementModelFactory
+     *
+     * @return ProjectService
+     */
+    private function getProjectServiceForCreateMetaDataElements(
+        ProjectRepository $projectRepository = null,
+        MetaDataElementRepository $metaDataElementRepository = null,
+        MetaDataElementModelFactory $metaDataElementModelFactory = null
+    ): ProjectService {
+        return new ProjectService(
+            $projectRepository ?: $this->createProjectRepository(),
+            $this->createProjectModelFactory(),
+            $this->createProjectInviteRepository(),
+            $this->createProjectInviteModelFactory(),
+            $metaDataElementRepository ?: $this->createMetaDataElementRepository(),
+            $metaDataElementModelFactory ?: $this->createMetaDataElementModelFactory()
         );
     }
 

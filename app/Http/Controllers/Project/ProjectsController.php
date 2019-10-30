@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Project;
 
 use App\Http\Controllers\Controller;
+use App\Models\Project\MetaDataElementModel;
 use App\Models\Project\ProjectInviteModel;
 use App\Models\Project\ProjectModel;
 use App\Models\User\UserModelInterface;
@@ -26,10 +27,12 @@ final class ProjectsController extends Controller
     const ROUTE_NAME_REMOVE  = 'projects.remove';
     const ROUTE_NAME_INVITES = 'projects.invites';
 
-    const REQUEST_PARAMETER_INVITE_URL = 'inviteUrl';
+    const REQUEST_PARAMETER_INVITE_URL         = 'inviteUrl';
+    const REQUEST_PARAMETER_META_DATA_ELEMENTS = 'metaDataElements';
 
-    const RESPONSE_PARAMETER_PROJECT  = 'project';
-    const RESPONSE_PARAMETER_PROJECTS = 'projects';
+    const RESPONSE_PARAMETER_PROJECT            = 'project';
+    const RESPONSE_PARAMETER_PROJECTS           = 'projects';
+    const RESPONSE_PARAMETER_META_DATA_ELEMENTS = 'metaDataElements';
 
     /**
      * @var UserModelInterface
@@ -167,7 +170,17 @@ final class ProjectsController extends Controller
      */
     public function createMetaDataElements(Request $request): JsonResponse
     {
+        $parameters = $this->validateDataForMetaDataElements($request);
 
+        return $this->createResponse(
+            [
+                self::RESPONSE_PARAMETER_META_DATA_ELEMENTS => $this->getProjectService()->createMetaDataElements(
+                    $parameters[ProjectModel::PROPERTY_UUID],
+                    $parameters[self::REQUEST_PARAMETER_META_DATA_ELEMENTS]
+                )
+            ],
+            Response::HTTP_CREATED
+        );
     }
 
     //endregion
@@ -230,5 +243,42 @@ final class ProjectsController extends Controller
     private function parseInviteUrl(string $inviteUrl, string $token): string
     {
         return \str_replace($this->getTokenPlaceholder(), $token, $inviteUrl);
+    }
+
+    /**
+     * @param Request $request
+     *
+     * @return array
+     *
+     * @throws ValidationException
+     */
+    private function validateDataForMetaDataElements(Request $request): array
+    {
+        return $this->validate(
+            $request,
+            [
+                ProjectModel::PROPERTY_UUID                                                                  => ['required'],
+                self::REQUEST_PARAMETER_META_DATA_ELEMENTS                                                   => [
+                    'required',
+                    'array',
+                ],
+                self::REQUEST_PARAMETER_META_DATA_ELEMENTS . '.*.' . MetaDataElementModel::PROPERTY_NAME     => [
+                    'required',
+                    'string',
+                ],
+                self::REQUEST_PARAMETER_META_DATA_ELEMENTS . '.*.' . MetaDataElementModel::PROPERTY_REQUIRED => [
+                    'required',
+                    'boolean',
+                ],
+                self::REQUEST_PARAMETER_META_DATA_ELEMENTS . '.*.' . MetaDataElementModel::PROPERTY_IN_LIST  => [
+                    'required',
+                    'boolean',
+                ],
+                self::REQUEST_PARAMETER_META_DATA_ELEMENTS . '.*.' . MetaDataElementModel::PROPERTY_POSITION => [
+                    'required',
+                    'integer',
+                ],
+            ]
+        );
     }
 }

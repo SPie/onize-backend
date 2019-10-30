@@ -345,6 +345,307 @@ final class ProjectsControllerTest extends TestCase
         $this->getProjectsController(null, $projectService)->details($uuid);
     }
 
+    /**
+     * @return void
+     */
+    public function testCreateMetaDataElements(): void
+    {
+        $request = $this->createRequest();
+        $request->offsetSet('uuid', $this->getFaker()->uuid);
+        $request->offsetSet(
+            'metaDataElements',
+            [
+                [
+                    'name'     => $this->getFaker()->uuid,
+                    'required' => $this->getFaker()->boolean,
+                    'inList'   => $this->getFaker()->boolean,
+                    'position' => $this->getFaker()->numberBetween(),
+                ]
+            ]
+        );
+        $metaDataElement = $this->createMetaDataElementModel();
+        $projectService = $this->createProjectService();
+        $this->mockProjectServiceCreateMetaDataElements(
+            $projectService,
+            [$metaDataElement],
+            $request->get('uuid'),
+            $request->get('metaDataElements')
+        );
+
+        $this->assertEquals(
+            $this->createJsonResponse($this->createJsonResponseData(['metaDataElements' => [$metaDataElement]]), 201),
+            $this->getProjectsController(null, $projectService)->createMetaDataElements($request)
+        );
+    }
+
+    /**
+     * @return void
+     */
+    public function testCreateMetaDataWithoutUuid(): void
+    {
+        $request = $this->createRequest();
+        $request->offsetSet(
+            'metaDataElements',
+            [
+                [
+                    'name'     => $this->getFaker()->uuid,
+                    'required' => $this->getFaker()->boolean,
+                    'inList'   => $this->getFaker()->boolean,
+                    'position' => $this->getFaker()->numberBetween(),
+                ]
+            ]
+        );
+
+        $this->expectException(ValidationException::class);
+
+        $this->getProjectsController()->createMetaDataElements($request);
+    }
+
+    /**
+     * @return void
+     */
+    public function testCreateMetaDataWithoutMetaDataElements(): void
+    {
+        $request = $this->createRequest();
+        $request->offsetSet('uuid', $this->getFaker()->uuid);
+
+        $this->expectException(ValidationException::class);
+
+        $this->getProjectsController()->createMetaDataElements($request);
+    }
+
+    /**
+     * @return void
+     */
+    public function testCreateMetaDataWithInvalidMetaDataElements(): void
+    {
+        $request = $this->createRequest();
+        $request->offsetSet('metaDataElements', $this->getFaker()->word);
+
+        $this->expectException(ValidationException::class);
+
+        $this->getProjectsController()->createMetaDataElements($request);
+    }
+
+    /**
+     * @return void
+     */
+    public function testCreateMetaDataWithInvalidMetaDataWithoutName(): void
+    {
+        $request = $this->createRequest();
+        $request->offsetSet('uuid', $this->getFaker()->uuid);
+        $request->offsetSet(
+            'metaDataElements',
+            [
+                [
+                    'required' => $this->getFaker()->boolean,
+                    'inList'   => $this->getFaker()->boolean,
+                    'position' => $this->getFaker()->numberBetween(),
+                ]
+            ]
+        );
+
+        $this->expectException(ValidationException::class);
+
+        $this->getProjectsController()->createMetaDataElements($request);
+    }
+
+    /**
+     * @return void
+     */
+    public function testCreateMetaDataWithInvalidMetaDataWithInvalidName(): void
+    {
+        $request = $this->createRequest();
+        $request->offsetSet('uuid', $this->getFaker()->uuid);
+        $request->offsetSet(
+            'metaDataElements',
+            [
+                [
+                    'name'     => $this->getFaker()->numberBetween(),
+                    'required' => $this->getFaker()->boolean,
+                    'inList'   => $this->getFaker()->boolean,
+                    'position' => $this->getFaker()->numberBetween(),
+                ]
+            ]
+        );
+
+        $this->expectException(ValidationException::class);
+
+        $this->getProjectsController()->createMetaDataElements($request);
+    }
+
+    /**
+     * @return void
+     */
+    public function testCreateMetaDataWithInvalidMetaDataWithoutRequired(): void
+    {
+        $request = $this->createRequest();
+        $request->offsetSet('uuid', $this->getFaker()->uuid);
+        $request->offsetSet(
+            'metaDataElements',
+            [
+                [
+                    'name'     => $this->getFaker()->uuid,
+                    'inList'   => $this->getFaker()->boolean,
+                    'position' => $this->getFaker()->numberBetween(),
+                ]
+            ]
+        );
+
+        $this->expectException(ValidationException::class);
+
+        $this->getProjectsController()->createMetaDataElements($request);
+    }
+
+    /**
+     * @return void
+     */
+    public function testCreateMetaDataWithInvalidMetaDataWithInvalidRequired(): void
+    {
+        $request = $this->createRequest();
+        $request->offsetSet('uuid', $this->getFaker()->uuid);
+        $request->offsetSet(
+            'metaDataElements',
+            [
+                [
+                    'name'     => $this->getFaker()->uuid,
+                    'required' => $this->getFaker()->word,
+                    'inList'   => $this->getFaker()->boolean,
+                    'position' => $this->getFaker()->numberBetween(),
+                ]
+            ]
+        );
+
+        $this->expectException(ValidationException::class);
+
+        $this->getProjectsController()->createMetaDataElements($request);
+    }
+
+    /**
+     * @return void
+     */
+    public function testCreateMetaDataWithInvalidMetaDataWithoutInList(): void
+    {
+        $request = $this->createRequest();
+        $request->offsetSet('uuid', $this->getFaker()->uuid);
+        $request->offsetSet(
+            'metaDataElements',
+            [
+                [
+                    'name'     => $this->getFaker()->uuid,
+                    'required' => $this->getFaker()->boolean,
+                    'position' => $this->getFaker()->numberBetween(),
+                ]
+            ]
+        );
+
+        $this->expectException(ValidationException::class);
+
+        $this->getProjectsController()->createMetaDataElements($request);
+    }
+
+    /**
+     * @return void
+     */
+    public function testCreateMetaDataWithInvalidMetaDataWithInvalidInList(): void
+    {
+        $request = $this->createRequest();
+        $request->offsetSet('uuid', $this->getFaker()->uuid);
+        $request->offsetSet(
+            'metaDataElements',
+            [
+                [
+                    'name'     => $this->getFaker()->uuid,
+                    'required' => $this->getFaker()->boolean,
+                    'inList'   => $this->getFaker()->word,
+                    'position' => $this->getFaker()->numberBetween(),
+                ]
+            ]
+        );
+
+        $this->expectException(ValidationException::class);
+
+        $this->getProjectsController()->createMetaDataElements($request);
+    }
+
+    /**
+     * @return void
+     */
+    public function testCreateMetaDataWithInvalidMetaDataWithoutPosition(): void
+    {
+        $request = $this->createRequest();
+        $request->offsetSet('uuid', $this->getFaker()->uuid);
+        $request->offsetSet(
+            'metaDataElements',
+            [
+                [
+                    'name'     => $this->getFaker()->uuid,
+                    'required' => $this->getFaker()->boolean,
+                    'inList'   => $this->getFaker()->boolean,
+                ],
+            ]
+        );
+
+        $this->expectException(ValidationException::class);
+
+        $this->getProjectsController()->createMetaDataElements($request);
+    }
+
+    /**
+     * @return void
+     */
+    public function testCreateMetaDataWithInvalidMetaDataWithInvalidPosition(): void
+    {
+        $request = $this->createRequest();
+        $request->offsetSet('uuid', $this->getFaker()->uuid);
+        $request->offsetSet(
+            'metaDataElements',
+            [
+                [
+                    'name'     => $this->getFaker()->uuid,
+                    'required' => $this->getFaker()->boolean,
+                    'inList'   => $this->getFaker()->boolean,
+                    'position' => $this->getFaker()->word,
+                ]
+            ]
+        );
+
+        $this->expectException(ValidationException::class);
+
+        $this->getProjectsController()->createMetaDataElements($request);
+    }
+
+    /**
+     * @return void
+     */
+    public function testCreateMetaDataElementsWithoutProject(): void
+    {
+        $request = $this->createRequest();
+        $request->offsetSet('uuid', $this->getFaker()->uuid);
+        $request->offsetSet(
+            'metaDataElements',
+            [
+                [
+                    'name'     => $this->getFaker()->uuid,
+                    'required' => $this->getFaker()->boolean,
+                    'inList'   => $this->getFaker()->boolean,
+                    'position' => $this->getFaker()->numberBetween(),
+                ]
+            ]
+        );
+        $projectService = $this->createProjectService();
+        $this->mockProjectServiceCreateMetaDataElements(
+            $projectService,
+            new ModelNotFoundException(ProjectModel::class, $request->get('uuid')),
+            $request->get('uuid'),
+            $request->get('metaDataElements')
+        );
+
+        $this->expectException(ModelNotFoundException::class);
+
+        $this->getProjectsController(null, $projectService)->createMetaDataElements($request);
+    }
+
     //endregion
 
     /**

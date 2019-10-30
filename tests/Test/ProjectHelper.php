@@ -11,6 +11,7 @@ use App\Models\Project\ProjectInviteModelFactory;
 use App\Models\Project\ProjectModel;
 use App\Models\Project\ProjectModelFactory;
 use App\Models\User\UserModelInterface;
+use App\Repositories\Project\MetaDataElementRepository;
 use App\Repositories\Project\ProjectInviteRepository;
 use App\Repositories\Project\ProjectRepository;
 use App\Services\Project\ProjectServiceInterface;
@@ -196,6 +197,35 @@ trait ProjectHelper
     }
 
     /**
+     * @param ProjectServiceInterface|MockInterface $projectService
+     * @param MetaDataElementModel[]|\Exception     $metaDataElements
+     * @param string                                $uuid
+     * @param array                                 $metaDataElementsData
+     *
+     * @return $this
+     */
+    private function mockProjectServiceCreateMetaDataElements(
+        MockInterface $projectService,
+        $metaDataElements,
+        string $uuid,
+        array $metaDataElementsData
+    ): self {
+        $expectation = $projectService
+            ->shouldReceive('createMetaDataElements')
+            ->with($uuid, $metaDataElementsData);
+
+        if ($metaDataElements instanceof \Exception) {
+            $expectation->andThrow($metaDataElements);
+
+            return $this;
+        }
+
+        $expectation->andReturn($metaDataElements);
+
+        return $this;
+    }
+
+    /**
      * @param int   $times
      * @param array $data
      *
@@ -292,6 +322,36 @@ trait ProjectHelper
     private function createMetaDataElementModelFactory(): MetaDataElementModelFactory
     {
         return m::spy(MetaDataElementModelFactory::class);
+    }
+
+    /**
+     * @return MetaDataElementRepository|MockInterface
+     */
+    private function createMetaDataElementRepository(): MetaDataElementRepository
+    {
+        return m::spy(MetaDataElementRepository::class);
+    }
+
+    /**
+     * @param MetaDataElementRepository|MockInterface $metaDataElementRepository
+     * @param MetaDataElementModel|null               $metaDataElement
+     * @param string                                  $name
+     * @param ProjectModel                            $project
+     *
+     * @return $this
+     */
+    private function mockMetaDataElementRepositoryFindByNameAndProject(
+        MockInterface $metaDataElementRepository,
+        ?MetaDataElementModel $metaDataElement,
+        string $name,
+        ProjectModel $project
+    ): self {
+        $metaDataElementRepository
+            ->shouldReceive('findByNameAndProject')
+            ->with($name, $project)
+            ->andReturn($metaDataElement);
+
+        return $this;
     }
 
     //region Assertions

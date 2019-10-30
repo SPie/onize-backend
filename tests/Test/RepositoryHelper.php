@@ -138,16 +138,24 @@ trait RepositoryHelper
     /**
      * @param MockInterface  $repository
      * @param ModelInterface $model
+     * @param bool|null      $flush
      *
      * @return $this
      */
-    protected function mockRepositorySave(MockInterface $repository, ModelInterface $model)
+    protected function mockRepositorySave(MockInterface $repository, ModelInterface $model, bool $flush = null)
     {
+        $arguments = [
+            Mockery::on(function ($argument) use ($model) {
+                return $argument == $model;
+            })
+        ];
+        if ($flush !== null) {
+            $arguments[] = $flush;
+        }
+
         $repository
             ->shouldReceive('save')
-            ->with(Mockery::on(function ($argument) use ($model) {
-                return $argument == $model;
-            }))
+            ->withArgs($arguments)
             ->andReturn($model);
 
         return $this;
@@ -169,6 +177,48 @@ trait RepositoryHelper
             ->with(Mockery::on(function ($argument) use ($model) {
                 return $argument == $model;
             }))
+            ->times($times);
+
+        return $this;
+    }
+
+    /**
+     * @param RepositoryInterface|MockInterface $repository
+     * @param ModelInterface                    $model
+     * @param bool                              $flush
+     * @param int                               $times
+     *
+     * @return $this
+     */
+    private function assertRepositorySaveWithFlush(
+        MockInterface $repository,
+        ModelInterface $model,
+        bool $flush = true,
+        int $times = 1
+    ): self {
+        $repository
+            ->shouldHaveReceived('save')
+            ->with(
+                Mockery::on(function ($argument) use ($model) {
+                    return $argument == $model;
+                }),
+                $flush
+            )
+            ->times($times);
+
+        return $this;
+    }
+
+    /**
+     * @param RepositoryInterface|MockInterface $repository
+     * @param int                               $times
+     *
+     * @return $this
+     */
+    private function assertRepositoryFlush(MockInterface $repository, int $times = 1): self
+    {
+        $repository
+            ->shouldHaveReceived('flush')
             ->times($times);
 
         return $this;
