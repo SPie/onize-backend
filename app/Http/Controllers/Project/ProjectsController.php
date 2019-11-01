@@ -2,7 +2,9 @@
 
 namespace App\Http\Controllers\Project;
 
+use App\Exceptions\Project\MetaDataElementExistsException;
 use App\Http\Controllers\Controller;
+use App\Http\Validation\EmptyValidator;
 use App\Models\Project\MetaDataElementModel;
 use App\Models\Project\ProjectInviteModel;
 use App\Models\Project\ProjectModel;
@@ -21,11 +23,12 @@ use Illuminate\Validation\ValidationException;
  */
 final class ProjectsController extends Controller
 {
-    const ROUTE_NAME_LIST    = 'projects.list';
-    const ROUTE_NAME_DETAILS = 'projects.details';
-    const ROUTE_NAME_ADD     = 'projects.add';
-    const ROUTE_NAME_REMOVE  = 'projects.remove';
-    const ROUTE_NAME_INVITES = 'projects.invites';
+    const ROUTE_NAME_LIST               = 'projects.list';
+    const ROUTE_NAME_DETAILS            = 'projects.details';
+    const ROUTE_NAME_ADD                = 'projects.add';
+    const ROUTE_NAME_REMOVE             = 'projects.remove';
+    const ROUTE_NAME_INVITES            = 'projects.invites';
+    const ROUTE_NAME_META_DATA_ELEMENTS = 'projects.metaDataElements';
 
     const REQUEST_PARAMETER_INVITE_URL         = 'inviteUrl';
     const REQUEST_PARAMETER_META_DATA_ELEMENTS = 'metaDataElements';
@@ -172,13 +175,17 @@ final class ProjectsController extends Controller
     {
         $parameters = $this->validateDataForMetaDataElements($request);
 
+        try {
+            $metaDataElements = $this->getProjectService()->createMetaDataElements(
+                $parameters[ProjectModel::PROPERTY_UUID],
+                $parameters[self::REQUEST_PARAMETER_META_DATA_ELEMENTS]
+            );
+        } catch (MetaDataElementExistsException $e) {
+            throw new ValidationException(new EmptyValidator(), $this->createUniqueMetaDataElementValidationResponse($e->getIndex()));
+        }
+
         return $this->createResponse(
-            [
-                self::RESPONSE_PARAMETER_META_DATA_ELEMENTS => $this->getProjectService()->createMetaDataElements(
-                    $parameters[ProjectModel::PROPERTY_UUID],
-                    $parameters[self::REQUEST_PARAMETER_META_DATA_ELEMENTS]
-                )
-            ],
+            [self::RESPONSE_PARAMETER_META_DATA_ELEMENTS => $metaDataElements],
             Response::HTTP_CREATED
         );
     }
@@ -279,6 +286,20 @@ final class ProjectsController extends Controller
                     'integer',
                 ],
             ]
+        );
+    }
+
+    /**
+     * @param int $index
+     *
+     * @return JsonResponse
+     */
+    private function createUniqueMetaDataElementValidationResponse(int $index): JsonResponse
+    {
+        return $this->createResponse(
+            [\sprintf('%s.%d.%s', self::REQUEST_PARAMETER_META_DATA_ELEMENTS, $index, MetaDataElementModel::PROPERTY_NAME)
+                => ['validation.unique']],
+            422
         );
     }
 }

@@ -73,6 +73,8 @@ $router->group(
             $router->post('', ['as' => ProjectsController::ROUTE_NAME_ADD, 'uses' => 'Project\ProjectsController@add']);
             $router->delete('', ['as' => ProjectsController::ROUTE_NAME_REMOVE, 'uses' => 'Project\ProjectsController@remove']);
 
+            $router->post('/meta-data-elements', ['as' => ProjectsController::ROUTE_NAME_META_DATA_ELEMENTS, 'uses' => 'Project\ProjectsController@createMetaDataElements']);
+
             $router->post('invites', ['as' => ProjectsController::ROUTE_NAME_INVITES, 'uses' => 'Project\ProjectsController@invite']);
         });
 

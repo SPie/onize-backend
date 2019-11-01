@@ -266,16 +266,14 @@ final class ProjectService implements ProjectServiceInterface
             throw new ModelNotFoundException(ProjectModel::class, $uuid);
         }
 
-        $metaDataElementModels = \array_map(
-            function (array $metaDataElement) use ($project) {
-                if (!empty($this->getMetaDataElementRepository()->findByNameAndProject($metaDataElement['name'], $project))) {
-                    throw new MetaDataElementExistsException();
-                }
+        $metaDataElementModels = [];
+        foreach ($metaDataElements as $index => $metaDataElement) {
+            if (!empty($this->getMetaDataElementRepository()->findByNameAndProject($metaDataElement['name'], $project))) {
+                throw new MetaDataElementExistsException($index);
+            }
 
-                return $this->createNewMetaDataElement($metaDataElement, $project);
-            },
-            $metaDataElements
-        );
+            $metaDataElementModels[] = $this->createNewMetaDataElement($metaDataElement, $project);
+        }
 
         $this->getMetaDataElementRepository()->flush();
 

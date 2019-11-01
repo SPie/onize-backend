@@ -30,14 +30,14 @@ final class MetaDataElementDoctrineModel extends AbstractDoctrineModel implement
     private $project;
 
     /**
-     * @ORM\Column(name="required", type="bool", nullable=false)
+     * @ORM\Column(name="required", type="boolean", nullable=false)
      *
      * @var bool
      */
     private $required;
 
     /**
-     * @ORM\Column(name="in_list", type="bool", nullable=false)
+     * @ORM\Column(name="in_list", type="boolean", nullable=false)
      *
      * @var bool
      */
@@ -166,5 +166,28 @@ final class MetaDataElementDoctrineModel extends AbstractDoctrineModel implement
     public function getPosition(): int
     {
         return $this->position;
+    }
+
+    /**
+     * @param int $depth
+     *
+     * @return array
+     */
+    public function toArray(int $depth = 1): array
+    {
+        $array = [
+            self::PROPERTY_NAME     => $this->getName(),
+            self::PROPERTY_REQUIRED => $this->isRequired(),
+            self::PROPERTY_IN_LIST  => $this->isInList(),
+            self::PROPERTY_POSITION => $this->getPosition(),
+        ];
+
+        if ($depth > 0) {
+            --$depth;
+
+            $array[self::PROPERTY_PROJECT] = $this->getProject()->toArray($depth);
+        }
+
+        return $array;
     }
 }

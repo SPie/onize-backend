@@ -28,6 +28,28 @@ trait ModelHelper
     }
 
     /**
+     * @param ModelInterface|MockInterface $model
+     * @param array                        $array
+     * @param int|null                     $depth
+     *
+     * @return $this
+     */
+    private function mockModelToArray(MockInterface $model, array $array, int $depth = null): self
+    {
+        $arguments = [];
+        if ($depth !== null) {
+            $arguments[] = $depth;
+        }
+
+        $model
+            ->shouldReceive('toArray')
+            ->withArgs($arguments)
+            ->andReturn($array);
+
+        return $this;
+    }
+
+    /**
      * @param string      $modelClass
      * @param int         $times
      * @param array       $data

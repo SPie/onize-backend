@@ -2,6 +2,7 @@
 
 namespace Test;
 
+use App\Models\Project\MetaDataElementDoctrineModel;
 use App\Models\Project\MetaDataElementModel;
 use App\Models\Project\MetaDataElementModelFactory;
 use App\Models\Project\ProjectDoctrineModel;
@@ -352,6 +353,17 @@ trait ProjectHelper
             ->andReturn($metaDataElement);
 
         return $this;
+    }
+
+    /**
+     * @param int   $times
+     * @param array $data
+     *
+     * @return MetaDataElementModel[]|Collection
+     */
+    private function createMetaDataElements(int $times = 1, array $data = []): Collection
+    {
+        return $this->createModels(MetaDataElementDoctrineModel::class, $times, $data);
     }
 
     //region Assertions

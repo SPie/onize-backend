@@ -405,6 +405,7 @@ final class ProjectServiceTest extends TestCase
     public function testCreateMetaDataElementsWithAlreadyExistingMetaDataElement(): void
     {
         $uuid = $this->getFaker()->uuid;
+        $index = $this->getFaker()->numberBetween();
         $metaDataElementData = [
             'name'     => $this->getFaker()->uuid,
             'required' => $this->getFaker()->boolean,
@@ -423,10 +424,14 @@ final class ProjectServiceTest extends TestCase
                 $project
             );
 
-        $this->expectException(MetaDataElementExistsException::class);
+        try {
+            $this->getProjectServiceForCreateMetaDataElements($projectRepository, $metaDataElementRepository)
+                ->createMetaDataElements($uuid, [$index => $metaDataElementData]);
 
-        $this->getProjectServiceForCreateMetaDataElements($projectRepository,$metaDataElementRepository)
-            ->createMetaDataElements($uuid, [$metaDataElementData]);
+            $this->assertTrue(false);
+        } catch (MetaDataElementExistsException $e) {
+            $this->assertEquals($index, $e->getIndex());
+        }
     }
 
     //endregion

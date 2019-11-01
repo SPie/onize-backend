@@ -2,6 +2,7 @@
 
 use App\Exceptions\Auth\NotAllowedException;
 use App\Exceptions\ModelNotFoundException;
+use App\Exceptions\Project\MetaDataElementExistsException;
 use App\Http\Controllers\Project\ProjectsController;
 use App\Models\Project\ProjectInviteModel;
 use App\Models\Project\ProjectModel;
@@ -644,6 +645,48 @@ final class ProjectsControllerTest extends TestCase
         $this->expectException(ModelNotFoundException::class);
 
         $this->getProjectsController(null, $projectService)->createMetaDataElements($request);
+    }
+
+    /**
+     * @return void
+     */
+    public function testCreateMetaDataElementsWithAlreadyExistingName(): void
+    {
+        $request = $this->createRequest();
+        $request->offsetSet('uuid', $this->getFaker()->uuid);
+        $request->offsetSet(
+            'metaDataElements',
+            [
+                [
+                    'name'     => $this->getFaker()->uuid,
+                    'required' => $this->getFaker()->boolean,
+                    'inList'   => $this->getFaker()->boolean,
+                    'position' => $this->getFaker()->numberBetween(),
+                ]
+            ]
+        );
+        $index = $this->getFaker()->numberBetween();
+        $projectService = $this->createProjectService();
+        $this->mockProjectServiceCreateMetaDataElements(
+            $projectService,
+            new MetaDataElementExistsException($index),
+            $request->get('uuid'),
+            $request->get('metaDataElements')
+        );
+
+        try {
+            $this->getProjectsController(null, $projectService)->createMetaDataElements($request);
+
+            $this->assertTrue(false);
+        } catch (ValidationException $e) {
+            $this->assertEquals(
+                $this->createJsonResponse(
+                    $this->createJsonResponseData([\sprintf('metaDataElements.%d.name', $index) => ['validation.unique']]),
+                    422
+                ),
+                $e->getResponse()
+            );
+        }
     }
 
     //endregion
