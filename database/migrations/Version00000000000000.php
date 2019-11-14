@@ -166,6 +166,7 @@ class Version00000000000000 extends AbstractMigration
         (new Builder($schema))->create('meta_data_elements', function (Table $table) {
             $table->increments('id');
             $table->string('name');
+            $table->string('label');
             $table->integer('project_id', false, true);
             $table->foreign('projects', 'project_id', 'id');
             $table->boolean('required');

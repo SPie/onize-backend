@@ -23,11 +23,12 @@ final class MetaDataElementDoctrineModelTest extends TestCase
         $projectData = [$this->getFaker()->uuid => $this->getFaker()->word];
         $project = $this->createProjectModel();
         $this->mockModelToArray($project, $projectData, 0);
-        $metaDataElement = $this->getMetaDataElementDoctrineModel(null, $project);
+        $metaDataElement = $this->getMetaDataElementDoctrineModel(null, null, $project);
 
         $metaDataElementArray = $metaDataElement->toArray();
 
         $this->assertEquals($metaDataElement->getName(), $metaDataElementArray['name']);
+        $this->assertEquals($metaDataElement->getLabel(), $metaDataElementArray['label']);
         $this->assertEquals($projectData, $metaDataElementArray['project']);
         $this->assertEquals($metaDataElement->isRequired(), $metaDataElementArray['required']);
         $this->assertEquals($metaDataElement->isInList(), $metaDataElementArray['inList']);
@@ -44,6 +45,7 @@ final class MetaDataElementDoctrineModelTest extends TestCase
         $metaDataElementArray = $metaDataElement->toArray(0);
 
         $this->assertEquals($metaDataElement->getName(), $metaDataElementArray['name']);
+        $this->assertEquals($metaDataElement->getLabel(), $metaDataElementArray['label']);
         $this->assertEquals($metaDataElement->isRequired(), $metaDataElementArray['required']);
         $this->assertEquals($metaDataElement->isInList(), $metaDataElementArray['inList']);
         $this->assertEquals($metaDataElement->getPosition(), $metaDataElementArray['position']);
@@ -54,6 +56,7 @@ final class MetaDataElementDoctrineModelTest extends TestCase
 
     /**
      * @param string|null       $name
+     * @param string|null       $label
      * @param ProjectModel|null $projectModel
      * @param bool              $required
      * @param bool              $inList
@@ -64,6 +67,7 @@ final class MetaDataElementDoctrineModelTest extends TestCase
      */
     private function getMetaDataElementDoctrineModel(
         string $name = null,
+        string $label = null,
         ProjectModel $projectModel = null,
         bool $required = null,
         bool $inList = null,
@@ -72,6 +76,7 @@ final class MetaDataElementDoctrineModelTest extends TestCase
     ): MetaDataElementDoctrineModel {
         return (new MetaDataElementDoctrineModel(
             $name ?: $this->getFaker()->uuid,
+            $label ?: $this->getFaker()->word,
             $projectModel ?: $this->createProjectModel(),
             ($required !== null) ? $required : $this->getFaker()->boolean,
             ($inList !== null) ? $inList : $this->getFaker()->boolean,

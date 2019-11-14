@@ -358,6 +358,7 @@ final class ProjectsControllerTest extends TestCase
             [
                 [
                     'name'     => $this->getFaker()->uuid,
+                    'label'    => $this->getFaker()->word,
                     'required' => $this->getFaker()->boolean,
                     'inList'   => $this->getFaker()->boolean,
                     'position' => $this->getFaker()->numberBetween(),
@@ -390,6 +391,7 @@ final class ProjectsControllerTest extends TestCase
             [
                 [
                     'name'     => $this->getFaker()->uuid,
+                    'label'    => $this->getFaker()->word,
                     'required' => $this->getFaker()->boolean,
                     'inList'   => $this->getFaker()->boolean,
                     'position' => $this->getFaker()->numberBetween(),
@@ -439,6 +441,7 @@ final class ProjectsControllerTest extends TestCase
             'metaDataElements',
             [
                 [
+                    'label'    => $this->getFaker()->word,
                     'required' => $this->getFaker()->boolean,
                     'inList'   => $this->getFaker()->boolean,
                     'position' => $this->getFaker()->numberBetween(),
@@ -463,6 +466,7 @@ final class ProjectsControllerTest extends TestCase
             [
                 [
                     'name'     => $this->getFaker()->numberBetween(),
+                    'label'    => $this->getFaker()->word,
                     'required' => $this->getFaker()->boolean,
                     'inList'   => $this->getFaker()->boolean,
                     'position' => $this->getFaker()->numberBetween(),
@@ -487,6 +491,7 @@ final class ProjectsControllerTest extends TestCase
             [
                 [
                     'name'     => $this->getFaker()->uuid,
+                    'label'    => $this->getFaker()->word,
                     'inList'   => $this->getFaker()->boolean,
                     'position' => $this->getFaker()->numberBetween(),
                 ]
@@ -510,6 +515,7 @@ final class ProjectsControllerTest extends TestCase
             [
                 [
                     'name'     => $this->getFaker()->uuid,
+                    'label'    => $this->getFaker()->word,
                     'required' => $this->getFaker()->word,
                     'inList'   => $this->getFaker()->boolean,
                     'position' => $this->getFaker()->numberBetween(),
@@ -534,6 +540,7 @@ final class ProjectsControllerTest extends TestCase
             [
                 [
                     'name'     => $this->getFaker()->uuid,
+                    'label'    => $this->getFaker()->word,
                     'required' => $this->getFaker()->boolean,
                     'position' => $this->getFaker()->numberBetween(),
                 ]
@@ -557,6 +564,7 @@ final class ProjectsControllerTest extends TestCase
             [
                 [
                     'name'     => $this->getFaker()->uuid,
+                    'label'    => $this->getFaker()->word,
                     'required' => $this->getFaker()->boolean,
                     'inList'   => $this->getFaker()->word,
                     'position' => $this->getFaker()->numberBetween(),
@@ -581,6 +589,7 @@ final class ProjectsControllerTest extends TestCase
             [
                 [
                     'name'     => $this->getFaker()->uuid,
+                    'label'    => $this->getFaker()->word,
                     'required' => $this->getFaker()->boolean,
                     'inList'   => $this->getFaker()->boolean,
                 ],
@@ -604,6 +613,7 @@ final class ProjectsControllerTest extends TestCase
             [
                 [
                     'name'     => $this->getFaker()->uuid,
+                    'label'    => $this->getFaker()->word,
                     'required' => $this->getFaker()->boolean,
                     'inList'   => $this->getFaker()->boolean,
                     'position' => $this->getFaker()->word,
@@ -628,6 +638,7 @@ final class ProjectsControllerTest extends TestCase
             [
                 [
                     'name'     => $this->getFaker()->uuid,
+                    'label'    => $this->getFaker()->word,
                     'required' => $this->getFaker()->boolean,
                     'inList'   => $this->getFaker()->boolean,
                     'position' => $this->getFaker()->numberBetween(),
@@ -659,6 +670,7 @@ final class ProjectsControllerTest extends TestCase
             [
                 [
                     'name'     => $this->getFaker()->uuid,
+                    'label'    => $this->getFaker()->word,
                     'required' => $this->getFaker()->boolean,
                     'inList'   => $this->getFaker()->boolean,
                     'position' => $this->getFaker()->numberBetween(),
@@ -687,6 +699,55 @@ final class ProjectsControllerTest extends TestCase
                 $e->getResponse()
             );
         }
+    }
+
+    /**
+     * @return void
+     */
+    public function testCreateMetaDataWithoutLabel(): void
+    {
+        $request = $this->createRequest();
+        $request->offsetSet('uuid', $this->getFaker()->uuid);
+        $request->offsetSet(
+            'metaDataElements',
+            [
+                [
+                    'name'     => $this->getFaker()->uuid,
+                    'required' => $this->getFaker()->boolean,
+                    'inList'   => $this->getFaker()->boolean,
+                    'position' => $this->getFaker()->numberBetween(),
+                ]
+            ]
+        );
+
+        $this->expectException(ValidationException::class);
+
+        $this->getProjectsController()->createMetaDataElements($request);
+    }
+
+    /**
+     * @return void
+     */
+    public function testCreateMetaDataWithInvalidLabel(): void
+    {
+        $request = $this->createRequest();
+        $request->offsetSet('uuid', $this->getFaker()->uuid);
+        $request->offsetSet(
+            'metaDataElements',
+            [
+                [
+                    'name'     => $this->getFaker()->uuid,
+                    'label'    => $this->getFaker()->numberBetween(),
+                    'required' => $this->getFaker()->boolean,
+                    'inList'   => $this->getFaker()->boolean,
+                    'position' => $this->getFaker()->numberBetween(),
+                ]
+            ]
+        );
+
+        $this->expectException(ValidationException::class);
+
+        $this->getProjectsController()->createMetaDataElements($request);
     }
 
     //endregion

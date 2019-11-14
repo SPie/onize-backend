@@ -26,6 +26,7 @@ final class MetaDataElementDoctrineModelFactoryTest extends TestCase
     {
         $data = [
             'name'     => $this->getFaker()->uuid,
+            'label'    => $this->getFaker()->word,
             'project'  => $this->createProjectModel(),
             'required' => $this->getFaker()->boolean,
             'inList'   => $this->getFaker()->boolean,
@@ -36,6 +37,7 @@ final class MetaDataElementDoctrineModelFactoryTest extends TestCase
         $this->assertEquals(
             $this->createMetaDataElementDoctrineModel(
                 $data['name'],
+                $data['label'],
                 $data['project'],
                 $data['required'],
                 $data['inList'],
@@ -52,6 +54,7 @@ final class MetaDataElementDoctrineModelFactoryTest extends TestCase
     {
         $data = [
             'name'     => $this->getFaker()->uuid,
+            'label'    => $this->getFaker()->word,
             'project'  => $this->createProjectModel(),
             'required' => $this->getFaker()->boolean,
             'inList'   => $this->getFaker()->boolean,
@@ -61,6 +64,7 @@ final class MetaDataElementDoctrineModelFactoryTest extends TestCase
         $this->assertEquals(
             $this->createMetaDataElementDoctrineModel(
                 $data['name'],
+                $data['label'],
                 $data['project'],
                 $data['required'],
                 $data['inList'],
@@ -77,6 +81,7 @@ final class MetaDataElementDoctrineModelFactoryTest extends TestCase
     {
         $data = [
             'name'     => $this->getFaker()->uuid,
+            'label'    => $this->getFaker()->word,
             'project'  => [$this->getFaker()->uuid => $this->getFaker()->word],
             'required' => $this->getFaker()->boolean,
             'inList'   => $this->getFaker()->boolean,
@@ -89,6 +94,7 @@ final class MetaDataElementDoctrineModelFactoryTest extends TestCase
         $this->assertEquals(
             $this->createMetaDataElementDoctrineModel(
                 $data['name'],
+                $data['label'],
                 $project,
                 $data['required'],
                 $data['inList'],
@@ -106,6 +112,7 @@ final class MetaDataElementDoctrineModelFactoryTest extends TestCase
         $this->expectException(InvalidParameterException::class);
 
         $this->getMetaDataElementDoctrineModelFactory()->create([
+            'label'    => $this->getFaker()->word,
             'project'  => $this->createProjectModel(),
             'required' => $this->getFaker()->boolean,
             'inList'   => $this->getFaker()->boolean,
@@ -122,6 +129,7 @@ final class MetaDataElementDoctrineModelFactoryTest extends TestCase
 
         $this->getMetaDataElementDoctrineModelFactory()->create([
             'name'     => $this->getFaker()->numberBetween(),
+            'label'    => $this->getFaker()->word,
             'project'  => $this->createProjectModel(),
             'required' => $this->getFaker()->boolean,
             'inList'   => $this->getFaker()->boolean,
@@ -138,6 +146,7 @@ final class MetaDataElementDoctrineModelFactoryTest extends TestCase
 
         $this->getMetaDataElementDoctrineModelFactory()->create([
             'name'     => $this->getFaker()->uuid,
+            'label'    => $this->getFaker()->word,
             'required' => $this->getFaker()->boolean,
             'inList'   => $this->getFaker()->boolean,
             'position' => $this->getFaker()->numberBetween(),
@@ -153,6 +162,7 @@ final class MetaDataElementDoctrineModelFactoryTest extends TestCase
 
         $this->getMetaDataElementDoctrineModelFactory()->create([
             'name'     => $this->getFaker()->uuid,
+            'label'    => $this->getFaker()->word,
             'project'  => $this->getFaker()->word,
             'required' => $this->getFaker()->boolean,
             'inList'   => $this->getFaker()->boolean,
@@ -173,6 +183,7 @@ final class MetaDataElementDoctrineModelFactoryTest extends TestCase
 
         $this->getMetaDataElementDoctrineModelFactory($projectModelFactory)->create([
             'name'     => $this->getFaker()->uuid,
+            'label'    => $this->getFaker()->word,
             'project'  => $this->getFaker()->word,
             'required' => $this->getFaker()->boolean,
             'inList'   => $this->getFaker()->boolean,
@@ -189,6 +200,7 @@ final class MetaDataElementDoctrineModelFactoryTest extends TestCase
 
         $this->getMetaDataElementDoctrineModelFactory()->create([
             'name'     => $this->getFaker()->uuid,
+            'label'    => $this->getFaker()->word,
             'project'  => $this->createProjectModel(),
             'inList'   => $this->getFaker()->boolean,
             'position' => $this->getFaker()->numberBetween(),
@@ -204,6 +216,7 @@ final class MetaDataElementDoctrineModelFactoryTest extends TestCase
 
         $this->getMetaDataElementDoctrineModelFactory()->create([
             'name'     => $this->getFaker()->uuid,
+            'label'    => $this->getFaker()->word,
             'project'  => $this->createProjectModel(),
             'required' => $this->getFaker()->word,
             'inList'   => $this->getFaker()->boolean,
@@ -220,6 +233,7 @@ final class MetaDataElementDoctrineModelFactoryTest extends TestCase
 
         $this->getMetaDataElementDoctrineModelFactory()->create([
             'name'     => $this->getFaker()->uuid,
+            'label'    => $this->getFaker()->word,
             'project'  => $this->createProjectModel(),
             'required' => $this->getFaker()->boolean,
             'position' => $this->getFaker()->numberBetween(),
@@ -235,6 +249,7 @@ final class MetaDataElementDoctrineModelFactoryTest extends TestCase
 
         $this->getMetaDataElementDoctrineModelFactory()->create([
             'name'     => $this->getFaker()->uuid,
+            'label'    => $this->getFaker()->word,
             'project'  => $this->createProjectModel(),
             'required' => $this->getFaker()->boolean,
             'inList'   => $this->getFaker()->word,
@@ -251,6 +266,7 @@ final class MetaDataElementDoctrineModelFactoryTest extends TestCase
 
         $this->getMetaDataElementDoctrineModelFactory()->create([
             'name'     => $this->getFaker()->uuid,
+            'label'    => $this->getFaker()->word,
             'project'  => $this->createProjectModel(),
             'required' => $this->getFaker()->boolean,
             'inList'   => $this->getFaker()->boolean,
@@ -266,6 +282,7 @@ final class MetaDataElementDoctrineModelFactoryTest extends TestCase
 
         $this->getMetaDataElementDoctrineModelFactory()->create([
             'name'     => $this->getFaker()->uuid,
+            'label'    => $this->getFaker()->word,
             'project'  => $this->createProjectModel(),
             'required' => $this->getFaker()->boolean,
             'inList'   => $this->getFaker()->boolean,
@@ -276,10 +293,44 @@ final class MetaDataElementDoctrineModelFactoryTest extends TestCase
     /**
      * @return void
      */
+    public function testCreateWithoutLabel(): void
+    {
+        $this->expectException(InvalidParameterException::class);
+
+        $this->getMetaDataElementDoctrineModelFactory()->create([
+            'name'     => $this->getFaker()->uuid,
+            'project'  => $this->createProjectModel(),
+            'required' => $this->getFaker()->boolean,
+            'inList'   => $this->getFaker()->boolean,
+            'position' => $this->getFaker()->numberBetween(),
+        ]);
+    }
+
+    /**
+     * @return void
+     */
+    public function testCreateWithInvalidLabel(): void
+    {
+        $this->expectException(InvalidParameterException::class);
+
+        $this->getMetaDataElementDoctrineModelFactory()->create([
+            'name'     => $this->getFaker()->uuid,
+            'label'    => $this->getFaker()->numberBetween(),
+            'project'  => $this->createProjectModel(),
+            'required' => $this->getFaker()->boolean,
+            'inList'   => $this->getFaker()->boolean,
+            'position' => $this->getFaker()->numberBetween(),
+        ]);
+    }
+
+    /**
+     * @return void
+     */
     public function testFill(): void
     {
         $data = [
             'name'     => $this->getFaker()->uuid,
+            'label'    => $this->getFaker()->word,
             'project'  => $this->createProjectModel(),
             'required' => $this->getFaker()->boolean,
             'inList'   => $this->getFaker()->boolean,
@@ -291,6 +342,7 @@ final class MetaDataElementDoctrineModelFactoryTest extends TestCase
         $this->assertEquals(
             $this->createMetaDataElementDoctrineModel(
                 $data['name'],
+                $data['label'],
                 $data['project'],
                 $data['required'],
                 $data['inList'],
@@ -401,6 +453,18 @@ final class MetaDataElementDoctrineModelFactoryTest extends TestCase
         ]);
     }
 
+    /**
+     * @return void
+     */
+    public function testFillWithInvalidLabel(): void
+    {
+        $this->expectException(InvalidParameterException::class);
+
+        $this->getMetaDataElementDoctrineModelFactory()->fill($this->createMetaDataElementDoctrineModel(), [
+            'label' => $this->getFaker()->numberBetween(),
+        ]);
+    }
+
     //endregion
 
     /**
@@ -418,6 +482,7 @@ final class MetaDataElementDoctrineModelFactoryTest extends TestCase
 
     /**
      * @param string|null       $name
+     * @param string|null       $label
      * @param ProjectModel|null $project
      * @param bool|null         $required
      * @param bool|null         $inList
@@ -427,6 +492,7 @@ final class MetaDataElementDoctrineModelFactoryTest extends TestCase
      */
     private function createMetaDataElementDoctrineModel(
         string $name = null,
+        string $label = null,
         ProjectModel $project = null,
         bool $required = null,
         bool $inList  = null,
@@ -434,6 +500,7 @@ final class MetaDataElementDoctrineModelFactoryTest extends TestCase
     ): MetaDataElementDoctrineModel {
         return new MetaDataElementDoctrineModel(
             $name ?: $this->getFaker()->uuid,
+            $label ?: $this->getFaker()->word,
             $project ?: $this->createProjectModel(),
             ($required !== null) ? $required : $this->getFaker()->boolean,
             ($inList !== null) ? $inList : $this->getFaker()->boolean,

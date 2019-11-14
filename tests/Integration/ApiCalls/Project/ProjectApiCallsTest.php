@@ -478,6 +478,7 @@ final class ProjectApiCallsTest extends IntegrationTestCase
         $this->clearModelCache();
         $metaDataElement = [
             'name'     => $this->getFaker()->uuid,
+            'label'    => $this->getFaker()->word,
             'required' => $this->getFaker()->boolean,
             'inList'   => $this->getFaker()->boolean,
             'position' => $this->getFaker()->numberBetween(),
@@ -497,6 +498,7 @@ final class ProjectApiCallsTest extends IntegrationTestCase
         $this->assertResponseStatus(201);
         $responseData = $response->getData(true);
         $this->assertEquals($metaDataElement['name'], $responseData['metaDataElements'][0]['name']);
+        $this->assertEquals($metaDataElement['label'], $responseData['metaDataElements'][0]['label']);
         $this->assertEquals($metaDataElement['required'], $responseData['metaDataElements'][0]['required']);
         $this->assertEquals($metaDataElement['inList'], $responseData['metaDataElements'][0]['inList']);
         $this->assertEquals($metaDataElement['position'], $responseData['metaDataElements'][0]['position']);
@@ -517,6 +519,7 @@ final class ProjectApiCallsTest extends IntegrationTestCase
             [
                 'metaDataElements' => [[
                     'name'     => $this->getFaker()->uuid,
+                    'label'    => $this->getFaker()->word,
                     'required' => $this->getFaker()->boolean,
                     'inList'   => $this->getFaker()->boolean,
                     'position' => $this->getFaker()->numberBetween(),
@@ -593,6 +596,7 @@ final class ProjectApiCallsTest extends IntegrationTestCase
             [
                 'uuid'             => $project->getUuid(),
                 'metaDataElements' => [[
+                    'label'    => $this->getFaker()->word,
                     'required' => $this->getFaker()->boolean,
                     'inList'   => $this->getFaker()->boolean,
                     'position' => $this->getFaker()->numberBetween(),
@@ -623,6 +627,7 @@ final class ProjectApiCallsTest extends IntegrationTestCase
                 'uuid'             => $project->getUuid(),
                 'metaDataElements' => [[
                     'name'     => $this->getFaker()->numberBetween(),
+                    'label'    => $this->getFaker()->word,
                     'required' => $this->getFaker()->boolean,
                     'inList'   => $this->getFaker()->boolean,
                     'position' => $this->getFaker()->numberBetween(),
@@ -653,6 +658,7 @@ final class ProjectApiCallsTest extends IntegrationTestCase
                 'uuid'             => $project->getUuid(),
                 'metaDataElements' => [[
                     'name'     => $this->getFaker()->uuid,
+                    'label'    => $this->getFaker()->word,
                     'inList'   => $this->getFaker()->boolean,
                     'position' => $this->getFaker()->numberBetween(),
                 ]],
@@ -682,6 +688,7 @@ final class ProjectApiCallsTest extends IntegrationTestCase
                 'uuid'             => $project->getUuid(),
                 'metaDataElements' => [[
                     'name'     => $this->getFaker()->uuid,
+                    'label'    => $this->getFaker()->word,
                     'required' => $this->getFaker()->word,
                     'inList'   => $this->getFaker()->boolean,
                     'position' => $this->getFaker()->numberBetween(),
@@ -712,6 +719,7 @@ final class ProjectApiCallsTest extends IntegrationTestCase
                 'uuid'             => $project->getUuid(),
                 'metaDataElements' => [[
                     'name'     => $this->getFaker()->uuid,
+                    'label'    => $this->getFaker()->word,
                     'required' => $this->getFaker()->boolean,
                     'position' => $this->getFaker()->numberBetween(),
                 ]],
@@ -741,6 +749,7 @@ final class ProjectApiCallsTest extends IntegrationTestCase
                 'uuid'             => $project->getUuid(),
                 'metaDataElements' => [[
                     'name'     => $this->getFaker()->uuid,
+                    'label'    => $this->getFaker()->word,
                     'required' => $this->getFaker()->boolean,
                     'inList'   => $this->getFaker()->word,
                     'position' => $this->getFaker()->numberBetween(),
@@ -771,6 +780,7 @@ final class ProjectApiCallsTest extends IntegrationTestCase
                 'uuid'             => $project->getUuid(),
                 'metaDataElements' => [[
                     'name'     => $this->getFaker()->uuid,
+                    'label'    => $this->getFaker()->word,
                     'required' => $this->getFaker()->boolean,
                     'inList'   => $this->getFaker()->word,
                 ]],
@@ -800,6 +810,7 @@ final class ProjectApiCallsTest extends IntegrationTestCase
                 'uuid'             => $project->getUuid(),
                 'metaDataElements' => [[
                     'name'     => $this->getFaker()->uuid,
+                    'label'    => $this->getFaker()->word,
                     'required' => $this->getFaker()->boolean,
                     'inList'   => $this->getFaker()->word,
                     'position' => $this->getFaker()->word,
@@ -826,6 +837,7 @@ final class ProjectApiCallsTest extends IntegrationTestCase
                 'uuid'             => $this->getFaker()->uuid,
                 'metaDataElements' => [[
                     'name'     => $this->getFaker()->uuid,
+                    'label'    => $this->getFaker()->word,
                     'required' => $this->getFaker()->boolean,
                     'inList'   => $this->getFaker()->boolean,
                     'position' => $this->getFaker()->numberBetween(),
@@ -856,6 +868,7 @@ final class ProjectApiCallsTest extends IntegrationTestCase
                 'metaDataElements' => [
                     [
                         'name'     => $metaDataElement->getName(),
+                        'label'    => $this->getFaker()->word,
                         'required' => $this->getFaker()->boolean,
                         'inList'   => $this->getFaker()->boolean,
                         'position' => $this->getFaker()->numberBetween(),
@@ -869,6 +882,67 @@ final class ProjectApiCallsTest extends IntegrationTestCase
         $this->assertResponseStatus(422);
         $responseData = $response->getData(true);
         $this->assertEquals('validation.unique', $responseData['metaDataElements.0.name'][0]);
+    }
+
+    /**
+     * @return void
+     */
+    public function testCreateMetaDataWithoutLabel(): void
+    {
+        $user = $this->createUsers()->first();
+        $project = $this->createProjects(1, ['user' => $user])->first();
+        $this->clearModelCache();
+
+        $response = $this->doApiCall(
+            URL::route('projects.metaDataElements'),
+            Request::METHOD_POST,
+            [
+                'uuid'             => $project->getUuid(),
+                'metaDataElements' => [[
+                    'name'     => $this->getFaker()->uuid,
+                    'required' => $this->getFaker()->boolean,
+                    'inList'   => $this->getFaker()->word,
+                    'position' => $this->getFaker()->numberBetween(),
+                ]],
+            ],
+            null,
+            $this->createAuthHeader($user)
+        );
+
+        $this->assertResponseStatus(422);
+        $responseData = $response->getData(true);
+        $this->assertEquals('validation.required', $responseData['metaDataElements.0.label'][0]);
+    }
+
+    /**
+     * @return void
+     */
+    public function testCreateMetaDataWithInvalidLabel(): void
+    {
+        $user = $this->createUsers()->first();
+        $project = $this->createProjects(1, ['user' => $user])->first();
+        $this->clearModelCache();
+
+        $response = $this->doApiCall(
+            URL::route('projects.metaDataElements'),
+            Request::METHOD_POST,
+            [
+                'uuid'             => $project->getUuid(),
+                'metaDataElements' => [[
+                    'name'     => $this->getFaker()->uuid,
+                    'label'    => $this->getFaker()->numberBetween(),
+                    'required' => $this->getFaker()->boolean,
+                    'inList'   => $this->getFaker()->word,
+                    'position' => $this->getFaker()->numberBetween(),
+                ]],
+            ],
+            null,
+            $this->createAuthHeader($user)
+        );
+
+        $this->assertResponseStatus(422);
+        $responseData = $response->getData(true);
+        $this->assertEquals('validation.string', $responseData['metaDataElements.0.label'][0]);
     }
 
     //endregion

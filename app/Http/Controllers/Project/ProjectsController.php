@@ -273,6 +273,10 @@ final class ProjectsController extends Controller
                     'required',
                     'string',
                 ],
+                self::REQUEST_PARAMETER_META_DATA_ELEMENTS . '.*.' . MetaDataElementModel::PROPERTY_LABEL    => [
+                    'required',
+                    'string',
+                ],
                 self::REQUEST_PARAMETER_META_DATA_ELEMENTS . '.*.' . MetaDataElementModel::PROPERTY_REQUIRED => [
                     'required',
                     'boolean',

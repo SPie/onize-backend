@@ -23,6 +23,13 @@ final class MetaDataElementDoctrineModel extends AbstractDoctrineModel implement
     private $name;
 
     /**
+     * @ORM\Column(name="label", type="string", length=255, nullable=false)
+     *
+     * @var string
+     */
+    private $label;
+
+    /**
      * @ORM\ManyToOne(targetEntity="App\Models\Project\ProjectDoctrineModel", inversedBy="metaDataElements", cascade={"persist"})
      *
      * @var ProjectModel
@@ -54,14 +61,22 @@ final class MetaDataElementDoctrineModel extends AbstractDoctrineModel implement
      * MetaDataElementDoctrineModel constructor.
      *
      * @param string       $name
+     * @param string       $label
      * @param ProjectModel $project
      * @param bool         $required
      * @param bool         $inList
      * @param int          $position
      */
-    public function __construct(string $name, ProjectModel $project, bool $required, bool $inList, int $position)
-    {
+    public function __construct(
+        string $name,
+        string $label,
+        ProjectModel $project,
+        bool $required,
+        bool $inList,
+        int $position
+    ) {
         $this->name = $name;
+        $this->label = $label;
         $this->project = $project;
         $this->required = $required;
         $this->inList = $inList;
@@ -86,6 +101,26 @@ final class MetaDataElementDoctrineModel extends AbstractDoctrineModel implement
     public function getName(): string
     {
         return $this->name;
+    }
+
+    /**
+     * @param string $label
+     *
+     * @return MetaDataElementModel
+     */
+    public function setLabel(string $label): MetaDataElementModel
+    {
+        $this->label = $label;
+
+        return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function getLabel(): string
+    {
+        return $this->label;
     }
 
     /**
@@ -177,6 +212,7 @@ final class MetaDataElementDoctrineModel extends AbstractDoctrineModel implement
     {
         $array = [
             self::PROPERTY_NAME     => $this->getName(),
+            self::PROPERTY_LABEL    => $this->getLabel(),
             self::PROPERTY_REQUIRED => $this->isRequired(),
             self::PROPERTY_IN_LIST  => $this->isInList(),
             self::PROPERTY_POSITION => $this->getPosition(),

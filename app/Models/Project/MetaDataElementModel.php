@@ -12,6 +12,7 @@ use App\Models\ModelInterface;
 interface MetaDataElementModel extends ModelInterface
 {
     const PROPERTY_NAME     = 'name';
+    const PROPERTY_LABEL    = 'label';
     const PROPERTY_PROJECT  = 'project';
     const PROPERTY_REQUIRED = 'required';
     const PROPERTY_IN_LIST  = 'inList';
@@ -28,6 +29,18 @@ interface MetaDataElementModel extends ModelInterface
      * @return string
      */
     public function getName(): string;
+
+    /**
+     * @param string $label
+     *
+     * @return $this
+     */
+    public function setLabel(string $label): self;
+
+    /**
+     * @return string
+     */
+    public function getLabel(): string;
 
     /**
      * @param ProjectModel $project

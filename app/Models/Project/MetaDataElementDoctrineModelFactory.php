@@ -51,6 +51,7 @@ final class MetaDataElementDoctrineModelFactory implements MetaDataElementModelF
     {
         return (new MetaDataElementDoctrineModel(
             $this->validateStringParameter($data, MetaDataElementModel::PROPERTY_NAME),
+            $this->validateStringParameter($data, MetaDataElementModel::PROPERTY_LABEL),
             $this->validateProjectModel($data),
             $this->validateBooleanParameter($data, MetaDataElementModel::PROPERTY_REQUIRED),
             $this->validateBooleanParameter($data, MetaDataElementModel::PROPERTY_IN_LIST),
@@ -71,6 +72,11 @@ final class MetaDataElementDoctrineModelFactory implements MetaDataElementModelF
         $name = $this->validateStringParameter($data, MetaDataElementModel::PROPERTY_NAME, false);
         if (!empty($name)) {
             $model->setName($name);
+        }
+
+        $label = $this->validateStringParameter($data, MetaDataElementModel::PROPERTY_LABEL, false);
+        if (!empty($label)) {
+            $model->setLabel($label);
         }
 
         $project = $this->validateProjectModel($data, false);
