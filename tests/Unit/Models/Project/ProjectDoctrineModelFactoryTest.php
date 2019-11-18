@@ -1,8 +1,8 @@
 <?php
 
 use App\Exceptions\InvalidParameterException;
-use App\Models\Project\MetaDataElementModel;
-use App\Models\Project\MetaDataElementModelFactory;
+use App\Models\Project\ProjectMetaDataElementModel;
+use App\Models\Project\ProjectMetaDataElementModelFactory;
 use App\Models\Project\ProjectDoctrineModel;
 use App\Models\Project\ProjectDoctrineModelFactory;
 use App\Models\Project\ProjectInviteModel;
@@ -42,7 +42,7 @@ final class ProjectDoctrineModelFactoryTest extends TestCase
             'deletedAt'        => $this->getFaker()->dateTime,
             'projectInvites'   => [$this->createProjectInviteModel(),],
             'members'          => [$this->createUserModel()],
-            'metaDataElements' => [$this->createMetaDataElementModel()],
+            'projectMetaDataElements' => [$this->createProjectMetaDataElementModel()],
         ];
 
         $this->assertEquals(
@@ -57,7 +57,7 @@ final class ProjectDoctrineModelFactoryTest extends TestCase
                 $data['id'],
                 $data['projectInvites'],
                 $data['members'],
-                $data['metaDataElements']
+                $data['projectMetaDataElements']
             ),
             $this->getProjectDoctrineModelFactory($this->createUuidFactoryWithUuid($uuid))->create($data)
         );
@@ -172,15 +172,15 @@ final class ProjectDoctrineModelFactoryTest extends TestCase
      */
     public function testCreateWithMetaDataElementsDataArray(): void
     {
-        $metaDataElementsData = [$this->getFaker()->uuid => $this->getFaker()->word];
-        $metaDataElement = $this->createMetaDataElementModel();
-        $metaDataElementModelFactory = $this->createMetaDataElementModelFactory();
-        $this->mockModelFactoryCreate($metaDataElementModelFactory, $metaDataElement, $metaDataElementsData);
+        $projectMetaDataElementsData = [$this->getFaker()->uuid => $this->getFaker()->word];
+        $metaDataElement = $this->createProjectMetaDataElementModel();
+        $metaDataElementModelFactory = $this->createProjectMetaDataElementModelFactory();
+        $this->mockModelFactoryCreate($metaDataElementModelFactory, $metaDataElement, $projectMetaDataElementsData);
         $uuid = $this->getFaker()->uuid;
         $data = [
             'label'            => $this->getFaker()->word,
             'user'             => $this->createUserModel(),
-            'metaDataElements' => [$metaDataElementsData],
+            'projectMetaDataElements' => [$projectMetaDataElementsData],
         ];
 
         $this->assertEquals(
@@ -491,7 +491,7 @@ final class ProjectDoctrineModelFactoryTest extends TestCase
         $this->getProjectDoctrineModelFactory()->create([
             'label'            => $this->getFaker()->word,
             'user'             => $this->createUserModel(),
-            'metaDataElements' => $this->getFaker()->word,
+            'projectMetaDataElements' => $this->getFaker()->word,
         ]);
     }
 
@@ -505,7 +505,7 @@ final class ProjectDoctrineModelFactoryTest extends TestCase
         $this->getProjectDoctrineModelFactory()->create([
             'label'            => $this->getFaker()->word,
             'user'             => $this->createUserModel(),
-            'metaDataElements' => [$this->getFaker()->word],
+            'projectMetaDataElements' => [$this->getFaker()->word],
         ]);
     }
 
@@ -514,16 +514,16 @@ final class ProjectDoctrineModelFactoryTest extends TestCase
      */
     public function testCreateWithInvalidMetaDataElementsData(): void
     {
-        $metaDataElementsData = [$this->getFaker()->uuid => $this->getFaker()->word];
-        $metaDataElementFactory = $this->createMetaDataElementModelFactory();
-        $this->mockModelFactoryCreate($metaDataElementFactory, new InvalidParameterException(), $metaDataElementsData);
+        $projectMetaDataElementsData = [$this->getFaker()->uuid => $this->getFaker()->word];
+        $metaDataElementFactory = $this->createProjectMetaDataElementModelFactory();
+        $this->mockModelFactoryCreate($metaDataElementFactory, new InvalidParameterException(), $projectMetaDataElementsData);
         $this->expectException(InvalidParameterException::class);
 
         $this->getProjectDoctrineModelFactory(null, null, null, $metaDataElementFactory)
             ->create([
                 'label'   => $this->getFaker()->word,
                 'user'    => $this->createUserModel(),
-                'metaDataElements' => [$metaDataElementsData],
+                'projectMetaDataElements' => [$projectMetaDataElementsData],
             ]);
     }
 
@@ -542,7 +542,7 @@ final class ProjectDoctrineModelFactoryTest extends TestCase
             'deletedAt'        => $this->getFaker()->dateTime,
             'projectInvites'   => [$this->createProjectInviteModel()],
             'members'          => [$this->createUserModel()],
-            'metaDataElements' => [$this->createMetaDataElementModel()],
+            'projectMetaDataElements' => [$this->createProjectMetaDataElementModel()],
         ];
         $project = $this->createProjectDoctrineModel();
 
@@ -557,7 +557,7 @@ final class ProjectDoctrineModelFactoryTest extends TestCase
                 $data['deletedAt'],
                 $data['projectInvites'],
                 $data['members'],
-                $data['metaDataElements']
+                $data['projectMetaDataElements']
             ))->setId($data['id']),
             $this->getProjectDoctrineModelFactory()->fill($project, $data)
         );
@@ -649,15 +649,15 @@ final class ProjectDoctrineModelFactoryTest extends TestCase
     public function testFillWithMetaDataElementsData(): void
     {
         $data = [
-            'metaDataElements' => [[$this->getFaker()->uuid => $this->getFaker()->word]],
+            'projectMetaDataElements' => [[$this->getFaker()->uuid => $this->getFaker()->word]],
         ];
-        $metaDataElement = $this->createMetaDataElementModel();
-        $metaDataElementFactory = $this->createMetaDataElementModelFactory();
-        $this->mockModelFactoryCreate($metaDataElementFactory, $metaDataElement, $data['metaDataElements'][0]);
+        $metaDataElement = $this->createProjectMetaDataElementModel();
+        $metaDataElementFactory = $this->createProjectMetaDataElementModelFactory();
+        $this->mockModelFactoryCreate($metaDataElementFactory, $metaDataElement, $data['projectMetaDataElements'][0]);
         $project = $this->createProjectDoctrineModel();
 
         $this->assertEquals(
-            $project->setMetaDataElements([$metaDataElement]),
+            $project->setProjectMetaDataElements([$metaDataElement]),
             $this->getProjectDoctrineModelFactory(
                 null,
                 null,
@@ -675,11 +675,11 @@ final class ProjectDoctrineModelFactoryTest extends TestCase
      */
     public function testFillWithEmptyMetaDataElements(): void
     {
-        $project = $this->createProjectDoctrineModel()->setMetaDataElements([$this->createMetaDataElementModel()]);
+        $project = $this->createProjectDoctrineModel()->setProjectMetaDataElements([$this->createProjectMetaDataElementModel()]);
 
         $this->assertEquals(
-            clone $project->setMetaDataElements([]),
-            $this->getProjectDoctrineModelFactory()->fill($project, ['metaDataElements' => []])
+            clone $project->setProjectMetaDataElements([]),
+            $this->getProjectDoctrineModelFactory()->fill($project, ['projectMetaDataElements' => []])
         );
     }
 
@@ -905,10 +905,10 @@ final class ProjectDoctrineModelFactoryTest extends TestCase
     //endregion
 
     /**
-     * @param UuidFactory|null                 $uuidFactory
-     * @param UserModelFactoryInterface|null   $userModelFactory
-     * @param ProjectInviteModelFactory|null   $projectInviteModelFactory
-     * @param MetaDataElementModelFactory|null $metaDataElementModelFactory
+     * @param UuidFactory|null                        $uuidFactory
+     * @param UserModelFactoryInterface|null          $userModelFactory
+     * @param ProjectInviteModelFactory|null          $projectInviteModelFactory
+     * @param ProjectMetaDataElementModelFactory|null $metaDataElementModelFactory
      *
      * @return ProjectDoctrineModelFactory|ProjectModelFactory
      */
@@ -916,7 +916,7 @@ final class ProjectDoctrineModelFactoryTest extends TestCase
         UuidFactory $uuidFactory = null,
         UserModelFactoryInterface $userModelFactory = null,
         ProjectInviteModelFactory $projectInviteModelFactory = null,
-        MetaDataElementModelFactory $metaDataElementModelFactory = null
+        ProjectMetaDataElementModelFactory $metaDataElementModelFactory = null
     ): ProjectDoctrineModelFactory {
         return (new ProjectDoctrineModelFactory($uuidFactory ?: $this->createUuidFactory()))
             ->setUserModelFactory(
@@ -925,23 +925,23 @@ final class ProjectDoctrineModelFactoryTest extends TestCase
             ->setProjectInviteModelFactory(
                 $projectInviteModelFactory ?: $this->createProjectInviteModelFactory()
             )
-            ->setMetaDataElementModelFactory(
-                $metaDataElementModelFactory ?: $this->createMetaDataElementModelFactory()
+            ->setProjectMetaDataElementModelFactory(
+                $metaDataElementModelFactory ?: $this->createProjectMetaDataElementModelFactory()
             );
     }
 
     /**
-     * @param string|null             $uuid
-     * @param string|null             $label
-     * @param UserModelInterface|null $user
-     * @param string|null             $description
-     * @param DateTime|null           $createdAt
-     * @param DateTime|null           $updatedAt
-     * @param DateTime|null           $deletedAt
-     * @param int|null                $id
-     * @param ProjectInviteModel[]    $projectInvites
-     * @param UserModelInterface[]    $members
-     * @param MetaDataElementModel[]  $metaDataElements
+     * @param string|null                   $uuid
+     * @param string|null                   $label
+     * @param UserModelInterface|null       $user
+     * @param string|null                   $description
+     * @param DateTime|null                 $createdAt
+     * @param DateTime|null                 $updatedAt
+     * @param DateTime|null                 $deletedAt
+     * @param int|null                      $id
+     * @param ProjectInviteModel[]          $projectInvites
+     * @param UserModelInterface[]          $members
+     * @param ProjectMetaDataElementModel[] $projectMetaDataElements
      *
      * @return ProjectDoctrineModel
      */
@@ -956,7 +956,7 @@ final class ProjectDoctrineModelFactoryTest extends TestCase
         int $id = null,
         array $projectInvites = [],
         array $members = [],
-        array $metaDataElements = []
+        array $projectMetaDataElements = []
     ): ProjectDoctrineModel {
         return (new ProjectDoctrineModel(
             $uuid ?: $this->getFaker()->uuid,
@@ -968,7 +968,7 @@ final class ProjectDoctrineModelFactoryTest extends TestCase
             $deletedAt ?: $this->getFaker()->dateTime,
             $projectInvites,
             $members,
-            $metaDataElements
+            $projectMetaDataElements
         ))->setId($id ?: $this->getFaker()->numberBetween());
     }
 }

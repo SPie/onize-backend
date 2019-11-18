@@ -6,14 +6,14 @@ use App\Models\AbstractDoctrineModel;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
- * Class MetaDataElementDoctrineModel
+ * Class ProjectMetaDataElementDoctrineModel
  *
- * @ORM\Table(name="meta_data_elements")
+ * @ORM\Table(name="project_meta_data_elements")
  * @ORM\Entity(repositoryClass="App\Repositories\Project\MetaDataElementDoctrineRepository")
  *
  * @package App\Models\Project
  */
-final class MetaDataElementDoctrineModel extends AbstractDoctrineModel implements MetaDataElementModel
+final class ProjectMetaDataElementDoctrineModel extends AbstractDoctrineModel implements ProjectMetaDataElementModel
 {
     /**
      * @ORM\Column(name="name", type="string", length=255, nullable=false)
@@ -88,7 +88,7 @@ final class MetaDataElementDoctrineModel extends AbstractDoctrineModel implement
      *
      * @return $this
      */
-    public function setName(string $name): MetaDataElementModel
+    public function setName(string $name): ProjectMetaDataElementModel
     {
         $this->name = $name;
 
@@ -106,9 +106,9 @@ final class MetaDataElementDoctrineModel extends AbstractDoctrineModel implement
     /**
      * @param string $label
      *
-     * @return MetaDataElementModel
+     * @return ProjectMetaDataElementModel
      */
-    public function setLabel(string $label): MetaDataElementModel
+    public function setLabel(string $label): ProjectMetaDataElementModel
     {
         $this->label = $label;
 
@@ -128,7 +128,7 @@ final class MetaDataElementDoctrineModel extends AbstractDoctrineModel implement
      *
      * @return $this
      */
-    public function setProject(ProjectModel $project): MetaDataElementModel
+    public function setProject(ProjectModel $project): ProjectMetaDataElementModel
     {
         $this->project = $project;
 
@@ -148,7 +148,7 @@ final class MetaDataElementDoctrineModel extends AbstractDoctrineModel implement
      *
      * @return $this
      */
-    public function setRequired(bool $required): MetaDataElementModel
+    public function setRequired(bool $required): ProjectMetaDataElementModel
     {
         $this->required = $required;
 
@@ -168,7 +168,7 @@ final class MetaDataElementDoctrineModel extends AbstractDoctrineModel implement
      *
      * @return $this
      */
-    public function setInList(bool $inList): MetaDataElementModel
+    public function setInList(bool $inList): ProjectMetaDataElementModel
     {
         $this->inList = $inList;
 
@@ -188,7 +188,7 @@ final class MetaDataElementDoctrineModel extends AbstractDoctrineModel implement
      *
      * @return $this
      */
-    public function setPosition(int $position): MetaDataElementModel
+    public function setPosition(int $position): ProjectMetaDataElementModel
     {
         $this->position = $position;
 

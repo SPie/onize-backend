@@ -2,9 +2,9 @@
 
 namespace Test;
 
-use App\Models\Project\MetaDataElementDoctrineModel;
-use App\Models\Project\MetaDataElementModel;
-use App\Models\Project\MetaDataElementModelFactory;
+use App\Models\Project\ProjectMetaDataElementDoctrineModel;
+use App\Models\Project\ProjectMetaDataElementModel;
+use App\Models\Project\ProjectMetaDataElementModelFactory;
 use App\Models\Project\ProjectDoctrineModel;
 use App\Models\Project\ProjectInviteDoctrineModel;
 use App\Models\Project\ProjectInviteModel;
@@ -12,7 +12,7 @@ use App\Models\Project\ProjectInviteModelFactory;
 use App\Models\Project\ProjectModel;
 use App\Models\Project\ProjectModelFactory;
 use App\Models\User\UserModelInterface;
-use App\Repositories\Project\MetaDataElementRepository;
+use App\Repositories\Project\ProjectMetaDataElementRepository;
 use App\Repositories\Project\ProjectInviteRepository;
 use App\Repositories\Project\ProjectRepository;
 use App\Services\Project\ProjectServiceInterface;
@@ -198,10 +198,10 @@ trait ProjectHelper
     }
 
     /**
-     * @param ProjectServiceInterface|MockInterface $projectService
-     * @param MetaDataElementModel[]|\Exception     $metaDataElements
-     * @param string                                $uuid
-     * @param array                                 $metaDataElementsData
+     * @param ProjectServiceInterface|MockInterface    $projectService
+     * @param ProjectMetaDataElementModel[]|\Exception $metaDataElements
+     * @param string                                   $uuid
+     * @param array                                    $metaDataElementsData
      *
      * @return $this
      */
@@ -310,40 +310,40 @@ trait ProjectHelper
     }
 
     /**
-     * @return MetaDataElementModel|MockInterface
+     * @return ProjectMetaDataElementModel|MockInterface
      */
-    private function createMetaDataElementModel(): MetaDataElementModel
+    private function createProjectMetaDataElementModel(): ProjectMetaDataElementModel
     {
-        return m::spy(MetaDataElementModel::class);
+        return m::spy(ProjectMetaDataElementModel::class);
     }
 
     /**
-     * @return MetaDataElementModelFactory
+     * @return ProjectMetaDataElementModelFactory
      */
-    private function createMetaDataElementModelFactory(): MetaDataElementModelFactory
+    private function createProjectMetaDataElementModelFactory(): ProjectMetaDataElementModelFactory
     {
-        return m::spy(MetaDataElementModelFactory::class);
+        return m::spy(ProjectMetaDataElementModelFactory::class);
     }
 
     /**
-     * @return MetaDataElementRepository|MockInterface
+     * @return ProjectMetaDataElementRepository|MockInterface
      */
-    private function createMetaDataElementRepository(): MetaDataElementRepository
+    private function createProjectMetaDataElementRepository(): ProjectMetaDataElementRepository
     {
-        return m::spy(MetaDataElementRepository::class);
+        return m::spy(ProjectMetaDataElementRepository::class);
     }
 
     /**
-     * @param MetaDataElementRepository|MockInterface $metaDataElementRepository
-     * @param MetaDataElementModel|null               $metaDataElement
-     * @param string                                  $name
-     * @param ProjectModel                            $project
+     * @param ProjectMetaDataElementRepository|MockInterface $metaDataElementRepository
+     * @param ProjectMetaDataElementModel|null               $metaDataElement
+     * @param string                                         $name
+     * @param ProjectModel                                   $project
      *
      * @return $this
      */
-    private function mockMetaDataElementRepositoryFindByNameAndProject(
+    private function mockProjectMetaDataElementRepositoryFindByNameAndProject(
         MockInterface $metaDataElementRepository,
-        ?MetaDataElementModel $metaDataElement,
+        ?ProjectMetaDataElementModel $metaDataElement,
         string $name,
         ProjectModel $project
     ): self {
@@ -359,11 +359,11 @@ trait ProjectHelper
      * @param int   $times
      * @param array $data
      *
-     * @return MetaDataElementModel[]|Collection
+     * @return ProjectMetaDataElementModel[]|Collection
      */
-    private function createMetaDataElements(int $times = 1, array $data = []): Collection
+    private function createProjectMetaDataElements(int $times = 1, array $data = []): Collection
     {
-        return $this->createModels(MetaDataElementDoctrineModel::class, $times, $data);
+        return $this->createModels(ProjectMetaDataElementDoctrineModel::class, $times, $data);
     }
 
     //region Assertions

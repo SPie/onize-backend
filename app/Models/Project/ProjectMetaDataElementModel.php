@@ -5,11 +5,11 @@ namespace App\Models\Project;
 use App\Models\ModelInterface;
 
 /**
- * Interface MetaDataElementModel
+ * Interface ProjectMetaDataElementModel
  *
  * @package App\Models\Project
  */
-interface MetaDataElementModel extends ModelInterface
+interface ProjectMetaDataElementModel extends ModelInterface
 {
     const PROPERTY_NAME     = 'name';
     const PROPERTY_LABEL    = 'label';

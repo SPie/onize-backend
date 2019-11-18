@@ -1,14 +1,14 @@
 <?php
 
-use App\Models\Project\MetaDataElementDoctrineModel;
+use App\Models\Project\ProjectMetaDataElementDoctrineModel;
 use App\Models\Project\ProjectModel;
 use Test\ModelHelper;
 use Test\ProjectHelper;
 
 /**
- * Class MetaDataElementDoctrineModelTest
+ * Class ProjectMetaDataElementDoctrineModelTest
  */
-final class MetaDataElementDoctrineModelTest extends TestCase
+final class ProjectMetaDataElementDoctrineModelTest extends TestCase
 {
     use ModelHelper;
     use ProjectHelper;
@@ -63,7 +63,7 @@ final class MetaDataElementDoctrineModelTest extends TestCase
      * @param int|null          $position
      * @param int|null          $id
      *
-     * @return MetaDataElementDoctrineModel
+     * @return ProjectMetaDataElementDoctrineModel
      */
     private function getMetaDataElementDoctrineModel(
         string $name = null,
@@ -73,8 +73,8 @@ final class MetaDataElementDoctrineModelTest extends TestCase
         bool $inList = null,
         int $position = null,
         int $id = null
-    ): MetaDataElementDoctrineModel {
-        return (new MetaDataElementDoctrineModel(
+    ): ProjectMetaDataElementDoctrineModel {
+        return (new ProjectMetaDataElementDoctrineModel(
             $name ?: $this->getFaker()->uuid,
             $label ?: $this->getFaker()->word,
             $projectModel ?: $this->createProjectModel(),

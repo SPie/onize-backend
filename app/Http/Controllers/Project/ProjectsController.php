@@ -5,7 +5,7 @@ namespace App\Http\Controllers\Project;
 use App\Exceptions\Project\MetaDataElementExistsException;
 use App\Http\Controllers\Controller;
 use App\Http\Validation\EmptyValidator;
-use App\Models\Project\MetaDataElementModel;
+use App\Models\Project\ProjectMetaDataElementModel;
 use App\Models\Project\ProjectInviteModel;
 use App\Models\Project\ProjectModel;
 use App\Models\User\UserModelInterface;
@@ -264,28 +264,28 @@ final class ProjectsController extends Controller
         return $this->validate(
             $request,
             [
-                ProjectModel::PROPERTY_UUID                                                                  => ['required'],
-                self::REQUEST_PARAMETER_META_DATA_ELEMENTS                                                   => [
+                ProjectModel::PROPERTY_UUID                                                                         => ['required'],
+                self::REQUEST_PARAMETER_META_DATA_ELEMENTS                                                          => [
                     'required',
                     'array',
                 ],
-                self::REQUEST_PARAMETER_META_DATA_ELEMENTS . '.*.' . MetaDataElementModel::PROPERTY_NAME     => [
+                self::REQUEST_PARAMETER_META_DATA_ELEMENTS . '.*.' . ProjectMetaDataElementModel::PROPERTY_NAME     => [
                     'required',
                     'string',
                 ],
-                self::REQUEST_PARAMETER_META_DATA_ELEMENTS . '.*.' . MetaDataElementModel::PROPERTY_LABEL    => [
+                self::REQUEST_PARAMETER_META_DATA_ELEMENTS . '.*.' . ProjectMetaDataElementModel::PROPERTY_LABEL    => [
                     'required',
                     'string',
                 ],
-                self::REQUEST_PARAMETER_META_DATA_ELEMENTS . '.*.' . MetaDataElementModel::PROPERTY_REQUIRED => [
+                self::REQUEST_PARAMETER_META_DATA_ELEMENTS . '.*.' . ProjectMetaDataElementModel::PROPERTY_REQUIRED => [
                     'required',
                     'boolean',
                 ],
-                self::REQUEST_PARAMETER_META_DATA_ELEMENTS . '.*.' . MetaDataElementModel::PROPERTY_IN_LIST  => [
+                self::REQUEST_PARAMETER_META_DATA_ELEMENTS . '.*.' . ProjectMetaDataElementModel::PROPERTY_IN_LIST  => [
                     'required',
                     'boolean',
                 ],
-                self::REQUEST_PARAMETER_META_DATA_ELEMENTS . '.*.' . MetaDataElementModel::PROPERTY_POSITION => [
+                self::REQUEST_PARAMETER_META_DATA_ELEMENTS . '.*.' . ProjectMetaDataElementModel::PROPERTY_POSITION => [
                     'required',
                     'integer',
                 ],
@@ -301,7 +301,7 @@ final class ProjectsController extends Controller
     private function createUniqueMetaDataElementValidationResponse(int $index): JsonResponse
     {
         return $this->createResponse(
-            [\sprintf('%s.%d.%s', self::REQUEST_PARAMETER_META_DATA_ELEMENTS, $index, MetaDataElementModel::PROPERTY_NAME)
+            [\sprintf('%s.%d.%s', self::REQUEST_PARAMETER_META_DATA_ELEMENTS, $index, ProjectMetaDataElementModel::PROPERTY_NAME)
                 => ['validation.unique']],
             422
         );

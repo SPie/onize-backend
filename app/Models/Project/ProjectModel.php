@@ -16,12 +16,12 @@ use Illuminate\Support\Collection;
  */
 interface ProjectModel extends ModelInterface, Timestampable, SoftDeletable, Uuidable
 {
-    const PROPERTY_LABEL              = 'label';
-    const PROPERTY_USER               = 'user';
-    const PROPERTY_DESCRIPTION        = 'description';
-    const PROPERTY_PROJECT_INVITES    = 'projectInvites';
-    const PROPERTY_MEMBERS            = 'members';
-    const PROPERTY_META_DATA_ELEMENTS = 'metaDataElements';
+    const PROPERTY_LABEL                      = 'label';
+    const PROPERTY_USER                       = 'user';
+    const PROPERTY_DESCRIPTION                = 'description';
+    const PROPERTY_PROJECT_INVITES            = 'projectInvites';
+    const PROPERTY_MEMBERS                    = 'members';
+    const PROPERTY_PROJECT_META_DATA_ELEMENTS = 'projectMetaDataElements';
 
     /**
      * @param string $label
@@ -105,21 +105,21 @@ interface ProjectModel extends ModelInterface, Timestampable, SoftDeletable, Uui
     public function getProjectInvites(): Collection;
 
     /**
-     * @param MetaDataElementModel[] $metaDataElements
+     * @param ProjectMetaDataElementModel[] $metaDataElements
      *
      * @return $this
      */
-    public function setMetaDataElements(array $metaDataElements): self;
+    public function setProjectMetaDataElements(array $metaDataElements): self;
 
     /**
-     * @param MetaDataElementModel $metaDataElement
+     * @param ProjectMetaDataElementModel $metaDataElement
      *
      * @return $this
      */
-    public function addMetaDataElement(MetaDataElementModel $metaDataElement): self;
+    public function addMetaDataElement(ProjectMetaDataElementModel $metaDataElement): self;
 
     /**
-     * @return MetaDataElementModel[]|Collection
+     * @return ProjectMetaDataElementModel[]|Collection
      */
-    public function getMetaDataElements(): Collection;
+    public function getProjectMetaDataElements(): Collection;
 }

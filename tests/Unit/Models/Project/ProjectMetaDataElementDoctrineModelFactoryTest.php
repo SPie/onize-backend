@@ -1,18 +1,18 @@
 <?php
 
 use App\Exceptions\InvalidParameterException;
-use App\Models\Project\MetaDataElementDoctrineModel;
-use App\Models\Project\MetaDataElementDoctrineModelFactory;
-use App\Models\Project\MetaDataElementModelFactory;
+use App\Models\Project\ProjectMetaDataElementDoctrineModel;
+use App\Models\Project\ProjectMetaDataElementDoctrineModelFactory;
+use App\Models\Project\ProjectMetaDataElementModelFactory;
 use App\Models\Project\ProjectModel;
 use App\Models\Project\ProjectModelFactory;
 use Test\ModelHelper;
 use Test\ProjectHelper;
 
 /**
- * Class MetaDataProfileElementDoctrineModelFactoryTest
+ * Class ProjectMetaDataElementDoctrineModelFactoryTest
  */
-final class MetaDataElementDoctrineModelFactoryTest extends TestCase
+final class ProjectMetaDataElementDoctrineModelFactoryTest extends TestCase
 {
     use ModelHelper;
     use ProjectHelper;
@@ -470,12 +470,12 @@ final class MetaDataElementDoctrineModelFactoryTest extends TestCase
     /**
      * @param ProjectModelFactory|null $projectModelFactory
      *
-     * @return MetaDataElementDoctrineModelFactory|MetaDataElementModelFactory
+     * @return ProjectMetaDataElementDoctrineModelFactory|ProjectMetaDataElementModelFactory
      */
     private function getMetaDataElementDoctrineModelFactory(
         ProjectModelFactory $projectModelFactory = null
-    ): MetaDataElementDoctrineModelFactory {
-        return (new MetaDataElementDoctrineModelFactory())->setProjectModelFactory(
+    ): ProjectMetaDataElementDoctrineModelFactory {
+        return (new ProjectMetaDataElementDoctrineModelFactory())->setProjectModelFactory(
             $projectModelFactory ?: $this->createProjectModelFactory()
         );
     }
@@ -488,7 +488,7 @@ final class MetaDataElementDoctrineModelFactoryTest extends TestCase
      * @param bool|null         $inList
      * @param int|null          $position
      *
-     * @return MetaDataElementDoctrineModel
+     * @return ProjectMetaDataElementDoctrineModel
      */
     private function createMetaDataElementDoctrineModel(
         string $name = null,
@@ -497,8 +497,8 @@ final class MetaDataElementDoctrineModelFactoryTest extends TestCase
         bool $required = null,
         bool $inList  = null,
         int $position = null
-    ): MetaDataElementDoctrineModel {
-        return new MetaDataElementDoctrineModel(
+    ): ProjectMetaDataElementDoctrineModel {
+        return new ProjectMetaDataElementDoctrineModel(
             $name ?: $this->getFaker()->uuid,
             $label ?: $this->getFaker()->word,
             $project ?: $this->createProjectModel(),

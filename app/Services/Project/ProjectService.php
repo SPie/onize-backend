@@ -7,14 +7,14 @@ use App\Exceptions\ModelNotFoundException;
 use App\Exceptions\Project\MetaDataElementExistsException;
 use App\Exceptions\Project\UserAlreadyMemberException;
 use App\Models\ModelInterface;
-use App\Models\Project\MetaDataElementModel;
-use App\Models\Project\MetaDataElementModelFactory;
+use App\Models\Project\ProjectMetaDataElementModel;
+use App\Models\Project\ProjectMetaDataElementModelFactory;
 use App\Models\Project\ProjectInviteModel;
 use App\Models\Project\ProjectInviteModelFactory;
 use App\Models\Project\ProjectModel;
 use App\Models\Project\ProjectModelFactory;
 use App\Models\User\UserModelInterface;
-use App\Repositories\Project\MetaDataElementRepository;
+use App\Repositories\Project\ProjectMetaDataElementRepository;
 use App\Repositories\Project\ProjectInviteRepository;
 use App\Repositories\Project\ProjectRepository;
 use Illuminate\Support\Collection;
@@ -53,20 +53,20 @@ final class ProjectService implements ProjectServiceInterface
     /**
      * ProjectService constructor.
      *
-     * @param ProjectRepository           $projectRepository
-     * @param ProjectModelFactory         $projectModelFactory
-     * @param ProjectInviteRepository     $projectInviteRepository
-     * @param ProjectInviteModelFactory   $projectInviteModelFactory
-     * @param MetaDataElementRepository   $metaDataElementRepository
-     * @param MetaDataElementModelFactory $metaDataElementModelFactory
+     * @param ProjectRepository                  $projectRepository
+     * @param ProjectModelFactory                $projectModelFactory
+     * @param ProjectInviteRepository            $projectInviteRepository
+     * @param ProjectInviteModelFactory          $projectInviteModelFactory
+     * @param ProjectMetaDataElementRepository   $metaDataElementRepository
+     * @param ProjectMetaDataElementModelFactory $metaDataElementModelFactory
      */
     public function __construct(
         ProjectRepository $projectRepository,
         ProjectModelFactory $projectModelFactory,
         ProjectInviteRepository $projectInviteRepository,
         ProjectInviteModelFactory $projectInviteModelFactory,
-        MetaDataElementRepository $metaDataElementRepository,
-        MetaDataElementModelFactory $metaDataElementModelFactory
+        ProjectMetaDataElementRepository $metaDataElementRepository,
+        ProjectMetaDataElementModelFactory $metaDataElementModelFactory
     ) {
         $this->projectRepository = $projectRepository;
         $this->projectModelFactory = $projectModelFactory;
@@ -109,17 +109,17 @@ final class ProjectService implements ProjectServiceInterface
     }
 
     /**
-     * @return MetaDataElementRepository
+     * @return ProjectMetaDataElementRepository
      */
-    private function getMetaDataElementRepository(): MetaDataElementRepository
+    private function getMetaDataElementRepository(): ProjectMetaDataElementRepository
     {
         return $this->metaDataElementRepository;
     }
 
     /**
-     * @return MetaDataElementModelFactory
+     * @return ProjectMetaDataElementModelFactory
      */
-    private function getMetaDataElementModelFactory(): MetaDataElementModelFactory
+    private function getMetaDataElementModelFactory(): ProjectMetaDataElementModelFactory
     {
         return $this->metaDataElementModelFactory;
     }
@@ -257,7 +257,7 @@ final class ProjectService implements ProjectServiceInterface
      * @param string $uuid
      * @param array  $metaDataElements
      *
-     * @return MetaDataElementModel[]
+     * @return ProjectMetaDataElementModel[]
      */
     public function createMetaDataElements(string $uuid, array $metaDataElements): array
     {
@@ -284,13 +284,13 @@ final class ProjectService implements ProjectServiceInterface
      * @param array        $metaDataElementData
      * @param ProjectModel $project
      *
-     * @return MetaDataElementModel
+     * @return ProjectMetaDataElementModel
      */
-    private function createNewMetaDataElement(array $metaDataElementData, ProjectModel $project): MetaDataElementModel
+    private function createNewMetaDataElement(array $metaDataElementData, ProjectModel $project): ProjectMetaDataElementModel
     {
         return $this->getMetaDataElementRepository()->save(
             $this->getMetaDataElementModelFactory()->create(
-                \array_merge($metaDataElementData, [MetaDataElementModel::PROPERTY_PROJECT => $project])
+                \array_merge($metaDataElementData, [ProjectMetaDataElementModel::PROPERTY_PROJECT => $project])
             ),
             false
         );

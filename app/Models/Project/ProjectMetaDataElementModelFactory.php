@@ -6,11 +6,11 @@ use App\Models\ModelFactoryInterface;
 use App\Models\ModelInterface;
 
 /**
- * Interface MetaDataElementModelFactory
+ * Interface ProjectMetaDataElementModelFactory
  *
  * @package App\Models\Project
  */
-interface MetaDataElementModelFactory extends ModelFactoryInterface
+interface ProjectMetaDataElementModelFactory extends ModelFactoryInterface
 {
     /**
      * @param ProjectModelFactory $projectModelFactory
@@ -22,15 +22,15 @@ interface MetaDataElementModelFactory extends ModelFactoryInterface
     /**
      * @param array $data
      *
-     * @return MetaDataElementModel|ModelInterface
+     * @return ProjectMetaDataElementModel|ModelInterface
      */
     public function create(array $data): ModelInterface;
 
     /**
-     * @param MetaDataElementModel|ModelInterface $model
-     * @param array                               $data
+     * @param ProjectMetaDataElementModel|ModelInterface $model
+     * @param array                                      $data
      *
-     * @return MetaDataElementModel|ModelInterface
+     * @return ProjectMetaDataElementModel|ModelInterface
      */
     public function fill(ModelInterface $model, array $data): ModelInterface;
 }

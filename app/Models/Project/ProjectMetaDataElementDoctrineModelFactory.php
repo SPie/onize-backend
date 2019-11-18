@@ -11,7 +11,7 @@ use App\Models\ModelParameterValidation;
  *
  * @package App\Models\Project
  */
-final class MetaDataElementDoctrineModelFactory implements MetaDataElementModelFactory
+final class ProjectMetaDataElementDoctrineModelFactory implements ProjectMetaDataElementModelFactory
 {
     use ModelParameterValidation;
 
@@ -23,9 +23,9 @@ final class MetaDataElementDoctrineModelFactory implements MetaDataElementModelF
     /**
      * @param ProjectModelFactory $projectModelFactory
      *
-     * @return MetaDataElementModelFactory
+     * @return ProjectMetaDataElementModelFactory
      */
-    public function setProjectModelFactory(ProjectModelFactory $projectModelFactory): MetaDataElementModelFactory
+    public function setProjectModelFactory(ProjectModelFactory $projectModelFactory): ProjectMetaDataElementModelFactory
     {
         $this->projectModelFactory = $projectModelFactory;
 
@@ -43,38 +43,38 @@ final class MetaDataElementDoctrineModelFactory implements MetaDataElementModelF
     /**
      * @param array $data
      *
-     * @return MetaDataElementModel|ModelInterface
+     * @return ProjectMetaDataElementModel|ModelInterface
      *
      * @throws InvalidParameterException
      */
     public function create(array $data): ModelInterface
     {
-        return (new MetaDataElementDoctrineModel(
-            $this->validateStringParameter($data, MetaDataElementModel::PROPERTY_NAME),
-            $this->validateStringParameter($data, MetaDataElementModel::PROPERTY_LABEL),
+        return (new ProjectMetaDataElementDoctrineModel(
+            $this->validateStringParameter($data, ProjectMetaDataElementModel::PROPERTY_NAME),
+            $this->validateStringParameter($data, ProjectMetaDataElementModel::PROPERTY_LABEL),
             $this->validateProjectModel($data),
-            $this->validateBooleanParameter($data, MetaDataElementModel::PROPERTY_REQUIRED),
-            $this->validateBooleanParameter($data, MetaDataElementModel::PROPERTY_IN_LIST),
-            $this->validateIntegerParameter($data, MetaDataElementModel::PROPERTY_POSITION)
-        ))->setId($data[MetaDataElementModel::PROPERTY_ID] ?? null);
+            $this->validateBooleanParameter($data, ProjectMetaDataElementModel::PROPERTY_REQUIRED),
+            $this->validateBooleanParameter($data, ProjectMetaDataElementModel::PROPERTY_IN_LIST),
+            $this->validateIntegerParameter($data, ProjectMetaDataElementModel::PROPERTY_POSITION)
+        ))->setId($data[ProjectMetaDataElementModel::PROPERTY_ID] ?? null);
     }
 
     /**
-     * @param MetaDataElementModel|ModelInterface $model
-     * @param array          $data
+     * @param ProjectMetaDataElementModel|ModelInterface $model
+     * @param array                                      $data
      *
-     * @return MetaDataElementModel|ModelInterface
+     * @return ProjectMetaDataElementModel|ModelInterface
      *
      * @throws InvalidParameterException
      */
     public function fill(ModelInterface $model, array $data): ModelInterface
     {
-        $name = $this->validateStringParameter($data, MetaDataElementModel::PROPERTY_NAME, false);
+        $name = $this->validateStringParameter($data, ProjectMetaDataElementModel::PROPERTY_NAME, false);
         if (!empty($name)) {
             $model->setName($name);
         }
 
-        $label = $this->validateStringParameter($data, MetaDataElementModel::PROPERTY_LABEL, false);
+        $label = $this->validateStringParameter($data, ProjectMetaDataElementModel::PROPERTY_LABEL, false);
         if (!empty($label)) {
             $model->setLabel($label);
         }
@@ -84,22 +84,22 @@ final class MetaDataElementDoctrineModelFactory implements MetaDataElementModelF
             $model->setProject($project);
         }
 
-        $required = $this->validateBooleanParameter($data, MetaDataElementModel::PROPERTY_REQUIRED, false);
+        $required = $this->validateBooleanParameter($data, ProjectMetaDataElementModel::PROPERTY_REQUIRED, false);
         if ($required !== null) {
             $model->setRequired($required);
         }
 
-        $inList = $this->validateBooleanParameter($data, MetaDataElementModel::PROPERTY_IN_LIST, false);
+        $inList = $this->validateBooleanParameter($data, ProjectMetaDataElementModel::PROPERTY_IN_LIST, false);
         if ($inList !== null) {
             $model->setInList($inList);
         }
 
-        $position = $this->validateIntegerParameter($data, MetaDataElementModel::PROPERTY_POSITION, false);
+        $position = $this->validateIntegerParameter($data, ProjectMetaDataElementModel::PROPERTY_POSITION, false);
         if (!empty($position)) {
             $model->setPosition($position);
         }
 
-        $id = $this->validateIntegerParameter($data, MetaDataElementModel::PROPERTY_ID, false);
+        $id = $this->validateIntegerParameter($data, ProjectMetaDataElementModel::PROPERTY_ID, false);
         if (!empty($id)) {
             $model->setId($id);
         }
@@ -119,7 +119,7 @@ final class MetaDataElementDoctrineModelFactory implements MetaDataElementModelF
     {
         return $this->validateModelParameter(
             $data,
-            MetaDataElementModel::PROPERTY_PROJECT,
+            ProjectMetaDataElementModel::PROPERTY_PROJECT,
             $this->getProjectModelFactory(),
             ProjectModel::class,
             $required

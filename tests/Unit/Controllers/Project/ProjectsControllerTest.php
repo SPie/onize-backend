@@ -365,7 +365,7 @@ final class ProjectsControllerTest extends TestCase
                 ]
             ]
         );
-        $metaDataElement = $this->createMetaDataElementModel();
+        $metaDataElement = $this->createProjectMetaDataElementModel();
         $projectService = $this->createProjectService();
         $this->mockProjectServiceCreateMetaDataElements(
             $projectService,

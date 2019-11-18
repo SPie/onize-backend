@@ -67,25 +67,25 @@ class ProjectDoctrineModel extends AbstractDoctrineModel implements ProjectModel
     private $members;
 
     /**
-     * @ORM\OneToMany(targetEntity="App\Models\Project\MetaDataElementDoctrineModel", mappedBy="project", cascade={"persist"})
+     * @ORM\OneToMany(targetEntity="App\Models\Project\ProjectMetaDataElementDoctrineModel", mappedBy="project", cascade={"persist"})
      *
-     * @var ArrayCollection|MetaDataElementModel[]
+     * @var ArrayCollection|ProjectMetaDataElementModel[]
      */
-    private $metaDataElements;
+    private $projectMetaDataElements;
 
     /**
      * ProjectDoctrineModel constructor.
      *
-     * @param string                 $uuid
-     * @param string                 $label
-     * @param UserModelInterface     $user
-     * @param string|null            $description
-     * @param \DateTime|null         $createdAt
-     * @param \DateTime|null         $updatedAt
-     * @param \DateTime|null         $deletedAt
-     * @param ProjectInviteModel[]   $projectInvites
-     * @param UserModelInterface[]   $members
-     * @param MetaDataElementModel[] $metaDataElements
+     * @param string                        $uuid
+     * @param string                        $label
+     * @param UserModelInterface            $user
+     * @param string|null                   $description
+     * @param \DateTime|null                $createdAt
+     * @param \DateTime|null                $updatedAt
+     * @param \DateTime|null                $deletedAt
+     * @param ProjectInviteModel[]          $projectInvites
+     * @param UserModelInterface[]          $members
+     * @param ProjectMetaDataElementModel[] $metaDataElements
      */
     public function __construct(
         string $uuid,
@@ -108,7 +108,7 @@ class ProjectDoctrineModel extends AbstractDoctrineModel implements ProjectModel
         $this->deletedAt = $deletedAt;
         $this->projectInvites = new ArrayCollection($projectInvites);
         $this->members = new ArrayCollection($members);
-        $this->metaDataElements = new ArrayCollection($metaDataElements);
+        $this->projectMetaDataElements = new ArrayCollection($metaDataElements);
     }
 
     /**
@@ -252,37 +252,37 @@ class ProjectDoctrineModel extends AbstractDoctrineModel implements ProjectModel
     }
 
     /**
-     * @param MetaDataElementModel[] $metaDataElements
+     * @param ProjectMetaDataElementModel[] $projectMetaDataElements
      *
      * @return ProjectModel
      */
-    public function setMetaDataElements(array $metaDataElements): ProjectModel
+    public function setProjectMetaDataElements(array $projectMetaDataElements): ProjectModel
     {
-        $this->metaDataElements = new ArrayCollection($metaDataElements);
+        $this->projectMetaDataElements = new ArrayCollection($projectMetaDataElements);
 
         return $this;
     }
 
     /**
-     * @param MetaDataElementModel $metaDataElement
+     * @param ProjectMetaDataElementModel $metaDataElement
      *
      * @return ProjectModel
      */
-    public function addMetaDataElement(MetaDataElementModel $metaDataElement): ProjectModel
+    public function addMetaDataElement(ProjectMetaDataElementModel $metaDataElement): ProjectModel
     {
-        if (!$this->metaDataElements->contains($metaDataElement)) {
-            $this->metaDataElements->add($metaDataElement);
+        if (!$this->projectMetaDataElements->contains($metaDataElement)) {
+            $this->projectMetaDataElements->add($metaDataElement);
         }
 
         return $this;
     }
 
     /**
-     * @return MetaDataElementModel[]|Collection
+     * @return ProjectMetaDataElementModel[]|Collection
      */
-    public function getMetaDataElements(): Collection
+    public function getProjectMetaDataElements(): Collection
     {
-        return new Collection($this->metaDataElements->toArray());
+        return new Collection($this->projectMetaDataElements->toArray());
     }
 
     /**
@@ -322,8 +322,8 @@ class ProjectDoctrineModel extends AbstractDoctrineModel implements ProjectModel
                     return $user->toArray($depth);
                 })
                 ->all();
-            $array[self::PROPERTY_META_DATA_ELEMENTS] = $this->getMetaDataElements()
-                ->map(function (MetaDataElementModel $metaDataElement) use ($depth) {
+            $array[self::PROPERTY_PROJECT_META_DATA_ELEMENTS] = $this->getProjectMetaDataElements()
+                ->map(function (ProjectMetaDataElementModel $metaDataElement) use ($depth) {
                     return $metaDataElement->toArray($depth);
                 })
                 ->all();

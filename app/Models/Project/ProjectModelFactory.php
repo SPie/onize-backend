@@ -28,11 +28,11 @@ interface ProjectModelFactory extends ModelFactoryInterface
     public function setProjectInviteModelFactory(ProjectInviteModelFactory $projectInviteModelFactory): self;
 
     /**
-     * @param MetaDataElementModelFactory $metaDataElementModelFactory
+     * @param ProjectMetaDataElementModelFactory $metaDataElementModelFactory
      *
      * @return $this
      */
-    public function setMetaDataElementModelFactory(MetaDataElementModelFactory $metaDataElementModelFactory): self;
+    public function setProjectMetaDataElementModelFactory(ProjectMetaDataElementModelFactory $metaDataElementModelFactory): self;
 
     /**
      * @param array $data

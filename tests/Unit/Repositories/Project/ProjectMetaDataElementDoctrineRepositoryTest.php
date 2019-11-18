@@ -1,14 +1,14 @@
 <?php
 
 use App\Repositories\DatabaseHandler;
-use App\Repositories\Project\MetaDataElementDoctrineRepository;
+use App\Repositories\Project\ProjectMetaDataElementDoctrineRepository;
 use Test\ModelHelper;
 use Test\ProjectHelper;
 
 /**
- * Class MetaDataElementDoctrineRepositoryTest
+ * Class ProjectMetaDataElementDoctrineRepositoryTest
  */
-final class MetaDataElementDoctrineRepositoryTest extends TestCase
+final class ProjectMetaDataElementDoctrineRepositoryTest extends TestCase
 {
     use ModelHelper;
     use ProjectHelper;
@@ -23,12 +23,12 @@ final class MetaDataElementDoctrineRepositoryTest extends TestCase
         $name = $this->getFaker()->uuid;
         $project = $this->createProjectModel();
         $databaseHandler = $this->createDatabaseHandler();
-        $metaDataElement = $this->createMetaDataElementModel();
+        $metaDataElement = $this->createProjectMetaDataElementModel();
         $this->mockDatabaseHandlerLoad($databaseHandler, $metaDataElement, ['name' => $name, 'project' => $project]);
 
         $this->assertEquals(
             $metaDataElement,
-            $this->getMetaDataElementDoctrineRepository($databaseHandler)->findByNameAndProject($name, $project)
+            $this->getProjectMetaDataElementDoctrineRepository($databaseHandler)->findByNameAndProject($name, $project)
         );
     }
 
@@ -43,15 +43,20 @@ final class MetaDataElementDoctrineRepositoryTest extends TestCase
         $this->mockDatabaseHandlerLoad($databaseHandler, null, ['name' => $name, 'project' => $project]);
 
         $this->assertNull(
-            $this->getMetaDataElementDoctrineRepository($databaseHandler)->findByNameAndProject($name, $project)
+            $this->getProjectMetaDataElementDoctrineRepository($databaseHandler)->findByNameAndProject($name, $project)
         );
     }
 
     //endregion
 
-    private function getMetaDataElementDoctrineRepository(
+    /**
+     * @param DatabaseHandler|null $databaseHandler
+     *
+     * @return ProjectMetaDataElementDoctrineRepository
+     */
+    private function getProjectMetaDataElementDoctrineRepository(
         DatabaseHandler $databaseHandler = null
-    ): MetaDataElementDoctrineRepository {
-        return new MetaDataElementDoctrineRepository($databaseHandler ?: $this->createDatabaseHandler());
+    ): ProjectMetaDataElementDoctrineRepository {
+        return new ProjectMetaDataElementDoctrineRepository($databaseHandler ?: $this->createDatabaseHandler());
     }
 }

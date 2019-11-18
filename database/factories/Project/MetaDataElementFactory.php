@@ -1,7 +1,7 @@
 <?php
 
-use App\Models\Project\MetaDataElementDoctrineModel;
-use App\Models\Project\MetaDataElementModel;
+use App\Models\Project\ProjectMetaDataElementDoctrineModel;
+use App\Models\Project\ProjectMetaDataElementModel;
 use App\Models\Project\ProjectDoctrineModel;
 use Faker\Generator as Faker;
 use LaravelDoctrine\ORM\Testing\Factory;
@@ -10,13 +10,13 @@ use LaravelDoctrine\ORM\Testing\Factory;
  * @var Factory $factory
  */
 
-$factory->define(MetaDataElementDoctrineModel::class, function (Faker $faker, array $attributes = []) {
+$factory->define(ProjectMetaDataElementDoctrineModel::class, function (Faker $faker, array $attributes = []) {
     return [
-        MetaDataElementModel::PROPERTY_NAME => $attributes[MetaDataElementModel::PROPERTY_NAME] ?? $faker->uuid,
-        MetaDataElementModel::PROPERTY_LABEL => $attributes[MetaDataElementModel::PROPERTY_LABEL] ?? $faker->word,
-        MetaDataElementModel::PROPERTY_PROJECT => $attributes[MetaDataElementModel::PROPERTY_PROJECT] ?? entity(ProjectDoctrineModel::class, 1)->create(),
-        MetaDataElementModel::PROPERTY_REQUIRED => $attributes[MetaDataElementModel::PROPERTY_REQUIRED] ?? $faker->boolean,
-        MetaDataElementModel::PROPERTY_IN_LIST => $attributes[MetaDataElementModel::PROPERTY_IN_LIST] ?? $faker->boolean,
-        MetaDataElementModel::PROPERTY_POSITION => $attributes[MetaDataElementModel::PROPERTY_POSITION] ?? $faker->numberBetween(),
+        ProjectMetaDataElementModel::PROPERTY_NAME     => $attributes[ProjectMetaDataElementModel::PROPERTY_NAME] ?? $faker->uuid,
+        ProjectMetaDataElementModel::PROPERTY_LABEL    => $attributes[ProjectMetaDataElementModel::PROPERTY_LABEL] ?? $faker->word,
+        ProjectMetaDataElementModel::PROPERTY_PROJECT  => $attributes[ProjectMetaDataElementModel::PROPERTY_PROJECT] ?? entity(ProjectDoctrineModel::class, 1)->create(),
+        ProjectMetaDataElementModel::PROPERTY_REQUIRED => $attributes[ProjectMetaDataElementModel::PROPERTY_REQUIRED] ?? $faker->boolean,
+        ProjectMetaDataElementModel::PROPERTY_IN_LIST  => $attributes[ProjectMetaDataElementModel::PROPERTY_IN_LIST] ?? $faker->boolean,
+        ProjectMetaDataElementModel::PROPERTY_POSITION => $attributes[ProjectMetaDataElementModel::PROPERTY_POSITION] ?? $faker->numberBetween(),
     ];
 });

@@ -31,7 +31,7 @@ final class ProjectDoctrineModelFactory implements ProjectModelFactory
     private $projectInviteModelFactory;
 
     /**
-     * @var MetaDataElementModelFactory
+     * @var ProjectMetaDataElementModelFactory
      */
     private $metaDataElementModelFactory;
 
@@ -86,12 +86,12 @@ final class ProjectDoctrineModelFactory implements ProjectModelFactory
     }
 
     /**
-     * @param MetaDataElementModelFactory $metaDataElementModelFactory
+     * @param ProjectMetaDataElementModelFactory $metaDataElementModelFactory
      *
      * @return ProjectModelFactory
      */
-    public function setMetaDataElementModelFactory(
-        MetaDataElementModelFactory $metaDataElementModelFactory
+    public function setProjectMetaDataElementModelFactory(
+        ProjectMetaDataElementModelFactory $metaDataElementModelFactory
     ): ProjectModelFactory {
         $this->metaDataElementModelFactory = $metaDataElementModelFactory;
 
@@ -99,9 +99,9 @@ final class ProjectDoctrineModelFactory implements ProjectModelFactory
     }
 
     /**
-     * @return MetaDataElementModelFactory
+     * @return ProjectMetaDataElementModelFactory
      */
-    private function getMetaDataElementModelFactory(): MetaDataElementModelFactory
+    private function getMetaDataElementModelFactory(): ProjectMetaDataElementModelFactory
     {
         return $this->metaDataElementModelFactory;
     }
@@ -182,7 +182,7 @@ final class ProjectDoctrineModelFactory implements ProjectModelFactory
 
         $metaDataElements = $this->validateMetaDataElements($data);
         if (!empty($metaDataElements)) {
-            $model->setMetaDataElements($metaDataElements);
+            $model->setProjectMetaDataElements($metaDataElements);
         }
 
         $id = $this->validateIntegerParameter($data, ProjectModel::PROPERTY_ID, false);
@@ -283,7 +283,7 @@ final class ProjectDoctrineModelFactory implements ProjectModelFactory
     /**
      * @param array $data
      *
-     * @return MetaDataElementModel[]
+     * @return ProjectMetaDataElementModel[]
      *
      * @throws InvalidParameterException
      */
@@ -291,7 +291,7 @@ final class ProjectDoctrineModelFactory implements ProjectModelFactory
     {
         $metaDataElements = $this->validateArrayParameter(
             $data,
-            ProjectModel::PROPERTY_META_DATA_ELEMENTS,
+            ProjectModel::PROPERTY_PROJECT_META_DATA_ELEMENTS,
             false,
             true
         );
@@ -299,7 +299,7 @@ final class ProjectDoctrineModelFactory implements ProjectModelFactory
         return \is_array($metaDataElements)
             ? \array_map(
                 function ($metaDataElement) {
-                    if ($metaDataElement instanceof MetaDataElementModel) {
+                    if ($metaDataElement instanceof ProjectMetaDataElementModel) {
                         return $metaDataElement;
                     }
 

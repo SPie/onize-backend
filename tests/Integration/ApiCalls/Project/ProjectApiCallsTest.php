@@ -1,7 +1,7 @@
 <?php
 
 use App\Models\Project\ProjectModel;
-use App\Repositories\Project\MetaDataElementRepository;
+use App\Repositories\Project\ProjectMetaDataElementRepository;
 use App\Repositories\Project\ProjectInviteRepository;
 use App\Repositories\Project\ProjectRepository;
 use App\Repositories\User\UserRepository;
@@ -857,7 +857,7 @@ final class ProjectApiCallsTest extends IntegrationTestCase
     {
         $user = $this->createUsers()->first();
         $project = $this->createProjects(1, ['user' => $user])->first();
-        $metaDataElement = $this->createMetaDataElements(1, ['project' => $project])->first();
+        $metaDataElement = $this->createProjectMetaDataElements(1, ['project' => $project])->first();
         $this->clearModelCache();
 
         $response = $this->doApiCall(
@@ -972,11 +972,11 @@ final class ProjectApiCallsTest extends IntegrationTestCase
     }
 
     /**
-     * @return MetaDataElementRepository
+     * @return ProjectMetaDataElementRepository
      */
-    private function getMetaDataElementsRepository(): MetaDataElementRepository
+    private function getMetaDataElementsRepository(): ProjectMetaDataElementRepository
     {
-        return $this->app->get(MetaDataElementRepository::class);
+        return $this->app->get(ProjectMetaDataElementRepository::class);
     }
 
     /**

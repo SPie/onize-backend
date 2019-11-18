@@ -31,7 +31,7 @@ final class ProjectDoctrineModelTest extends TestCase
         $member
             ->shouldReceive('toArray')
             ->andReturn([$this->getFaker()->uuid => $this->getFaker()->word]);
-        $metaDataElement = $this->createMetaDataElementModel();
+        $metaDataElement = $this->createProjectMetaDataElementModel();
         $metaDataElement
             ->shouldReceive('toArray')
             ->andReturn([$this->getFaker()->uuid => $this->getFaker()->word]);
@@ -50,16 +50,16 @@ final class ProjectDoctrineModelTest extends TestCase
 
         $this->assertEquals(
             [
-                'uuid'             => $project->getUuid(),
-                'label'            => $project->getLabel(),
-                'user'             => $project->getUser()->toArray(),
-                'description'      => $project->getDescription(),
-                'createdAt'        => (array)$project->getCreatedAt(),
-                'updatedAt'        => (array)$project->getUpdatedAt(),
-                'deletedAt'        => (array)$project->getDeletedAt(),
-                'projectInvites'   => [$projectInvite->toArray()],
-                'members'          => [$member->toArray()],
-                'metaDataElements' => [$metaDataElement->toArray()],
+                'uuid'                    => $project->getUuid(),
+                'label'                   => $project->getLabel(),
+                'user'                    => $project->getUser()->toArray(),
+                'description'             => $project->getDescription(),
+                'createdAt'               => (array)$project->getCreatedAt(),
+                'updatedAt'               => (array)$project->getUpdatedAt(),
+                'deletedAt'               => (array)$project->getDeletedAt(),
+                'projectInvites'          => [$projectInvite->toArray()],
+                'members'                 => [$member->toArray()],
+                'projectMetaDataElements' => [$metaDataElement->toArray()],
             ],
             $project->toArray()
         );
@@ -82,16 +82,16 @@ final class ProjectDoctrineModelTest extends TestCase
 
         $this->assertEquals(
             [
-                'uuid'             => $project->getUuid(),
-                'label'            => $project->getLabel(),
-                'user'             => $project->getUser()->toArray(),
-                'description'      => null,
-                'createdAt'        => null,
-                'updatedAt'        => null,
-                'deletedAt'        => null,
-                'projectInvites'   => [],
-                'members'          => [],
-                'metaDataElements' => [],
+                'uuid'                    => $project->getUuid(),
+                'label'                   => $project->getLabel(),
+                'user'                    => $project->getUser()->toArray(),
+                'description'             => null,
+                'createdAt'               => null,
+                'updatedAt'               => null,
+                'deletedAt'               => null,
+                'projectInvites'          => [],
+                'members'                 => [],
+                'projectMetaDataElements' => [],
             ],
             $project->toArray()
         );

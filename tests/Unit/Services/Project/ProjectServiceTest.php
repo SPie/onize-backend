@@ -5,13 +5,13 @@ use App\Exceptions\InvalidParameterException;
 use App\Exceptions\ModelNotFoundException;
 use App\Exceptions\Project\MetaDataElementExistsException;
 use App\Exceptions\Project\UserAlreadyMemberException;
-use App\Models\Project\MetaDataElementModelFactory;
+use App\Models\Project\ProjectMetaDataElementModelFactory;
 use App\Models\Project\ProjectInviteModel;
 use App\Models\Project\ProjectInviteModelFactory;
 use App\Models\Project\ProjectModel;
 use App\Models\Project\ProjectModelFactory;
 use App\Models\User\UserModelInterface;
-use App\Repositories\Project\MetaDataElementRepository;
+use App\Repositories\Project\ProjectMetaDataElementRepository;
 use App\Repositories\Project\ProjectInviteRepository;
 use App\Repositories\Project\ProjectRepository;
 use App\Services\Project\ProjectService;
@@ -317,10 +317,10 @@ final class ProjectServiceTest extends TestCase
             'position' => $this->getFaker()->numberBetween(),
         ];
         $project = $this->createProjectModel();
-        $metaDataElement = $this->createMetaDataElementModel();
+        $metaDataElement = $this->createProjectMetaDataElementModel();
         $projectRepository = $this->createProjectRepository();
-        $metaDataElementModelFactory = $this->createMetaDataElementModelFactory();
-        $metaDataElementRepository = $this->createMetaDataElementRepository();
+        $metaDataElementModelFactory = $this->createProjectMetaDataElementModelFactory();
+        $metaDataElementRepository = $this->createProjectMetaDataElementRepository();
         $this
             ->mockProjectRepositoryFindByUuid($projectRepository, $project, $uuid)
             ->mockModelFactoryCreate(
@@ -381,7 +381,7 @@ final class ProjectServiceTest extends TestCase
         ];
         $project = $this->createProjectModel();
         $projectRepository = $this->createProjectRepository();
-        $metaDataElementModelFactory = $this->createMetaDataElementModelFactory();
+        $metaDataElementModelFactory = $this->createProjectMetaDataElementModelFactory();
         $this
             ->mockProjectRepositoryFindByUuid($projectRepository, $project, $uuid)
             ->mockModelFactoryCreate(
@@ -414,12 +414,12 @@ final class ProjectServiceTest extends TestCase
         ];
         $project = $this->createProjectModel();
         $projectRepository = $this->createProjectRepository();
-        $metaDataElementRepository = $this->createMetaDataElementRepository();
+        $metaDataElementRepository = $this->createProjectMetaDataElementRepository();
         $this
             ->mockProjectRepositoryFindByUuid($projectRepository, $project, $uuid)
-            ->mockMetaDataElementRepositoryFindByNameAndProject(
+            ->mockProjectMetaDataElementRepositoryFindByNameAndProject(
                 $metaDataElementRepository,
-                $this->createMetaDataElementModel(),
+                $this->createProjectMetaDataElementModel(),
                 $metaDataElementData['name'],
                 $project
             );
@@ -437,12 +437,12 @@ final class ProjectServiceTest extends TestCase
     //endregion
 
     /**
-     * @param ProjectRepository|null           $projectRepository
-     * @param ProjectModelFactory|null         $projectModelFactory
-     * @param ProjectInviteRepository|null     $projectInviteRepository
-     * @param ProjectInviteModelFactory|null   $projectInviteModelFactory
-     * @param MetaDataElementRepository|null   $metaDataElementRepository
-     * @param MetaDataElementModelFactory|null $metaDataElementModelFactory
+     * @param ProjectRepository|null                  $projectRepository
+     * @param ProjectModelFactory|null                $projectModelFactory
+     * @param ProjectInviteRepository|null            $projectInviteRepository
+     * @param ProjectInviteModelFactory|null          $projectInviteModelFactory
+     * @param ProjectMetaDataElementRepository|null   $metaDataElementRepository
+     * @param ProjectMetaDataElementModelFactory|null $metaDataElementModelFactory
      *
      * @return ProjectService
      */
@@ -451,38 +451,38 @@ final class ProjectServiceTest extends TestCase
         ProjectModelFactory $projectModelFactory = null,
         ProjectInviteRepository $projectInviteRepository = null,
         ProjectInviteModelFactory $projectInviteModelFactory = null,
-        MetaDataElementRepository $metaDataElementRepository = null,
-        MetaDataElementModelFactory $metaDataElementModelFactory = null
+        ProjectMetaDataElementRepository $metaDataElementRepository = null,
+        ProjectMetaDataElementModelFactory $metaDataElementModelFactory = null
     ): ProjectService {
         return new ProjectService(
             $projectRepository ?: $this->createProjectRepository(),
             $projectModelFactory ?: $this->createProjectModelFactory(),
             $projectInviteRepository ?: $this->createProjectInviteRepository(),
             $projectInviteModelFactory ?: $this->createProjectInviteModelFactory(),
-            $metaDataElementRepository ?: $this->createMetaDataElementRepository(),
-            $metaDataElementModelFactory ?: $this->createMetaDataElementModelFactory()
+            $metaDataElementRepository ?: $this->createProjectMetaDataElementRepository(),
+            $metaDataElementModelFactory ?: $this->createProjectMetaDataElementModelFactory()
         );
     }
 
     /**
-     * @param ProjectRepository|null           $projectRepository
-     * @param MetaDataElementRepository|null   $metaDataElementRepository
-     * @param MetaDataElementModelFactory|null $metaDataElementModelFactory
+     * @param ProjectRepository|null                  $projectRepository
+     * @param ProjectMetaDataElementRepository|null   $metaDataElementRepository
+     * @param ProjectMetaDataElementModelFactory|null $metaDataElementModelFactory
      *
      * @return ProjectService
      */
     private function getProjectServiceForCreateMetaDataElements(
         ProjectRepository $projectRepository = null,
-        MetaDataElementRepository $metaDataElementRepository = null,
-        MetaDataElementModelFactory $metaDataElementModelFactory = null
+        ProjectMetaDataElementRepository $metaDataElementRepository = null,
+        ProjectMetaDataElementModelFactory $metaDataElementModelFactory = null
     ): ProjectService {
         return new ProjectService(
             $projectRepository ?: $this->createProjectRepository(),
             $this->createProjectModelFactory(),
             $this->createProjectInviteRepository(),
             $this->createProjectInviteModelFactory(),
-            $metaDataElementRepository ?: $this->createMetaDataElementRepository(),
-            $metaDataElementModelFactory ?: $this->createMetaDataElementModelFactory()
+            $metaDataElementRepository ?: $this->createProjectMetaDataElementRepository(),
+            $metaDataElementModelFactory ?: $this->createProjectMetaDataElementModelFactory()
         );
     }
 
