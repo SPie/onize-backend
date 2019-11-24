@@ -71,6 +71,38 @@ trait ModelParameterValidation
     /**
      * @param array  $data
      * @param string $parameterName
+     * @param array  $possibleValues
+     * @param bool   $required
+     *
+     * @return string|null
+     *
+     * @throws InvalidParameterException
+     */
+    private function validateEnumParameter(
+        array $data,
+        string $parameterName,
+        array $possibleValues,
+        bool $required = true
+    ): ?string {
+        $parameter = $this->validateEmptyParameter($data, $parameterName, $required);
+
+        if (\is_null($parameter)) {
+            return $parameter;
+        }
+
+        if (!\in_array($parameter, $possibleValues)) {
+            throw new InvalidParameterException(
+                'Parameter ' . $parameterName . ' has to be one of these values: '
+                    . \implode(", ", $possibleValues)
+            );
+        }
+
+        return $parameter;
+    }
+
+    /**
+     * @param array  $data
+     * @param string $parameterName
      * @param bool   $required
      *
      * @return null|string

@@ -13,7 +13,7 @@ use Doctrine\ORM\Mapping as ORM;
  *
  * @package App\Models\Project
  */
-final class ProjectMetaDataElementDoctrineModel extends AbstractDoctrineModel implements ProjectMetaDataElementModel
+class ProjectMetaDataElementDoctrineModel extends AbstractDoctrineModel implements ProjectMetaDataElementModel
 {
     /**
      * @ORM\Column(name="name", type="string", length=255, nullable=false)
@@ -58,6 +58,13 @@ final class ProjectMetaDataElementDoctrineModel extends AbstractDoctrineModel im
     private $position;
 
     /**
+     * @ORM\Column(name="field_type", type="string", length=255, nullable=false, columnDefinition="ENUM('text', 'number', 'date', 'email')")
+     *
+     * @var string
+     */
+    private $fieldType;
+
+    /**
      * MetaDataElementDoctrineModel constructor.
      *
      * @param string       $name
@@ -66,6 +73,7 @@ final class ProjectMetaDataElementDoctrineModel extends AbstractDoctrineModel im
      * @param bool         $required
      * @param bool         $inList
      * @param int          $position
+     * @param string       $fieldType
      */
     public function __construct(
         string $name,
@@ -73,7 +81,8 @@ final class ProjectMetaDataElementDoctrineModel extends AbstractDoctrineModel im
         ProjectModel $project,
         bool $required,
         bool $inList,
-        int $position
+        int $position,
+        string $fieldType
     ) {
         $this->name = $name;
         $this->label = $label;
@@ -81,6 +90,7 @@ final class ProjectMetaDataElementDoctrineModel extends AbstractDoctrineModel im
         $this->required = $required;
         $this->inList = $inList;
         $this->position = $position;
+        $this->fieldType = $fieldType;
     }
 
     /**
@@ -204,6 +214,26 @@ final class ProjectMetaDataElementDoctrineModel extends AbstractDoctrineModel im
     }
 
     /**
+     * @param string $fieldType
+     *
+     * @return ProjectMetaDataElementModel
+     */
+    public function setFieldType(string $fieldType): ProjectMetaDataElementModel
+    {
+        $this->fieldType = $fieldType;
+
+        return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function getFieldType(): string
+    {
+        return $this->fieldType;
+    }
+
+    /**
      * @param int $depth
      *
      * @return array
@@ -211,11 +241,12 @@ final class ProjectMetaDataElementDoctrineModel extends AbstractDoctrineModel im
     public function toArray(int $depth = 1): array
     {
         $array = [
-            self::PROPERTY_NAME     => $this->getName(),
-            self::PROPERTY_LABEL    => $this->getLabel(),
-            self::PROPERTY_REQUIRED => $this->isRequired(),
-            self::PROPERTY_IN_LIST  => $this->isInList(),
-            self::PROPERTY_POSITION => $this->getPosition(),
+            self::PROPERTY_NAME       => $this->getName(),
+            self::PROPERTY_LABEL      => $this->getLabel(),
+            self::PROPERTY_REQUIRED   => $this->isRequired(),
+            self::PROPERTY_IN_LIST    => $this->isInList(),
+            self::PROPERTY_POSITION   => $this->getPosition(),
+            self::PROPERTY_FIELD_TYPE => $this->getFieldType(),
         ];
 
         if ($depth > 0) {

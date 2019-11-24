@@ -39,8 +39,7 @@ class Version00000000000000 extends AbstractMigration
      */
     private function createUsersTable(Schema $schema): self
     {
-        (new Builder($schema))->create(
-            'users', function (Table $table) {
+        (new Builder($schema))->create('users', function (Table $table) {
             $table->increments('id');
             $table->string('uuid');
             $table->unique('uuid');
@@ -49,8 +48,7 @@ class Version00000000000000 extends AbstractMigration
             $table->string('password');
             $table->timestamps();
             $table->softDeletes();
-        }
-        );
+        });
 
         return $this;
     }
@@ -62,8 +60,7 @@ class Version00000000000000 extends AbstractMigration
      */
     private function createRefreshTokensTable(Schema $schema): self
     {
-        (new Builder($schema))->create(
-            'refresh_tokens', function (Table $table) {
+        (new Builder($schema))->create('refresh_tokens', function (Table $table) {
             $table->increments('id');
             $table->string('identifier');
             $table->unique('identifier');
@@ -72,8 +69,7 @@ class Version00000000000000 extends AbstractMigration
             $table->foreign('users', 'user_id', 'id');
             $table->timestamps();
             $table->index('valid_until');
-        }
-        );
+        });
 
         return $this;
     }
@@ -85,15 +81,13 @@ class Version00000000000000 extends AbstractMigration
      */
     private function createLoginAttemptsTable(Schema $schema): self
     {
-        (new Builder($schema))->create(
-            'login_attempts', function (Table $table) {
+        (new Builder($schema))->create('login_attempts', function (Table $table) {
             $table->increments('id');
             $table->string('ip_address');
             $table->string('identifier');
             $table->dateTime('attempted_at');
             $table->boolean('success');
-        }
-        );
+        });
 
         return $this;
     }
@@ -105,8 +99,7 @@ class Version00000000000000 extends AbstractMigration
      */
     private function createProjectsTable(Schema $schema): self
     {
-        (new Builder($schema))->create(
-            'projects', function (Table $table) {
+        (new Builder($schema))->create('projects', function (Table $table) {
             $table->increments('id');
             $table->string('uuid');
             $table->unique('uuid');
@@ -116,8 +109,7 @@ class Version00000000000000 extends AbstractMigration
             $table->foreign('users', 'user_id', 'id');
             $table->timestamps();
             $table->softDeletes();
-        }
-        );
+        });
 
         return $this;
     }
@@ -129,8 +121,7 @@ class Version00000000000000 extends AbstractMigration
      */
     private function createProjectInvitesTable(Schema $schema): self
     {
-        (new Builder($schema))->create(
-            'project_invites', function (Table $table) {
+        (new Builder($schema))->create('project_invites', function (Table $table) {
             $table->increments('id');
             $table->string('uuid');
             $table->unique('uuid');
@@ -141,8 +132,7 @@ class Version00000000000000 extends AbstractMigration
             $table->foreign('projects', 'project_id', 'id');
             $table->unique(['email', 'project_id']);
             $table->timestamps();
-        }
-        );
+        });
 
         return $this;
     }
@@ -154,16 +144,14 @@ class Version00000000000000 extends AbstractMigration
      */
     private function createProjectMembersTable(Schema $schema): self
     {
-        (new Builder($schema))->create(
-            'project_members', function (Table $table) {
+        (new Builder($schema))->create('project_members', function (Table $table) {
             $table->increments('id');
             $table->integer('user_id', false, true);
             $table->foreign('users', 'user_id', 'id');
             $table->integer('project_id', false, true);
             $table->foreign('projects', 'project_id', 'id');
             $table->unique(['user_id', 'project_id']);
-        }
-        );
+        });
 
         return $this;
     }
@@ -175,8 +163,7 @@ class Version00000000000000 extends AbstractMigration
      */
     private function createProjectMetaDataElements(Schema $schema): self
     {
-        (new Builder($schema))->create(
-            'project_meta_data_elements', function (Table $table) {
+        (new Builder($schema))->create('project_meta_data_elements', function (Table $table) {
             $table->increments('id');
             $table->string('name');
             $table->string('label');
@@ -185,9 +172,9 @@ class Version00000000000000 extends AbstractMigration
             $table->boolean('required');
             $table->boolean('in_list');
             $table->smallInteger('position');
+            $table->string('field_type');
             $table->unique(['project_id', 'name']);
-        }
-        );
+        });
 
         return $this;
     }

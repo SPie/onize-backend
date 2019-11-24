@@ -33,6 +33,7 @@ final class ProjectMetaDataElementDoctrineModelTest extends TestCase
         $this->assertEquals($metaDataElement->isRequired(), $metaDataElementArray['required']);
         $this->assertEquals($metaDataElement->isInList(), $metaDataElementArray['inList']);
         $this->assertEquals($metaDataElement->getPosition(), $metaDataElementArray['position']);
+        $this->assertEquals($metaDataElement->getFieldType(), $metaDataElementArray['fieldType']);
     }
 
     /**
@@ -49,6 +50,7 @@ final class ProjectMetaDataElementDoctrineModelTest extends TestCase
         $this->assertEquals($metaDataElement->isRequired(), $metaDataElementArray['required']);
         $this->assertEquals($metaDataElement->isInList(), $metaDataElementArray['inList']);
         $this->assertEquals($metaDataElement->getPosition(), $metaDataElementArray['position']);
+        $this->assertEquals($metaDataElement->getFieldType(), $metaDataElementArray['fieldType']);
         $this->assertArrayNotHasKey('project', $metaDataElementArray);
     }
 
@@ -61,6 +63,7 @@ final class ProjectMetaDataElementDoctrineModelTest extends TestCase
      * @param bool              $required
      * @param bool              $inList
      * @param int|null          $position
+     * @param string|null       $fieldType
      * @param int|null          $id
      *
      * @return ProjectMetaDataElementDoctrineModel
@@ -72,6 +75,7 @@ final class ProjectMetaDataElementDoctrineModelTest extends TestCase
         bool $required = null,
         bool $inList = null,
         int $position = null,
+        string $fieldType = null,
         int $id = null
     ): ProjectMetaDataElementDoctrineModel {
         return (new ProjectMetaDataElementDoctrineModel(
@@ -80,7 +84,8 @@ final class ProjectMetaDataElementDoctrineModelTest extends TestCase
             $projectModel ?: $this->createProjectModel(),
             ($required !== null) ? $required : $this->getFaker()->boolean,
             ($inList !== null) ? $inList : $this->getFaker()->boolean,
-            $position ?: $this->getFaker()->numberBetween()
+            $position ?: $this->getFaker()->numberBetween(),
+            $fieldType ?: 'text'
         ))->setId($id ?: $this->getFaker()->numberBetween());
     }
 }

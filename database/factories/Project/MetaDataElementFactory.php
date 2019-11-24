@@ -18,5 +18,6 @@ $factory->define(ProjectMetaDataElementDoctrineModel::class, function (Faker $fa
         ProjectMetaDataElementModel::PROPERTY_REQUIRED => $attributes[ProjectMetaDataElementModel::PROPERTY_REQUIRED] ?? $faker->boolean,
         ProjectMetaDataElementModel::PROPERTY_IN_LIST  => $attributes[ProjectMetaDataElementModel::PROPERTY_IN_LIST] ?? $faker->boolean,
         ProjectMetaDataElementModel::PROPERTY_POSITION => $attributes[ProjectMetaDataElementModel::PROPERTY_POSITION] ?? $faker->numberBetween(),
+        ProjectMetaDataElementModel::PROPERTY_FIELD_TYPE => $attributes[ProjectMetaDataElementModel::PROPERTY_FIELD_TYPE] ?? ProjectMetaDataElementModel::FIELD_TYPE_TEXT,
     ];
 });

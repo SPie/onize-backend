@@ -55,7 +55,17 @@ final class ProjectMetaDataElementDoctrineModelFactory implements ProjectMetaDat
             $this->validateProjectModel($data),
             $this->validateBooleanParameter($data, ProjectMetaDataElementModel::PROPERTY_REQUIRED),
             $this->validateBooleanParameter($data, ProjectMetaDataElementModel::PROPERTY_IN_LIST),
-            $this->validateIntegerParameter($data, ProjectMetaDataElementModel::PROPERTY_POSITION)
+            $this->validateIntegerParameter($data, ProjectMetaDataElementModel::PROPERTY_POSITION),
+            $this->validateEnumParameter(
+                $data,
+                ProjectMetaDataElementModel::PROPERTY_FIELD_TYPE,
+                [
+                    ProjectMetaDataElementModel::FIELD_TYPE_TEXT,
+                    ProjectMetaDataElementModel::FIELD_TYPE_NUMBER,
+                    ProjectMetaDataElementModel::FIELD_TYPE_DATE,
+                    ProjectMetaDataElementModel::FIELD_TYPE_EMAIL,
+                ]
+            )
         ))->setId($data[ProjectMetaDataElementModel::PROPERTY_ID] ?? null);
     }
 
@@ -97,6 +107,21 @@ final class ProjectMetaDataElementDoctrineModelFactory implements ProjectMetaDat
         $position = $this->validateIntegerParameter($data, ProjectMetaDataElementModel::PROPERTY_POSITION, false);
         if (!empty($position)) {
             $model->setPosition($position);
+        }
+
+        $fieldType = $this->validateEnumParameter(
+            $data,
+            ProjectMetaDataElementModel::PROPERTY_FIELD_TYPE,
+            [
+                ProjectMetaDataElementModel::FIELD_TYPE_TEXT,
+                ProjectMetaDataElementModel::FIELD_TYPE_NUMBER,
+                ProjectMetaDataElementModel::FIELD_TYPE_DATE,
+                ProjectMetaDataElementModel::FIELD_TYPE_EMAIL,
+            ],
+            false
+        );
+        if (!empty($fieldType)) {
+            $model->setFieldType($fieldType);
         }
 
         $id = $this->validateIntegerParameter($data, ProjectMetaDataElementModel::PROPERTY_ID, false);

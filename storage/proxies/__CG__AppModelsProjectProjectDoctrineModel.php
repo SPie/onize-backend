@@ -64,10 +64,10 @@ class ProjectDoctrineModel extends \App\Models\Project\ProjectDoctrineModel impl
     public function __sleep()
     {
         if ($this->__isInitialized__) {
-            return ['__isInitialized__', '' . "\0" . 'App\\Models\\Project\\ProjectDoctrineModel' . "\0" . 'label', '' . "\0" . 'App\\Models\\Project\\ProjectDoctrineModel' . "\0" . 'user', '' . "\0" . 'App\\Models\\Project\\ProjectDoctrineModel' . "\0" . 'description', '' . "\0" . 'App\\Models\\Project\\ProjectDoctrineModel' . "\0" . 'projectInvites', '' . "\0" . 'App\\Models\\Project\\ProjectDoctrineModel' . "\0" . 'members', 'id', 'deletedAt', 'createdAt', 'updatedAt', '' . "\0" . 'App\\Models\\Project\\ProjectDoctrineModel' . "\0" . 'uuid'];
+            return ['__isInitialized__', '' . "\0" . 'App\\Models\\Project\\ProjectDoctrineModel' . "\0" . 'label', '' . "\0" . 'App\\Models\\Project\\ProjectDoctrineModel' . "\0" . 'user', '' . "\0" . 'App\\Models\\Project\\ProjectDoctrineModel' . "\0" . 'description', '' . "\0" . 'App\\Models\\Project\\ProjectDoctrineModel' . "\0" . 'projectInvites', '' . "\0" . 'App\\Models\\Project\\ProjectDoctrineModel' . "\0" . 'members', '' . "\0" . 'App\\Models\\Project\\ProjectDoctrineModel' . "\0" . 'projectMetaDataElements', 'id', 'deletedAt', 'createdAt', 'updatedAt', '' . "\0" . 'App\\Models\\Project\\ProjectDoctrineModel' . "\0" . 'uuid'];
         }
 
-        return ['__isInitialized__', '' . "\0" . 'App\\Models\\Project\\ProjectDoctrineModel' . "\0" . 'label', '' . "\0" . 'App\\Models\\Project\\ProjectDoctrineModel' . "\0" . 'user', '' . "\0" . 'App\\Models\\Project\\ProjectDoctrineModel' . "\0" . 'description', '' . "\0" . 'App\\Models\\Project\\ProjectDoctrineModel' . "\0" . 'projectInvites', '' . "\0" . 'App\\Models\\Project\\ProjectDoctrineModel' . "\0" . 'members', 'id', 'deletedAt', 'createdAt', 'updatedAt', '' . "\0" . 'App\\Models\\Project\\ProjectDoctrineModel' . "\0" . 'uuid'];
+        return ['__isInitialized__', '' . "\0" . 'App\\Models\\Project\\ProjectDoctrineModel' . "\0" . 'label', '' . "\0" . 'App\\Models\\Project\\ProjectDoctrineModel' . "\0" . 'user', '' . "\0" . 'App\\Models\\Project\\ProjectDoctrineModel' . "\0" . 'description', '' . "\0" . 'App\\Models\\Project\\ProjectDoctrineModel' . "\0" . 'projectInvites', '' . "\0" . 'App\\Models\\Project\\ProjectDoctrineModel' . "\0" . 'members', '' . "\0" . 'App\\Models\\Project\\ProjectDoctrineModel' . "\0" . 'projectMetaDataElements', 'id', 'deletedAt', 'createdAt', 'updatedAt', '' . "\0" . 'App\\Models\\Project\\ProjectDoctrineModel' . "\0" . 'uuid'];
     }
 
     /**
@@ -314,6 +314,39 @@ class ProjectDoctrineModel extends \App\Models\Project\ProjectDoctrineModel impl
         $this->__initializer__ && $this->__initializer__->__invoke($this, 'getProjectInvites', []);
 
         return parent::getProjectInvites();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function setProjectMetaDataElements(array $projectMetaDataElements): \App\Models\Project\ProjectModel
+    {
+
+        $this->__initializer__ && $this->__initializer__->__invoke($this, 'setProjectMetaDataElements', [$projectMetaDataElements]);
+
+        return parent::setProjectMetaDataElements($projectMetaDataElements);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function addMetaDataElement(\App\Models\Project\ProjectMetaDataElementModel $metaDataElement): \App\Models\Project\ProjectModel
+    {
+
+        $this->__initializer__ && $this->__initializer__->__invoke($this, 'addMetaDataElement', [$metaDataElement]);
+
+        return parent::addMetaDataElement($metaDataElement);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function getProjectMetaDataElements(): \Illuminate\Support\Collection
+    {
+
+        $this->__initializer__ && $this->__initializer__->__invoke($this, 'getProjectMetaDataElements', []);
+
+        return parent::getProjectMetaDataElements();
     }
 
     /**

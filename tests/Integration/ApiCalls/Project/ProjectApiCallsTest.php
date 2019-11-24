@@ -482,6 +482,7 @@ final class ProjectApiCallsTest extends IntegrationTestCase
             'required' => $this->getFaker()->boolean,
             'inList'   => $this->getFaker()->boolean,
             'position' => $this->getFaker()->numberBetween(),
+            'fieldType' => $this->getRandomFieldType(),
         ];
 
         $response = $this->doApiCall(
@@ -502,6 +503,7 @@ final class ProjectApiCallsTest extends IntegrationTestCase
         $this->assertEquals($metaDataElement['required'], $responseData['metaDataElements'][0]['required']);
         $this->assertEquals($metaDataElement['inList'], $responseData['metaDataElements'][0]['inList']);
         $this->assertEquals($metaDataElement['position'], $responseData['metaDataElements'][0]['position']);
+        $this->assertEquals($metaDataElement['fieldType'], $responseData['metaDataElements'][0]['fieldType']);
         $this->assertNotEmpty($this->getMetaDataElementsRepository()->findOneBy([
             'name'    => $metaDataElement['name'],
             'project' => $project,
@@ -523,6 +525,7 @@ final class ProjectApiCallsTest extends IntegrationTestCase
                     'required' => $this->getFaker()->boolean,
                     'inList'   => $this->getFaker()->boolean,
                     'position' => $this->getFaker()->numberBetween(),
+                    'fieldType' => $this->getRandomFieldType(),
                 ]],
             ],
             null,
@@ -600,6 +603,7 @@ final class ProjectApiCallsTest extends IntegrationTestCase
                     'required' => $this->getFaker()->boolean,
                     'inList'   => $this->getFaker()->boolean,
                     'position' => $this->getFaker()->numberBetween(),
+                    'fieldType' => $this->getRandomFieldType(),
                 ]],
             ],
             null,
@@ -631,6 +635,7 @@ final class ProjectApiCallsTest extends IntegrationTestCase
                     'required' => $this->getFaker()->boolean,
                     'inList'   => $this->getFaker()->boolean,
                     'position' => $this->getFaker()->numberBetween(),
+                    'fieldType' => $this->getRandomFieldType(),
                 ]],
             ],
             null,
@@ -661,6 +666,7 @@ final class ProjectApiCallsTest extends IntegrationTestCase
                     'label'    => $this->getFaker()->word,
                     'inList'   => $this->getFaker()->boolean,
                     'position' => $this->getFaker()->numberBetween(),
+                    'fieldType' => $this->getRandomFieldType(),
                 ]],
             ],
             null,
@@ -692,6 +698,7 @@ final class ProjectApiCallsTest extends IntegrationTestCase
                     'required' => $this->getFaker()->word,
                     'inList'   => $this->getFaker()->boolean,
                     'position' => $this->getFaker()->numberBetween(),
+                    'fieldType' => $this->getRandomFieldType(),
                 ]],
             ],
             null,
@@ -722,6 +729,7 @@ final class ProjectApiCallsTest extends IntegrationTestCase
                     'label'    => $this->getFaker()->word,
                     'required' => $this->getFaker()->boolean,
                     'position' => $this->getFaker()->numberBetween(),
+                    'fieldType' => $this->getRandomFieldType(),
                 ]],
             ],
             null,
@@ -753,6 +761,7 @@ final class ProjectApiCallsTest extends IntegrationTestCase
                     'required' => $this->getFaker()->boolean,
                     'inList'   => $this->getFaker()->word,
                     'position' => $this->getFaker()->numberBetween(),
+                    'fieldType' => $this->getRandomFieldType(),
                 ]],
             ],
             null,
@@ -783,6 +792,7 @@ final class ProjectApiCallsTest extends IntegrationTestCase
                     'label'    => $this->getFaker()->word,
                     'required' => $this->getFaker()->boolean,
                     'inList'   => $this->getFaker()->word,
+                    'fieldType' => $this->getRandomFieldType(),
                 ]],
             ],
             null,
@@ -814,6 +824,7 @@ final class ProjectApiCallsTest extends IntegrationTestCase
                     'required' => $this->getFaker()->boolean,
                     'inList'   => $this->getFaker()->word,
                     'position' => $this->getFaker()->word,
+                    'fieldType' => $this->getRandomFieldType(),
                 ]],
             ],
             null,
@@ -841,6 +852,7 @@ final class ProjectApiCallsTest extends IntegrationTestCase
                     'required' => $this->getFaker()->boolean,
                     'inList'   => $this->getFaker()->boolean,
                     'position' => $this->getFaker()->numberBetween(),
+                    'fieldType' => $this->getRandomFieldType(),
                 ]],
             ],
             null,
@@ -872,6 +884,7 @@ final class ProjectApiCallsTest extends IntegrationTestCase
                         'required' => $this->getFaker()->boolean,
                         'inList'   => $this->getFaker()->boolean,
                         'position' => $this->getFaker()->numberBetween(),
+                        'fieldType' => $this->getRandomFieldType(),
                     ]
                 ],
             ],
@@ -903,6 +916,7 @@ final class ProjectApiCallsTest extends IntegrationTestCase
                     'required' => $this->getFaker()->boolean,
                     'inList'   => $this->getFaker()->word,
                     'position' => $this->getFaker()->numberBetween(),
+                    'fieldType' => $this->getRandomFieldType(),
                 ]],
             ],
             null,
@@ -934,6 +948,7 @@ final class ProjectApiCallsTest extends IntegrationTestCase
                     'required' => $this->getFaker()->boolean,
                     'inList'   => $this->getFaker()->word,
                     'position' => $this->getFaker()->numberBetween(),
+                    'fieldType' => $this->getRandomFieldType(),
                 ]],
             ],
             null,
@@ -943,6 +958,69 @@ final class ProjectApiCallsTest extends IntegrationTestCase
         $this->assertResponseStatus(422);
         $responseData = $response->getData(true);
         $this->assertEquals('validation.string', $responseData['metaDataElements.0.label'][0]);
+    }
+
+    /**
+     * @return void
+     */
+    public function testCreateMetaDataWithoutFieldType(): void
+    {
+        $user = $this->createUsers()->first();
+        $project = $this->createProjects(1, ['user' => $user])->first();
+        $this->clearModelCache();
+
+        $response = $this->doApiCall(
+            URL::route('projects.metaDataElements'),
+            Request::METHOD_POST,
+            [
+                'uuid'             => $project->getUuid(),
+                'metaDataElements' => [[
+                    'name'     => $this->getFaker()->uuid,
+                    'label'    => $this->getFaker()->word,
+                    'required' => $this->getFaker()->boolean,
+                    'inList'   => $this->getFaker()->word,
+                    'position' => $this->getFaker()->numberBetween(),
+                ]],
+            ],
+            null,
+            $this->createAuthHeader($user)
+        );
+
+        $this->assertResponseStatus(422);
+        $responseData = $response->getData(true);
+        $this->assertEquals('validation.required', $responseData['metaDataElements.0.fieldType'][0]);
+    }
+
+    /**
+     * @return void
+     */
+    public function testCreateMetaDataWithInvalidFieldTypee(): void
+    {
+        $user = $this->createUsers()->first();
+        $project = $this->createProjects(1, ['user' => $user])->first();
+        $this->clearModelCache();
+
+        $response = $this->doApiCall(
+            URL::route('projects.metaDataElements'),
+            Request::METHOD_POST,
+            [
+                'uuid'             => $project->getUuid(),
+                'metaDataElements' => [[
+                    'name'     => $this->getFaker()->uuid,
+                    'label'    => $this->getFaker()->word,
+                    'required' => $this->getFaker()->boolean,
+                    'inList'   => $this->getFaker()->word,
+                    'position' => $this->getFaker()->numberBetween(),
+                    'fieldType' => $this->getFaker()->uuid,
+                ]],
+            ],
+            null,
+            $this->createAuthHeader($user)
+        );
+
+        $this->assertResponseStatus(422);
+        $responseData = $response->getData(true);
+        $this->assertEquals('validation.in', $responseData['metaDataElements.0.fieldType'][0]);
     }
 
     //endregion

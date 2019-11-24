@@ -14,6 +14,7 @@ use App\Services\Project\ProjectServiceInterface;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
+use Illuminate\Validation\Rule;
 use Illuminate\Validation\ValidationException;
 
 /**
@@ -289,6 +290,15 @@ final class ProjectsController extends Controller
                     'required',
                     'integer',
                 ],
+                self::REQUEST_PARAMETER_META_DATA_ELEMENTS . '.*.' . ProjectMetaDataElementModel::PROPERTY_FIELD_TYPE => [
+                    'required',
+                    Rule::in([
+                        ProjectMetaDataElementModel::FIELD_TYPE_TEXT,
+                        ProjectMetaDataElementModel::FIELD_TYPE_NUMBER,
+                        ProjectMetaDataElementModel::FIELD_TYPE_DATE,
+                        ProjectMetaDataElementModel::FIELD_TYPE_EMAIL,
+                    ])
+                ]
             ]
         );
     }

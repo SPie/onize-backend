@@ -11,12 +11,18 @@ use App\Models\ModelInterface;
  */
 interface ProjectMetaDataElementModel extends ModelInterface
 {
-    const PROPERTY_NAME     = 'name';
-    const PROPERTY_LABEL    = 'label';
-    const PROPERTY_PROJECT  = 'project';
-    const PROPERTY_REQUIRED = 'required';
-    const PROPERTY_IN_LIST  = 'inList';
-    const PROPERTY_POSITION = 'position';
+    const PROPERTY_NAME       = 'name';
+    const PROPERTY_LABEL      = 'label';
+    const PROPERTY_PROJECT    = 'project';
+    const PROPERTY_REQUIRED   = 'required';
+    const PROPERTY_IN_LIST    = 'inList';
+    const PROPERTY_POSITION   = 'position';
+    const PROPERTY_FIELD_TYPE = 'fieldType';
+
+    const FIELD_TYPE_TEXT   = 'text';
+    const FIELD_TYPE_NUMBER = 'number';
+    const FIELD_TYPE_DATE   = 'date';
+    const FIELD_TYPE_EMAIL  = 'email';
 
     /**
      * @param string $name
@@ -89,4 +95,16 @@ interface ProjectMetaDataElementModel extends ModelInterface
      * @return int
      */
     public function getPosition(): int;
+
+    /**
+     * @param string $fieldType
+     *
+     * @return $this
+     */
+    public function setFieldType(string $fieldType): self;
+
+    /**
+     * @return string
+     */
+    public function getFieldType(): string;
 }

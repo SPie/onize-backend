@@ -25,13 +25,14 @@ final class ProjectMetaDataElementDoctrineModelFactoryTest extends TestCase
     public function testCreate(): void
     {
         $data = [
-            'name'     => $this->getFaker()->uuid,
-            'label'    => $this->getFaker()->word,
-            'project'  => $this->createProjectModel(),
-            'required' => $this->getFaker()->boolean,
-            'inList'   => $this->getFaker()->boolean,
-            'position' => $this->getFaker()->numberBetween(),
-            'id'       => $this->getFaker()->numberBetween(),
+            'name'      => $this->getFaker()->uuid,
+            'label'     => $this->getFaker()->word,
+            'project'   => $this->createProjectModel(),
+            'required'  => $this->getFaker()->boolean,
+            'inList'    => $this->getFaker()->boolean,
+            'position'  => $this->getFaker()->numberBetween(),
+            'fieldType' => $this->getRandomFieldType(),
+            'id'        => $this->getFaker()->numberBetween(),
         ];
 
         $this->assertEquals(
@@ -41,7 +42,8 @@ final class ProjectMetaDataElementDoctrineModelFactoryTest extends TestCase
                 $data['project'],
                 $data['required'],
                 $data['inList'],
-                $data['position']
+                $data['position'],
+                $data['fieldType']
             )->setId($data['id']),
             $this->getMetaDataElementDoctrineModelFactory()->create($data)
         );
@@ -53,12 +55,13 @@ final class ProjectMetaDataElementDoctrineModelFactoryTest extends TestCase
     public function testCreateOnlyWithRequiredParameters(): void
     {
         $data = [
-            'name'     => $this->getFaker()->uuid,
-            'label'    => $this->getFaker()->word,
-            'project'  => $this->createProjectModel(),
-            'required' => $this->getFaker()->boolean,
-            'inList'   => $this->getFaker()->boolean,
-            'position' => $this->getFaker()->numberBetween(),
+            'name'      => $this->getFaker()->uuid,
+            'label'     => $this->getFaker()->word,
+            'project'   => $this->createProjectModel(),
+            'required'  => $this->getFaker()->boolean,
+            'inList'    => $this->getFaker()->boolean,
+            'position'  => $this->getFaker()->numberBetween(),
+            'fieldType' => $this->getRandomFieldType(),
         ];
 
         $this->assertEquals(
@@ -68,7 +71,8 @@ final class ProjectMetaDataElementDoctrineModelFactoryTest extends TestCase
                 $data['project'],
                 $data['required'],
                 $data['inList'],
-                $data['position']
+                $data['position'],
+                $data['fieldType']
             ),
             $this->getMetaDataElementDoctrineModelFactory()->create($data)
         );
@@ -80,12 +84,13 @@ final class ProjectMetaDataElementDoctrineModelFactoryTest extends TestCase
     public function testCreateWithProjectData(): void
     {
         $data = [
-            'name'     => $this->getFaker()->uuid,
-            'label'    => $this->getFaker()->word,
-            'project'  => [$this->getFaker()->uuid => $this->getFaker()->word],
-            'required' => $this->getFaker()->boolean,
-            'inList'   => $this->getFaker()->boolean,
-            'position' => $this->getFaker()->numberBetween(),
+            'name'      => $this->getFaker()->uuid,
+            'label'     => $this->getFaker()->word,
+            'project'   => [$this->getFaker()->uuid => $this->getFaker()->word],
+            'required'  => $this->getFaker()->boolean,
+            'inList'    => $this->getFaker()->boolean,
+            'position'  => $this->getFaker()->numberBetween(),
+            'fieldType' => $this->getRandomFieldType(),
         ];
         $project = $this->createProjectModel();
         $projectModelFactory = $this->createProjectModelFactory();
@@ -98,7 +103,8 @@ final class ProjectMetaDataElementDoctrineModelFactoryTest extends TestCase
                 $project,
                 $data['required'],
                 $data['inList'],
-                $data['position']
+                $data['position'],
+                $data['fieldType']
             ),
             $this->getMetaDataElementDoctrineModelFactory($projectModelFactory)->create($data)
         );
@@ -112,11 +118,12 @@ final class ProjectMetaDataElementDoctrineModelFactoryTest extends TestCase
         $this->expectException(InvalidParameterException::class);
 
         $this->getMetaDataElementDoctrineModelFactory()->create([
-            'label'    => $this->getFaker()->word,
-            'project'  => $this->createProjectModel(),
-            'required' => $this->getFaker()->boolean,
-            'inList'   => $this->getFaker()->boolean,
-            'position' => $this->getFaker()->numberBetween(),
+            'label'     => $this->getFaker()->word,
+            'project'   => $this->createProjectModel(),
+            'required'  => $this->getFaker()->boolean,
+            'inList'    => $this->getFaker()->boolean,
+            'position'  => $this->getFaker()->numberBetween(),
+            'fieldType' => $this->getRandomFieldType(),
         ]);
     }
 
@@ -128,12 +135,13 @@ final class ProjectMetaDataElementDoctrineModelFactoryTest extends TestCase
         $this->expectException(InvalidParameterException::class);
 
         $this->getMetaDataElementDoctrineModelFactory()->create([
-            'name'     => $this->getFaker()->numberBetween(),
-            'label'    => $this->getFaker()->word,
-            'project'  => $this->createProjectModel(),
-            'required' => $this->getFaker()->boolean,
-            'inList'   => $this->getFaker()->boolean,
-            'position' => $this->getFaker()->numberBetween(),
+            'name'      => $this->getFaker()->numberBetween(),
+            'label'     => $this->getFaker()->word,
+            'project'   => $this->createProjectModel(),
+            'required'  => $this->getFaker()->boolean,
+            'inList'    => $this->getFaker()->boolean,
+            'position'  => $this->getFaker()->numberBetween(),
+            'fieldType' => $this->getRandomFieldType(),
         ]);
     }
 
@@ -150,6 +158,7 @@ final class ProjectMetaDataElementDoctrineModelFactoryTest extends TestCase
             'required' => $this->getFaker()->boolean,
             'inList'   => $this->getFaker()->boolean,
             'position' => $this->getFaker()->numberBetween(),
+            'fieldType' => $this->getRandomFieldType(),
         ]);
     }
 
@@ -167,6 +176,7 @@ final class ProjectMetaDataElementDoctrineModelFactoryTest extends TestCase
             'required' => $this->getFaker()->boolean,
             'inList'   => $this->getFaker()->boolean,
             'position' => $this->getFaker()->numberBetween(),
+            'fieldType' => $this->getRandomFieldType(),
         ]);
     }
 
@@ -188,6 +198,7 @@ final class ProjectMetaDataElementDoctrineModelFactoryTest extends TestCase
             'required' => $this->getFaker()->boolean,
             'inList'   => $this->getFaker()->boolean,
             'position' => $this->getFaker()->numberBetween(),
+            'fieldType' => $this->getRandomFieldType(),
         ]);
     }
 
@@ -204,6 +215,7 @@ final class ProjectMetaDataElementDoctrineModelFactoryTest extends TestCase
             'project'  => $this->createProjectModel(),
             'inList'   => $this->getFaker()->boolean,
             'position' => $this->getFaker()->numberBetween(),
+            'fieldType' => $this->getRandomFieldType(),
         ]);
     }
 
@@ -221,6 +233,7 @@ final class ProjectMetaDataElementDoctrineModelFactoryTest extends TestCase
             'required' => $this->getFaker()->word,
             'inList'   => $this->getFaker()->boolean,
             'position' => $this->getFaker()->numberBetween(),
+            'fieldType' => $this->getRandomFieldType(),
         ]);
     }
 
@@ -237,6 +250,7 @@ final class ProjectMetaDataElementDoctrineModelFactoryTest extends TestCase
             'project'  => $this->createProjectModel(),
             'required' => $this->getFaker()->boolean,
             'position' => $this->getFaker()->numberBetween(),
+            'fieldType' => $this->getRandomFieldType(),
         ]);
     }
 
@@ -254,6 +268,7 @@ final class ProjectMetaDataElementDoctrineModelFactoryTest extends TestCase
             'required' => $this->getFaker()->boolean,
             'inList'   => $this->getFaker()->word,
             'position' => $this->getFaker()->numberBetween(),
+            'fieldType' => $this->getRandomFieldType(),
         ]);
     }
 
@@ -270,6 +285,7 @@ final class ProjectMetaDataElementDoctrineModelFactoryTest extends TestCase
             'project'  => $this->createProjectModel(),
             'required' => $this->getFaker()->boolean,
             'inList'   => $this->getFaker()->boolean,
+            'fieldType' => $this->getRandomFieldType(),
         ]);
     }
 
@@ -287,6 +303,7 @@ final class ProjectMetaDataElementDoctrineModelFactoryTest extends TestCase
             'required' => $this->getFaker()->boolean,
             'inList'   => $this->getFaker()->boolean,
             'position' => $this->getFaker()->word,
+            'fieldType' => $this->getRandomFieldType(),
         ]);
     }
 
@@ -303,6 +320,7 @@ final class ProjectMetaDataElementDoctrineModelFactoryTest extends TestCase
             'required' => $this->getFaker()->boolean,
             'inList'   => $this->getFaker()->boolean,
             'position' => $this->getFaker()->numberBetween(),
+            'fieldType' => $this->getRandomFieldType(),
         ]);
     }
 
@@ -320,6 +338,42 @@ final class ProjectMetaDataElementDoctrineModelFactoryTest extends TestCase
             'required' => $this->getFaker()->boolean,
             'inList'   => $this->getFaker()->boolean,
             'position' => $this->getFaker()->numberBetween(),
+            'fieldType' => $this->getRandomFieldType(),
+        ]);
+    }
+
+    /**
+     * @return void
+     */
+    public function testCreateWithoutFieldType(): void
+    {
+        $this->expectException(InvalidParameterException::class);
+
+        $this->getMetaDataElementDoctrineModelFactory()->create([
+            'name'     => $this->getFaker()->uuid,
+            'label'    => $this->getFaker()->word,
+            'project'  => $this->createProjectModel(),
+            'required' => $this->getFaker()->boolean,
+            'inList'   => $this->getFaker()->boolean,
+            'position' => $this->getFaker()->numberBetween(),
+        ]);
+    }
+
+    /**
+     * @return void
+     */
+    public function testCreateWithInvalidFieldType(): void
+    {
+        $this->expectException(InvalidParameterException::class);
+
+        $this->getMetaDataElementDoctrineModelFactory()->create([
+            'name'     => $this->getFaker()->uuid,
+            'label'    => $this->getFaker()->word,
+            'project'  => $this->createProjectModel(),
+            'required' => $this->getFaker()->boolean,
+            'inList'   => $this->getFaker()->boolean,
+            'position' => $this->getFaker()->numberBetween(),
+            'fieldType' => $this->getFaker()->uuid,
         ]);
     }
 
@@ -335,6 +389,7 @@ final class ProjectMetaDataElementDoctrineModelFactoryTest extends TestCase
             'required' => $this->getFaker()->boolean,
             'inList'   => $this->getFaker()->boolean,
             'position' => $this->getFaker()->numberBetween(),
+            'fieldType' => $this->getRandomFieldType(),
             'id'       => $this->getFaker()->numberBetween(),
         ];
         $metaDataElement = $this->createMetaDataElementDoctrineModel();
@@ -346,7 +401,8 @@ final class ProjectMetaDataElementDoctrineModelFactoryTest extends TestCase
                 $data['project'],
                 $data['required'],
                 $data['inList'],
-                $data['position']
+                $data['position'],
+                $data['fieldType']
             )->setId($data['id']),
             $this->getMetaDataElementDoctrineModelFactory()->fill($metaDataElement, $data)
         );
@@ -465,6 +521,18 @@ final class ProjectMetaDataElementDoctrineModelFactoryTest extends TestCase
         ]);
     }
 
+    /**
+     * @return void
+     */
+    public function testFillWithInvalidFieldType(): void
+    {
+        $this->expectException(InvalidParameterException::class);
+
+        $this->getMetaDataElementDoctrineModelFactory()->fill($this->createMetaDataElementDoctrineModel(), [
+            'fieldType' => $this->getFaker()->uuid,
+        ]);
+    }
+
     //endregion
 
     /**
@@ -487,6 +555,7 @@ final class ProjectMetaDataElementDoctrineModelFactoryTest extends TestCase
      * @param bool|null         $required
      * @param bool|null         $inList
      * @param int|null          $position
+     * @param string|null       $fieldType
      *
      * @return ProjectMetaDataElementDoctrineModel
      */
@@ -496,7 +565,8 @@ final class ProjectMetaDataElementDoctrineModelFactoryTest extends TestCase
         ProjectModel $project = null,
         bool $required = null,
         bool $inList  = null,
-        int $position = null
+        int $position = null,
+        string $fieldType = null
     ): ProjectMetaDataElementDoctrineModel {
         return new ProjectMetaDataElementDoctrineModel(
             $name ?: $this->getFaker()->uuid,
@@ -504,7 +574,8 @@ final class ProjectMetaDataElementDoctrineModelFactoryTest extends TestCase
             $project ?: $this->createProjectModel(),
             ($required !== null) ? $required : $this->getFaker()->boolean,
             ($inList !== null) ? $inList : $this->getFaker()->boolean,
-            $position ?: $this->getFaker()->numberBetween()
+            $position ?: $this->getFaker()->numberBetween(),
+                $fieldType ?: $this->getRandomFieldType()
         );
     }
 }

@@ -362,6 +362,7 @@ final class ProjectsControllerTest extends TestCase
                     'required' => $this->getFaker()->boolean,
                     'inList'   => $this->getFaker()->boolean,
                     'position' => $this->getFaker()->numberBetween(),
+                    'fieldType' => $this->getRandomFieldType(),
                 ]
             ]
         );
@@ -395,6 +396,7 @@ final class ProjectsControllerTest extends TestCase
                     'required' => $this->getFaker()->boolean,
                     'inList'   => $this->getFaker()->boolean,
                     'position' => $this->getFaker()->numberBetween(),
+                    'fieldType' => $this->getRandomFieldType(),
                 ]
             ]
         );
@@ -445,6 +447,7 @@ final class ProjectsControllerTest extends TestCase
                     'required' => $this->getFaker()->boolean,
                     'inList'   => $this->getFaker()->boolean,
                     'position' => $this->getFaker()->numberBetween(),
+                    'fieldType' => $this->getRandomFieldType(),
                 ]
             ]
         );
@@ -470,6 +473,7 @@ final class ProjectsControllerTest extends TestCase
                     'required' => $this->getFaker()->boolean,
                     'inList'   => $this->getFaker()->boolean,
                     'position' => $this->getFaker()->numberBetween(),
+                    'fieldType' => $this->getRandomFieldType(),
                 ]
             ]
         );
@@ -494,6 +498,7 @@ final class ProjectsControllerTest extends TestCase
                     'label'    => $this->getFaker()->word,
                     'inList'   => $this->getFaker()->boolean,
                     'position' => $this->getFaker()->numberBetween(),
+                    'fieldType' => $this->getRandomFieldType(),
                 ]
             ]
         );
@@ -519,6 +524,7 @@ final class ProjectsControllerTest extends TestCase
                     'required' => $this->getFaker()->word,
                     'inList'   => $this->getFaker()->boolean,
                     'position' => $this->getFaker()->numberBetween(),
+                    'fieldType' => $this->getRandomFieldType(),
                 ]
             ]
         );
@@ -543,6 +549,7 @@ final class ProjectsControllerTest extends TestCase
                     'label'    => $this->getFaker()->word,
                     'required' => $this->getFaker()->boolean,
                     'position' => $this->getFaker()->numberBetween(),
+                    'fieldType' => $this->getRandomFieldType(),
                 ]
             ]
         );
@@ -568,6 +575,7 @@ final class ProjectsControllerTest extends TestCase
                     'required' => $this->getFaker()->boolean,
                     'inList'   => $this->getFaker()->word,
                     'position' => $this->getFaker()->numberBetween(),
+                    'fieldType' => $this->getRandomFieldType(),
                 ]
             ]
         );
@@ -592,6 +600,7 @@ final class ProjectsControllerTest extends TestCase
                     'label'    => $this->getFaker()->word,
                     'required' => $this->getFaker()->boolean,
                     'inList'   => $this->getFaker()->boolean,
+                    'fieldType' => $this->getRandomFieldType(),
                 ],
             ]
         );
@@ -617,6 +626,7 @@ final class ProjectsControllerTest extends TestCase
                     'required' => $this->getFaker()->boolean,
                     'inList'   => $this->getFaker()->boolean,
                     'position' => $this->getFaker()->word,
+                    'fieldType' => $this->getRandomFieldType(),
                 ]
             ]
         );
@@ -642,6 +652,7 @@ final class ProjectsControllerTest extends TestCase
                     'required' => $this->getFaker()->boolean,
                     'inList'   => $this->getFaker()->boolean,
                     'position' => $this->getFaker()->numberBetween(),
+                    'fieldType' => $this->getRandomFieldType(),
                 ]
             ]
         );
@@ -674,6 +685,7 @@ final class ProjectsControllerTest extends TestCase
                     'required' => $this->getFaker()->boolean,
                     'inList'   => $this->getFaker()->boolean,
                     'position' => $this->getFaker()->numberBetween(),
+                    'fieldType' => $this->getRandomFieldType(),
                 ]
             ]
         );
@@ -716,6 +728,7 @@ final class ProjectsControllerTest extends TestCase
                     'required' => $this->getFaker()->boolean,
                     'inList'   => $this->getFaker()->boolean,
                     'position' => $this->getFaker()->numberBetween(),
+                    'fieldType' => $this->getRandomFieldType(),
                 ]
             ]
         );
@@ -741,6 +754,58 @@ final class ProjectsControllerTest extends TestCase
                     'required' => $this->getFaker()->boolean,
                     'inList'   => $this->getFaker()->boolean,
                     'position' => $this->getFaker()->numberBetween(),
+                    'fieldType' => $this->getRandomFieldType(),
+                ]
+            ]
+        );
+
+        $this->expectException(ValidationException::class);
+
+        $this->getProjectsController()->createMetaDataElements($request);
+    }
+
+    /**
+     * @return void
+     */
+    public function testCreateMetaDataWithoutFieldType(): void
+    {
+        $request = $this->createRequest();
+        $request->offsetSet('uuid', $this->getFaker()->uuid);
+        $request->offsetSet(
+            'metaDataElements',
+            [
+                [
+                    'name'     => $this->getFaker()->uuid,
+                    'label'    => $this->getFaker()->word,
+                    'required' => $this->getFaker()->boolean,
+                    'inList'   => $this->getFaker()->boolean,
+                    'position' => $this->getFaker()->numberBetween(),
+                ]
+            ]
+        );
+
+        $this->expectException(ValidationException::class);
+
+        $this->getProjectsController()->createMetaDataElements($request);
+    }
+
+    /**
+     * @return void
+     */
+    public function testCreateMetaDataWithInvalidFieldType(): void
+    {
+        $request = $this->createRequest();
+        $request->offsetSet('uuid', $this->getFaker()->uuid);
+        $request->offsetSet(
+            'metaDataElements',
+            [
+                [
+                    'name'     => $this->getFaker()->uuid,
+                    'label'    => $this->getFaker()->word,
+                    'required' => $this->getFaker()->boolean,
+                    'inList'   => $this->getFaker()->boolean,
+                    'position' => $this->getFaker()->numberBetween(),
+                    'fieldType' => $this->getFaker()->uuid,
                 ]
             ]
         );

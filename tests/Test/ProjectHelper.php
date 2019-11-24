@@ -318,6 +318,21 @@ trait ProjectHelper
     }
 
     /**
+     * @return string
+     */
+    private function getRandomFieldType(): string
+    {
+        $fieldTypes = [
+            ProjectMetaDataElementModel::FIELD_TYPE_TEXT,
+            ProjectMetaDataElementModel::FIELD_TYPE_NUMBER,
+            ProjectMetaDataElementModel::FIELD_TYPE_DATE,
+            ProjectMetaDataElementModel::FIELD_TYPE_EMAIL,
+        ];
+
+        return $fieldTypes[\mt_rand(0, \count($fieldTypes) - 1)];
+    }
+
+    /**
      * @return ProjectMetaDataElementModelFactory
      */
     private function createProjectMetaDataElementModelFactory(): ProjectMetaDataElementModelFactory
