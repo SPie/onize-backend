@@ -3,15 +3,15 @@
 namespace App\Models\Project;
 
 use App\Models\ModelInterface;
+use App\Models\Uuidable;
 
 /**
  * Interface ProjectMetaDataElementModel
  *
  * @package App\Models\Project
  */
-interface ProjectMetaDataElementModel extends ModelInterface
+interface ProjectMetaDataElementModel extends ModelInterface, Uuidable
 {
-    const PROPERTY_NAME       = 'name';
     const PROPERTY_LABEL      = 'label';
     const PROPERTY_PROJECT    = 'project';
     const PROPERTY_REQUIRED   = 'required';
@@ -23,18 +23,6 @@ interface ProjectMetaDataElementModel extends ModelInterface
     const FIELD_TYPE_NUMBER = 'number';
     const FIELD_TYPE_DATE   = 'date';
     const FIELD_TYPE_EMAIL  = 'email';
-
-    /**
-     * @param string $name
-     *
-     * @return $this
-     */
-    public function setName(string $name): self;
-
-    /**
-     * @return string
-     */
-    public function getName(): string;
 
     /**
      * @param string $label

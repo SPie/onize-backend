@@ -64,10 +64,10 @@ class ProjectMetaDataElementDoctrineModel extends \App\Models\Project\ProjectMet
     public function __sleep()
     {
         if ($this->__isInitialized__) {
-            return ['__isInitialized__', '' . "\0" . 'App\\Models\\Project\\ProjectMetaDataElementDoctrineModel' . "\0" . 'name', '' . "\0" . 'App\\Models\\Project\\ProjectMetaDataElementDoctrineModel' . "\0" . 'label', '' . "\0" . 'App\\Models\\Project\\ProjectMetaDataElementDoctrineModel' . "\0" . 'project', '' . "\0" . 'App\\Models\\Project\\ProjectMetaDataElementDoctrineModel' . "\0" . 'required', '' . "\0" . 'App\\Models\\Project\\ProjectMetaDataElementDoctrineModel' . "\0" . 'inList', '' . "\0" . 'App\\Models\\Project\\ProjectMetaDataElementDoctrineModel' . "\0" . 'position', '' . "\0" . 'App\\Models\\Project\\ProjectMetaDataElementDoctrineModel' . "\0" . 'fieldType', 'id'];
+            return ['__isInitialized__', '' . "\0" . 'App\\Models\\Project\\ProjectMetaDataElementDoctrineModel' . "\0" . 'label', '' . "\0" . 'App\\Models\\Project\\ProjectMetaDataElementDoctrineModel' . "\0" . 'project', '' . "\0" . 'App\\Models\\Project\\ProjectMetaDataElementDoctrineModel' . "\0" . 'required', '' . "\0" . 'App\\Models\\Project\\ProjectMetaDataElementDoctrineModel' . "\0" . 'inList', '' . "\0" . 'App\\Models\\Project\\ProjectMetaDataElementDoctrineModel' . "\0" . 'position', '' . "\0" . 'App\\Models\\Project\\ProjectMetaDataElementDoctrineModel' . "\0" . 'fieldType', 'id', '' . "\0" . 'App\\Models\\Project\\ProjectMetaDataElementDoctrineModel' . "\0" . 'uuid'];
         }
 
-        return ['__isInitialized__', '' . "\0" . 'App\\Models\\Project\\ProjectMetaDataElementDoctrineModel' . "\0" . 'name', '' . "\0" . 'App\\Models\\Project\\ProjectMetaDataElementDoctrineModel' . "\0" . 'label', '' . "\0" . 'App\\Models\\Project\\ProjectMetaDataElementDoctrineModel' . "\0" . 'project', '' . "\0" . 'App\\Models\\Project\\ProjectMetaDataElementDoctrineModel' . "\0" . 'required', '' . "\0" . 'App\\Models\\Project\\ProjectMetaDataElementDoctrineModel' . "\0" . 'inList', '' . "\0" . 'App\\Models\\Project\\ProjectMetaDataElementDoctrineModel' . "\0" . 'position', '' . "\0" . 'App\\Models\\Project\\ProjectMetaDataElementDoctrineModel' . "\0" . 'fieldType', 'id'];
+        return ['__isInitialized__', '' . "\0" . 'App\\Models\\Project\\ProjectMetaDataElementDoctrineModel' . "\0" . 'label', '' . "\0" . 'App\\Models\\Project\\ProjectMetaDataElementDoctrineModel' . "\0" . 'project', '' . "\0" . 'App\\Models\\Project\\ProjectMetaDataElementDoctrineModel' . "\0" . 'required', '' . "\0" . 'App\\Models\\Project\\ProjectMetaDataElementDoctrineModel' . "\0" . 'inList', '' . "\0" . 'App\\Models\\Project\\ProjectMetaDataElementDoctrineModel' . "\0" . 'position', '' . "\0" . 'App\\Models\\Project\\ProjectMetaDataElementDoctrineModel' . "\0" . 'fieldType', 'id', '' . "\0" . 'App\\Models\\Project\\ProjectMetaDataElementDoctrineModel' . "\0" . 'uuid'];
     }
 
     /**
@@ -173,28 +173,6 @@ class ProjectMetaDataElementDoctrineModel extends \App\Models\Project\ProjectMet
     }
 
     
-    /**
-     * {@inheritDoc}
-     */
-    public function setName(string $name): \App\Models\Project\ProjectMetaDataElementModel
-    {
-
-        $this->__initializer__ && $this->__initializer__->__invoke($this, 'setName', [$name]);
-
-        return parent::setName($name);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public function getName(): string
-    {
-
-        $this->__initializer__ && $this->__initializer__->__invoke($this, 'getName', []);
-
-        return parent::getName();
-    }
-
     /**
      * {@inheritDoc}
      */
@@ -362,6 +340,28 @@ class ProjectMetaDataElementDoctrineModel extends \App\Models\Project\ProjectMet
         $this->__initializer__ && $this->__initializer__->__invoke($this, 'getId', []);
 
         return parent::getId();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function setUuid(string $uuid): \App\Models\Uuidable
+    {
+
+        $this->__initializer__ && $this->__initializer__->__invoke($this, 'setUuid', [$uuid]);
+
+        return parent::setUuid($uuid);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function getUuid(): string
+    {
+
+        $this->__initializer__ && $this->__initializer__->__invoke($this, 'getUuid', []);
+
+        return parent::getUuid();
     }
 
 }

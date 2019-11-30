@@ -27,7 +27,7 @@ final class ProjectMetaDataElementDoctrineModelTest extends TestCase
 
         $metaDataElementArray = $metaDataElement->toArray();
 
-        $this->assertEquals($metaDataElement->getName(), $metaDataElementArray['name']);
+        $this->assertEquals($metaDataElement->getUuid(), $metaDataElementArray['uuid']);
         $this->assertEquals($metaDataElement->getLabel(), $metaDataElementArray['label']);
         $this->assertEquals($projectData, $metaDataElementArray['project']);
         $this->assertEquals($metaDataElement->isRequired(), $metaDataElementArray['required']);
@@ -45,7 +45,7 @@ final class ProjectMetaDataElementDoctrineModelTest extends TestCase
 
         $metaDataElementArray = $metaDataElement->toArray(0);
 
-        $this->assertEquals($metaDataElement->getName(), $metaDataElementArray['name']);
+        $this->assertEquals($metaDataElement->getUuid(), $metaDataElementArray['uuid']);
         $this->assertEquals($metaDataElement->getLabel(), $metaDataElementArray['label']);
         $this->assertEquals($metaDataElement->isRequired(), $metaDataElementArray['required']);
         $this->assertEquals($metaDataElement->isInList(), $metaDataElementArray['inList']);
@@ -57,7 +57,7 @@ final class ProjectMetaDataElementDoctrineModelTest extends TestCase
     //endregion
 
     /**
-     * @param string|null       $name
+     * @param string|null       $uuid
      * @param string|null       $label
      * @param ProjectModel|null $projectModel
      * @param bool              $required
@@ -69,7 +69,7 @@ final class ProjectMetaDataElementDoctrineModelTest extends TestCase
      * @return ProjectMetaDataElementDoctrineModel
      */
     private function getMetaDataElementDoctrineModel(
-        string $name = null,
+        string $uuid = null,
         string $label = null,
         ProjectModel $projectModel = null,
         bool $required = null,
@@ -79,7 +79,7 @@ final class ProjectMetaDataElementDoctrineModelTest extends TestCase
         int $id = null
     ): ProjectMetaDataElementDoctrineModel {
         return (new ProjectMetaDataElementDoctrineModel(
-            $name ?: $this->getFaker()->uuid,
+            $uuid ?: $this->getFaker()->uuid,
             $label ?: $this->getFaker()->word,
             $projectModel ?: $this->createProjectModel(),
             ($required !== null) ? $required : $this->getFaker()->boolean,

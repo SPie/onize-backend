@@ -4,7 +4,6 @@ namespace App\Services\Project;
 
 use App\Exceptions\Auth\NotAllowedException;
 use App\Exceptions\ModelNotFoundException;
-use App\Exceptions\Project\MetaDataElementExistsException;
 use App\Exceptions\Project\UserAlreadyMemberException;
 use App\Models\ModelInterface;
 use App\Models\Project\ProjectMetaDataElementModel;
@@ -17,7 +16,6 @@ use App\Models\User\UserModelInterface;
 use App\Repositories\Project\ProjectMetaDataElementRepository;
 use App\Repositories\Project\ProjectInviteRepository;
 use App\Repositories\Project\ProjectRepository;
-use Illuminate\Support\Collection;
 
 /**
  * Class ProjectService
@@ -46,8 +44,14 @@ final class ProjectService implements ProjectServiceInterface
      */
     private $projectInviteModelFactory;
 
+    /**
+     * @var ProjectMetaDataElementRepository
+     */
     private $metaDataElementRepository;
 
+    /**
+     * @var ProjectMetaDataElementModelFactory
+     */
     private $metaDataElementModelFactory;
 
     /**
@@ -268,10 +272,6 @@ final class ProjectService implements ProjectServiceInterface
 
         $metaDataElementModels = [];
         foreach ($metaDataElements as $index => $metaDataElement) {
-            if (!empty($this->getMetaDataElementRepository()->findByNameAndProject($metaDataElement['name'], $project))) {
-                throw new MetaDataElementExistsException($index);
-            }
-
             $metaDataElementModels[] = $this->createNewMetaDataElement($metaDataElement, $project);
         }
 

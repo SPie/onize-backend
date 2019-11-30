@@ -477,7 +477,6 @@ final class ProjectApiCallsTest extends IntegrationTestCase
         $project = $this->createProjects(1, ['user' => $user])->first();
         $this->clearModelCache();
         $metaDataElement = [
-            'name'     => $this->getFaker()->uuid,
             'label'    => $this->getFaker()->word,
             'required' => $this->getFaker()->boolean,
             'inList'   => $this->getFaker()->boolean,
@@ -498,15 +497,13 @@ final class ProjectApiCallsTest extends IntegrationTestCase
 
         $this->assertResponseStatus(201);
         $responseData = $response->getData(true);
-        $this->assertEquals($metaDataElement['name'], $responseData['metaDataElements'][0]['name']);
         $this->assertEquals($metaDataElement['label'], $responseData['metaDataElements'][0]['label']);
         $this->assertEquals($metaDataElement['required'], $responseData['metaDataElements'][0]['required']);
         $this->assertEquals($metaDataElement['inList'], $responseData['metaDataElements'][0]['inList']);
         $this->assertEquals($metaDataElement['position'], $responseData['metaDataElements'][0]['position']);
         $this->assertEquals($metaDataElement['fieldType'], $responseData['metaDataElements'][0]['fieldType']);
         $this->assertNotEmpty($this->getMetaDataElementsRepository()->findOneBy([
-            'name'    => $metaDataElement['name'],
-            'project' => $project,
+            'uuid' => $responseData['metaDataElements'][0]['uuid'],
         ]));
     }
 
@@ -520,7 +517,6 @@ final class ProjectApiCallsTest extends IntegrationTestCase
             Request::METHOD_POST,
             [
                 'metaDataElements' => [[
-                    'name'     => $this->getFaker()->uuid,
                     'label'    => $this->getFaker()->word,
                     'required' => $this->getFaker()->boolean,
                     'inList'   => $this->getFaker()->boolean,
@@ -587,69 +583,6 @@ final class ProjectApiCallsTest extends IntegrationTestCase
     /**
      * @return void
      */
-    public function testCreateMetaDataWithoutName(): void
-    {
-        $user = $this->createUsers()->first();
-        $project = $this->createProjects(1, ['user' => $user])->first();
-        $this->clearModelCache();
-
-        $response = $this->doApiCall(
-            URL::route('projects.metaDataElements'),
-            Request::METHOD_POST,
-            [
-                'uuid'             => $project->getUuid(),
-                'metaDataElements' => [[
-                    'label'    => $this->getFaker()->word,
-                    'required' => $this->getFaker()->boolean,
-                    'inList'   => $this->getFaker()->boolean,
-                    'position' => $this->getFaker()->numberBetween(),
-                    'fieldType' => $this->getRandomFieldType(),
-                ]],
-            ],
-            null,
-            $this->createAuthHeader($user)
-        );
-
-        $this->assertResponseStatus(422);
-        $responseData = $response->getData(true);
-        $this->assertEquals('validation.required', $responseData['metaDataElements.0.name'][0]);
-    }
-
-    /**
-     * @return void
-     */
-    public function testCreateMetaDataWithInvalidName(): void
-    {
-        $user = $this->createUsers()->first();
-        $project = $this->createProjects(1, ['user' => $user])->first();
-        $this->clearModelCache();
-
-        $response = $this->doApiCall(
-            URL::route('projects.metaDataElements'),
-            Request::METHOD_POST,
-            [
-                'uuid'             => $project->getUuid(),
-                'metaDataElements' => [[
-                    'name'     => $this->getFaker()->numberBetween(),
-                    'label'    => $this->getFaker()->word,
-                    'required' => $this->getFaker()->boolean,
-                    'inList'   => $this->getFaker()->boolean,
-                    'position' => $this->getFaker()->numberBetween(),
-                    'fieldType' => $this->getRandomFieldType(),
-                ]],
-            ],
-            null,
-            $this->createAuthHeader($user)
-        );
-
-        $this->assertResponseStatus(422);
-        $responseData = $response->getData(true);
-        $this->assertEquals('validation.string', $responseData['metaDataElements.0.name'][0]);
-    }
-
-    /**
-     * @return void
-     */
     public function testCreateMetaDataWithoutRequired(): void
     {
         $user = $this->createUsers()->first();
@@ -662,7 +595,6 @@ final class ProjectApiCallsTest extends IntegrationTestCase
             [
                 'uuid'             => $project->getUuid(),
                 'metaDataElements' => [[
-                    'name'     => $this->getFaker()->uuid,
                     'label'    => $this->getFaker()->word,
                     'inList'   => $this->getFaker()->boolean,
                     'position' => $this->getFaker()->numberBetween(),
@@ -693,7 +625,6 @@ final class ProjectApiCallsTest extends IntegrationTestCase
             [
                 'uuid'             => $project->getUuid(),
                 'metaDataElements' => [[
-                    'name'     => $this->getFaker()->uuid,
                     'label'    => $this->getFaker()->word,
                     'required' => $this->getFaker()->word,
                     'inList'   => $this->getFaker()->boolean,
@@ -725,7 +656,6 @@ final class ProjectApiCallsTest extends IntegrationTestCase
             [
                 'uuid'             => $project->getUuid(),
                 'metaDataElements' => [[
-                    'name'     => $this->getFaker()->uuid,
                     'label'    => $this->getFaker()->word,
                     'required' => $this->getFaker()->boolean,
                     'position' => $this->getFaker()->numberBetween(),
@@ -756,7 +686,6 @@ final class ProjectApiCallsTest extends IntegrationTestCase
             [
                 'uuid'             => $project->getUuid(),
                 'metaDataElements' => [[
-                    'name'     => $this->getFaker()->uuid,
                     'label'    => $this->getFaker()->word,
                     'required' => $this->getFaker()->boolean,
                     'inList'   => $this->getFaker()->word,
@@ -788,7 +717,6 @@ final class ProjectApiCallsTest extends IntegrationTestCase
             [
                 'uuid'             => $project->getUuid(),
                 'metaDataElements' => [[
-                    'name'     => $this->getFaker()->uuid,
                     'label'    => $this->getFaker()->word,
                     'required' => $this->getFaker()->boolean,
                     'inList'   => $this->getFaker()->word,
@@ -819,7 +747,6 @@ final class ProjectApiCallsTest extends IntegrationTestCase
             [
                 'uuid'             => $project->getUuid(),
                 'metaDataElements' => [[
-                    'name'     => $this->getFaker()->uuid,
                     'label'    => $this->getFaker()->word,
                     'required' => $this->getFaker()->boolean,
                     'inList'   => $this->getFaker()->word,
@@ -847,7 +774,6 @@ final class ProjectApiCallsTest extends IntegrationTestCase
             [
                 'uuid'             => $this->getFaker()->uuid,
                 'metaDataElements' => [[
-                    'name'     => $this->getFaker()->uuid,
                     'label'    => $this->getFaker()->word,
                     'required' => $this->getFaker()->boolean,
                     'inList'   => $this->getFaker()->boolean,
@@ -865,41 +791,6 @@ final class ProjectApiCallsTest extends IntegrationTestCase
     /**
      * @return void
      */
-    public function testCreateMetaDataWithAlreadyExistingName(): void
-    {
-        $user = $this->createUsers()->first();
-        $project = $this->createProjects(1, ['user' => $user])->first();
-        $metaDataElement = $this->createProjectMetaDataElements(1, ['project' => $project])->first();
-        $this->clearModelCache();
-
-        $response = $this->doApiCall(
-            URL::route('projects.metaDataElements'),
-            Request::METHOD_POST,
-            [
-                'uuid'             => $project->getUuid(),
-                'metaDataElements' => [
-                    [
-                        'name'     => $metaDataElement->getName(),
-                        'label'    => $this->getFaker()->word,
-                        'required' => $this->getFaker()->boolean,
-                        'inList'   => $this->getFaker()->boolean,
-                        'position' => $this->getFaker()->numberBetween(),
-                        'fieldType' => $this->getRandomFieldType(),
-                    ]
-                ],
-            ],
-            null,
-            $this->createAuthHeader($user)
-        );
-
-        $this->assertResponseStatus(422);
-        $responseData = $response->getData(true);
-        $this->assertEquals('validation.unique', $responseData['metaDataElements.0.name'][0]);
-    }
-
-    /**
-     * @return void
-     */
     public function testCreateMetaDataWithoutLabel(): void
     {
         $user = $this->createUsers()->first();
@@ -912,7 +803,6 @@ final class ProjectApiCallsTest extends IntegrationTestCase
             [
                 'uuid'             => $project->getUuid(),
                 'metaDataElements' => [[
-                    'name'     => $this->getFaker()->uuid,
                     'required' => $this->getFaker()->boolean,
                     'inList'   => $this->getFaker()->word,
                     'position' => $this->getFaker()->numberBetween(),
@@ -943,7 +833,6 @@ final class ProjectApiCallsTest extends IntegrationTestCase
             [
                 'uuid'             => $project->getUuid(),
                 'metaDataElements' => [[
-                    'name'     => $this->getFaker()->uuid,
                     'label'    => $this->getFaker()->numberBetween(),
                     'required' => $this->getFaker()->boolean,
                     'inList'   => $this->getFaker()->word,
@@ -975,7 +864,6 @@ final class ProjectApiCallsTest extends IntegrationTestCase
             [
                 'uuid'             => $project->getUuid(),
                 'metaDataElements' => [[
-                    'name'     => $this->getFaker()->uuid,
                     'label'    => $this->getFaker()->word,
                     'required' => $this->getFaker()->boolean,
                     'inList'   => $this->getFaker()->word,
@@ -994,7 +882,7 @@ final class ProjectApiCallsTest extends IntegrationTestCase
     /**
      * @return void
      */
-    public function testCreateMetaDataWithInvalidFieldTypee(): void
+    public function testCreateMetaDataWithInvalidFieldType(): void
     {
         $user = $this->createUsers()->first();
         $project = $this->createProjects(1, ['user' => $user])->first();
@@ -1006,7 +894,6 @@ final class ProjectApiCallsTest extends IntegrationTestCase
             [
                 'uuid'             => $project->getUuid(),
                 'metaDataElements' => [[
-                    'name'     => $this->getFaker()->uuid,
                     'label'    => $this->getFaker()->word,
                     'required' => $this->getFaker()->boolean,
                     'inList'   => $this->getFaker()->word,

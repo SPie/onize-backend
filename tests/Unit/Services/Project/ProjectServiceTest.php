@@ -3,7 +3,6 @@
 use App\Exceptions\Auth\NotAllowedException;
 use App\Exceptions\InvalidParameterException;
 use App\Exceptions\ModelNotFoundException;
-use App\Exceptions\Project\MetaDataElementExistsException;
 use App\Exceptions\Project\UserAlreadyMemberException;
 use App\Models\Project\ProjectMetaDataElementModelFactory;
 use App\Models\Project\ProjectInviteModel;
@@ -311,7 +310,6 @@ final class ProjectServiceTest extends TestCase
     {
         $uuid = $this->getFaker()->uuid;
         $metaDataElementData = [
-            'name'     => $this->getFaker()->uuid,
             'required' => $this->getFaker()->boolean,
             'inList'   => $this->getFaker()->boolean,
             'position' => $this->getFaker()->numberBetween(),
@@ -358,7 +356,6 @@ final class ProjectServiceTest extends TestCase
             $uuid,
             [
                 [
-                    'name'     => $this->getFaker()->uuid,
                     'required' => $this->getFaker()->boolean,
                     'inList'   => $this->getFaker()->boolean,
                     'position' => $this->getFaker()->numberBetween(),
@@ -374,7 +371,6 @@ final class ProjectServiceTest extends TestCase
     {
         $uuid = $this->getFaker()->uuid;
         $metaDataElementData = [
-            'name'     => $this->getFaker()->uuid,
             'required' => $this->getFaker()->boolean,
             'inList'   => $this->getFaker()->boolean,
             'position' => $this->getFaker()->numberBetween(),
@@ -397,41 +393,6 @@ final class ProjectServiceTest extends TestCase
             null,
             $metaDataElementModelFactory
         )->createMetaDataElements($uuid, [$metaDataElementData]);
-    }
-
-    /**
-     * @return void
-     */
-    public function testCreateMetaDataElementsWithAlreadyExistingMetaDataElement(): void
-    {
-        $uuid = $this->getFaker()->uuid;
-        $index = $this->getFaker()->numberBetween();
-        $metaDataElementData = [
-            'name'     => $this->getFaker()->uuid,
-            'required' => $this->getFaker()->boolean,
-            'inList'   => $this->getFaker()->boolean,
-            'position' => $this->getFaker()->numberBetween(),
-        ];
-        $project = $this->createProjectModel();
-        $projectRepository = $this->createProjectRepository();
-        $metaDataElementRepository = $this->createProjectMetaDataElementRepository();
-        $this
-            ->mockProjectRepositoryFindByUuid($projectRepository, $project, $uuid)
-            ->mockProjectMetaDataElementRepositoryFindByNameAndProject(
-                $metaDataElementRepository,
-                $this->createProjectMetaDataElementModel(),
-                $metaDataElementData['name'],
-                $project
-            );
-
-        try {
-            $this->getProjectServiceForCreateMetaDataElements($projectRepository, $metaDataElementRepository)
-                ->createMetaDataElements($uuid, [$index => $metaDataElementData]);
-
-            $this->assertTrue(false);
-        } catch (MetaDataElementExistsException $e) {
-            $this->assertEquals($index, $e->getIndex());
-        }
     }
 
     //endregion

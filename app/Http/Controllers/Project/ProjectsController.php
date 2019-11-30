@@ -2,9 +2,7 @@
 
 namespace App\Http\Controllers\Project;
 
-use App\Exceptions\Project\MetaDataElementExistsException;
 use App\Http\Controllers\Controller;
-use App\Http\Validation\EmptyValidator;
 use App\Models\Project\ProjectMetaDataElementModel;
 use App\Models\Project\ProjectInviteModel;
 use App\Models\Project\ProjectModel;
@@ -176,14 +174,10 @@ final class ProjectsController extends Controller
     {
         $parameters = $this->validateDataForMetaDataElements($request);
 
-        try {
-            $metaDataElements = $this->getProjectService()->createMetaDataElements(
-                $parameters[ProjectModel::PROPERTY_UUID],
-                $parameters[self::REQUEST_PARAMETER_META_DATA_ELEMENTS]
-            );
-        } catch (MetaDataElementExistsException $e) {
-            throw new ValidationException(new EmptyValidator(), $this->createUniqueMetaDataElementValidationResponse($e->getIndex()));
-        }
+        $metaDataElements = $this->getProjectService()->createMetaDataElements(
+            $parameters[ProjectModel::PROPERTY_UUID],
+            $parameters[self::REQUEST_PARAMETER_META_DATA_ELEMENTS]
+        );
 
         return $this->createResponse(
             [self::RESPONSE_PARAMETER_META_DATA_ELEMENTS => $metaDataElements],
@@ -270,10 +264,6 @@ final class ProjectsController extends Controller
                     'required',
                     'array',
                 ],
-                self::REQUEST_PARAMETER_META_DATA_ELEMENTS . '.*.' . ProjectMetaDataElementModel::PROPERTY_NAME     => [
-                    'required',
-                    'string',
-                ],
                 self::REQUEST_PARAMETER_META_DATA_ELEMENTS . '.*.' . ProjectMetaDataElementModel::PROPERTY_LABEL    => [
                     'required',
                     'string',
@@ -300,20 +290,6 @@ final class ProjectsController extends Controller
                     ])
                 ]
             ]
-        );
-    }
-
-    /**
-     * @param int $index
-     *
-     * @return JsonResponse
-     */
-    private function createUniqueMetaDataElementValidationResponse(int $index): JsonResponse
-    {
-        return $this->createResponse(
-            [\sprintf('%s.%d.%s', self::REQUEST_PARAMETER_META_DATA_ELEMENTS, $index, ProjectMetaDataElementModel::PROPERTY_NAME)
-                => ['validation.unique']],
-            422
         );
     }
 }

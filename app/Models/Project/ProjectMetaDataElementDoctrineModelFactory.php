@@ -5,6 +5,8 @@ namespace App\Models\Project;
 use App\Exceptions\InvalidParameterException;
 use App\Models\ModelInterface;
 use App\Models\ModelParameterValidation;
+use App\Models\UuidCreate;
+use App\Services\Uuid\UuidFactory;
 
 /**
  * Class MetaDataElementDoctrineModelFactory
@@ -14,11 +16,22 @@ use App\Models\ModelParameterValidation;
 final class ProjectMetaDataElementDoctrineModelFactory implements ProjectMetaDataElementModelFactory
 {
     use ModelParameterValidation;
+    use UuidCreate;
 
     /**
      * @var ProjectModelFactory
      */
     private $projectModelFactory;
+
+    /**
+     * ProjectMetaDataElementDoctrineModelFactory constructor.
+     *
+     * @param UuidFactory $uuidFactory
+     */
+    public function __construct(UuidFactory $uuidFactory)
+    {
+        $this->uuidFactory = $uuidFactory;
+    }
 
     /**
      * @param ProjectModelFactory $projectModelFactory
@@ -50,7 +63,7 @@ final class ProjectMetaDataElementDoctrineModelFactory implements ProjectMetaDat
     public function create(array $data): ModelInterface
     {
         return (new ProjectMetaDataElementDoctrineModel(
-            $this->validateStringParameter($data, ProjectMetaDataElementModel::PROPERTY_NAME),
+            $this->getUuidFactory()->create(),
             $this->validateStringParameter($data, ProjectMetaDataElementModel::PROPERTY_LABEL),
             $this->validateProjectModel($data),
             $this->validateBooleanParameter($data, ProjectMetaDataElementModel::PROPERTY_REQUIRED),
@@ -79,11 +92,6 @@ final class ProjectMetaDataElementDoctrineModelFactory implements ProjectMetaDat
      */
     public function fill(ModelInterface $model, array $data): ModelInterface
     {
-        $name = $this->validateStringParameter($data, ProjectMetaDataElementModel::PROPERTY_NAME, false);
-        if (!empty($name)) {
-            $model->setName($name);
-        }
-
         $label = $this->validateStringParameter($data, ProjectMetaDataElementModel::PROPERTY_LABEL, false);
         if (!empty($label)) {
             $model->setLabel($label);

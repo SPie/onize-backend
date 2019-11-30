@@ -3,6 +3,7 @@
 namespace App\Models\Project;
 
 use App\Models\AbstractDoctrineModel;
+use App\Models\Uuid;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
@@ -15,12 +16,7 @@ use Doctrine\ORM\Mapping as ORM;
  */
 class ProjectMetaDataElementDoctrineModel extends AbstractDoctrineModel implements ProjectMetaDataElementModel
 {
-    /**
-     * @ORM\Column(name="name", type="string", length=255, nullable=false)
-     *
-     * @var string
-     */
-    private $name;
+    use Uuid;
 
     /**
      * @ORM\Column(name="label", type="string", length=255, nullable=false)
@@ -67,7 +63,7 @@ class ProjectMetaDataElementDoctrineModel extends AbstractDoctrineModel implemen
     /**
      * MetaDataElementDoctrineModel constructor.
      *
-     * @param string       $name
+     * @param string       $uuid
      * @param string       $label
      * @param ProjectModel $project
      * @param bool         $required
@@ -76,7 +72,7 @@ class ProjectMetaDataElementDoctrineModel extends AbstractDoctrineModel implemen
      * @param string       $fieldType
      */
     public function __construct(
-        string $name,
+        string $uuid,
         string $label,
         ProjectModel $project,
         bool $required,
@@ -84,33 +80,13 @@ class ProjectMetaDataElementDoctrineModel extends AbstractDoctrineModel implemen
         int $position,
         string $fieldType
     ) {
-        $this->name = $name;
+        $this->uuid = $uuid;
         $this->label = $label;
         $this->project = $project;
         $this->required = $required;
         $this->inList = $inList;
         $this->position = $position;
         $this->fieldType = $fieldType;
-    }
-
-    /**
-     * @param string $name
-     *
-     * @return $this
-     */
-    public function setName(string $name): ProjectMetaDataElementModel
-    {
-        $this->name = $name;
-
-        return $this;
-    }
-
-    /**
-     * @return string
-     */
-    public function getName(): string
-    {
-        return $this->name;
     }
 
     /**
@@ -241,7 +217,7 @@ class ProjectMetaDataElementDoctrineModel extends AbstractDoctrineModel implemen
     public function toArray(int $depth = 1): array
     {
         $array = [
-            self::PROPERTY_NAME       => $this->getName(),
+            self::PROPERTY_UUID       => $this->getUuid(),
             self::PROPERTY_LABEL      => $this->getLabel(),
             self::PROPERTY_REQUIRED   => $this->isRequired(),
             self::PROPERTY_IN_LIST    => $this->isInList(),

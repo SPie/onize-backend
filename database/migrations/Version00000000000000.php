@@ -165,7 +165,8 @@ class Version00000000000000 extends AbstractMigration
     {
         (new Builder($schema))->create('project_meta_data_elements', function (Table $table) {
             $table->increments('id');
-            $table->string('name');
+            $table->string('uuid');
+            $table->unique('uuid');
             $table->string('label');
             $table->integer('project_id', false, true);
             $table->foreign('projects', 'project_id', 'id');
@@ -173,7 +174,6 @@ class Version00000000000000 extends AbstractMigration
             $table->boolean('in_list');
             $table->smallInteger('position');
             $table->string('field_type');
-            $table->unique(['project_id', 'name']);
         });
 
         return $this;
