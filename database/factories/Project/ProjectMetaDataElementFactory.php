@@ -12,6 +12,7 @@ use LaravelDoctrine\ORM\Testing\Factory;
 
 $factory->define(ProjectMetaDataElementDoctrineModel::class, function (Faker $faker, array $attributes = []) {
     return [
+        ProjectMetaDataElementModel::PROPERTY_UUID     => $attributes[ProjectMetaDataElementModel::PROPERTY_UUID] ?? $faker->uuid,
         ProjectMetaDataElementModel::PROPERTY_LABEL    => $attributes[ProjectMetaDataElementModel::PROPERTY_LABEL] ?? $faker->word,
         ProjectMetaDataElementModel::PROPERTY_PROJECT  => $attributes[ProjectMetaDataElementModel::PROPERTY_PROJECT] ?? entity(ProjectDoctrineModel::class, 1)->create(),
         ProjectMetaDataElementModel::PROPERTY_REQUIRED => $attributes[ProjectMetaDataElementModel::PROPERTY_REQUIRED] ?? $faker->boolean,

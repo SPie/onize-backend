@@ -20,4 +20,11 @@ interface ProjectMetaDataElementRepository extends RepositoryInterface
      * @return ProjectMetaDataElementModel|ModelInterface
      */
     public function save(ModelInterface $model, bool $flush = true): ModelInterface;
+
+    /**
+     * @param string $uuid
+     *
+     * @return ProjectMetaDataElementModel|null
+     */
+    public function findOneByUuid(string $uuid): ?ProjectMetaDataElementModel;
 }

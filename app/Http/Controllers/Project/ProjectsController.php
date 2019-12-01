@@ -22,12 +22,13 @@ use Illuminate\Validation\ValidationException;
  */
 final class ProjectsController extends Controller
 {
-    const ROUTE_NAME_LIST               = 'projects.list';
-    const ROUTE_NAME_DETAILS            = 'projects.details';
-    const ROUTE_NAME_ADD                = 'projects.add';
-    const ROUTE_NAME_REMOVE             = 'projects.remove';
-    const ROUTE_NAME_INVITES            = 'projects.invites';
-    const ROUTE_NAME_META_DATA_ELEMENTS = 'projects.metaDataElements';
+    const ROUTE_NAME_LIST                             = 'projects.list';
+    const ROUTE_NAME_DETAILS                          = 'projects.details';
+    const ROUTE_NAME_ADD                              = 'projects.add';
+    const ROUTE_NAME_REMOVE                           = 'projects.remove';
+    const ROUTE_NAME_INVITES                          = 'projects.invites';
+    const ROUTE_NAME_META_DATA_ELEMENTS               = 'projects.metaDataElements';
+    const ROUTE_NAME_REMOVE_PROJECT_META_DATA_ELEMENT = 'projects.removeProjectMetaDataElement';
 
     const REQUEST_PARAMETER_INVITE_URL         = 'inviteUrl';
     const REQUEST_PARAMETER_META_DATA_ELEMENTS = 'metaDataElements';
@@ -185,6 +186,20 @@ final class ProjectsController extends Controller
         );
     }
 
+    /**
+     * @param Request $request
+     *
+     * @return JsonResponse
+     */
+    public function removeProjectMetaDataElement(Request $request): JsonResponse
+    {
+        $this->getProjectService()->removeProjectMetaDataElement(
+            $this->validateProjectMetaDataElementUuidFromRequest($request)
+        );
+
+        return $this->createResponse([], Response::HTTP_NO_CONTENT);
+    }
+
     //endregion
 
     /**
@@ -291,5 +306,20 @@ final class ProjectsController extends Controller
                 ]
             ]
         );
+    }
+
+    /**
+     * @param Request $request
+     *
+     * @return string
+     *
+     * @throws ValidationException
+     */
+    private function validateProjectMetaDataElementUuidFromRequest(Request $request): string
+    {
+        return $this->validate(
+            $request,
+            [ProjectMetaDataElementModel::PROPERTY_UUID => ['required']]
+        )[ProjectMetaDataElementModel::PROPERTY_UUID];
     }
 }

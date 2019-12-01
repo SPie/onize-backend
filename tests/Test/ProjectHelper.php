@@ -227,6 +227,33 @@ trait ProjectHelper
     }
 
     /**
+     * @param ProjectServiceInterface|MockInterface $projectService
+     * @param string                                $uuid
+     * @param \Exception|null                       $exception
+     *
+     * @return $this
+     */
+    private function mockProjectServiceRemoveProjectMetaDataElement(
+        MockInterface $projectService,
+        string $uuid,
+        \Exception $exception = null
+    ): self {
+        $expectation = $projectService
+            ->shouldReceive('removeProjectMetaDataElement')
+            ->with($uuid);
+
+        if ($exception) {
+            $expectation->andThrow($exception);
+
+            return $this;
+        }
+
+        $expectation->andReturn($projectService);
+
+        return $this;
+    }
+
+    /**
      * @param int   $times
      * @param array $data
      *
@@ -351,20 +378,18 @@ trait ProjectHelper
     /**
      * @param ProjectMetaDataElementRepository|MockInterface $metaDataElementRepository
      * @param ProjectMetaDataElementModel|null               $metaDataElement
-     * @param string                                         $name
-     * @param ProjectModel                                   $project
+     * @param string                                         $uuid
      *
      * @return $this
      */
-    private function mockProjectMetaDataElementRepositoryFindByNameAndProject(
+    private function mockProjectMetaDataElementRepositoryFindOneByUuid(
         MockInterface $metaDataElementRepository,
         ?ProjectMetaDataElementModel $metaDataElement,
-        string $name,
-        ProjectModel $project
+        string $uuid
     ): self {
         $metaDataElementRepository
-            ->shouldReceive('findByNameAndProject')
-            ->with($name, $project)
+            ->shouldReceive('findOneByUuid')
+            ->with($uuid)
             ->andReturn($metaDataElement);
 
         return $this;
@@ -398,6 +423,24 @@ trait ProjectHelper
         $projectService
             ->shouldHaveReceived('removeProject')
             ->with($uuid, $user)
+            ->once();
+
+        return $this;
+    }
+
+    /**
+     * @param ProjectServiceInterface|MockInterface $projectService
+     * @param string                                $uuid
+     *
+     * @return $this
+     */
+    private function assertProjectServiceRemoveProjectMetaDataElement(
+        MockInterface $projectService,
+        string $uuid
+    ): self {
+        $projectService
+            ->shouldHaveReceived('removeProjectMetaDataElement')
+            ->with($uuid)
             ->once();
 
         return $this;

@@ -910,6 +910,59 @@ final class ProjectApiCallsTest extends IntegrationTestCase
         $this->assertEquals('validation.in', $responseData['metaDataElements.0.fieldType'][0]);
     }
 
+    /**
+     * @return void
+     */
+    public function testRemoveProjectMetaDataElement(): void
+    {
+        $projectMetaDataElement = $this->createProjectMetaDataElements()->first();
+
+        $this->doApiCall(
+            URL::route('projects.removeProjectMetaDataElement'),
+            Request::METHOD_DELETE,
+            ['uuid' => $projectMetaDataElement->getUuid()],
+            null,
+            $this->createAuthHeader($this->createUsers()->first())
+        );
+
+        $this->assertResponseStatus(204);
+        $this->assertEmpty($this->getMetaDataElementsRepository()->findOneByUuid($projectMetaDataElement->getUuid()));
+    }
+
+    /**
+     * @return void
+     */
+    public function testRemoveProjectMetaDataElementWithoutUuid(): void
+    {
+        $response = $this->doApiCall(
+            URL::route('projects.removeProjectMetaDataElement'),
+            Request::METHOD_DELETE,
+            [],
+            null,
+            $this->createAuthHeader($this->createUsers()->first())
+        );
+
+        $this->assertResponseStatus(422);
+        $responseData = $response->getData(true);
+        $this->assertEquals('validation.required', $responseData['uuid'][0]);
+    }
+
+    /**
+     * @return void
+     */
+    public function testRemoveProjectMetaDataElementWithoutModel(): void
+    {
+        $this->doApiCall(
+            URL::route('projects.removeProjectMetaDataElement'),
+            Request::METHOD_DELETE,
+            ['uuid' => $this->getFaker()->uuid],
+            null,
+            $this->createAuthHeader($this->createUsers()->first())
+        );
+
+        $this->assertResponseStatus(404);
+    }
+
     //endregion
 
     /**

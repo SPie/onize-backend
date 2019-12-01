@@ -52,4 +52,11 @@ interface ProjectServiceInterface
      * @return ProjectMetaDataElementModel[]
      */
     public function createMetaDataElements(string $uuid, array $metaDataElements): array;
+
+    /**
+     * @param string $uuid
+     *
+     * @return $this
+     */
+    public function removeProjectMetaDataElement(string $uuid): self;
 }

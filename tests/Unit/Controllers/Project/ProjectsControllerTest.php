@@ -4,6 +4,7 @@ use App\Exceptions\Auth\NotAllowedException;
 use App\Exceptions\ModelNotFoundException;
 use App\Http\Controllers\Project\ProjectsController;
 use App\Models\Project\ProjectInviteModel;
+use App\Models\Project\ProjectMetaDataElementModel;
 use App\Models\Project\ProjectModel;
 use App\Models\User\UserModelInterface;
 use App\Services\Project\ProjectServiceInterface;
@@ -704,6 +705,56 @@ final class ProjectsControllerTest extends TestCase
         $this->expectException(ValidationException::class);
 
         $this->getProjectsController()->createMetaDataElements($request);
+    }
+
+    /**
+     * @return void
+     */
+    public function testDeleteProjectMetaDataElement(): void
+    {
+        $uuid = $this->getFaker()->uuid;
+        $request = $this->createRequest();
+        $request->offsetSet('uuid', $uuid);
+        $projectService = $this->createProjectService();
+
+        $this->assertEquals(
+            $this->createJsonResponse($this->createJsonResponseData([]), 204),
+            $this->getProjectsController(null, $projectService)->removeProjectMetaDataElement($request)
+        );
+
+        $this->assertProjectServiceRemoveProjectMetaDataElement($projectService, $uuid);
+    }
+
+    /**
+     * @return void
+     */
+    public function testDeleteProjectMetaDataElementWithoutUuid(): void
+    {
+        $projectService = $this->createProjectService();
+
+        $this->expectException(ValidationException::class);
+
+        $this->getProjectsController(null, $projectService)->removeProjectMetaDataElement($this->createRequest());
+    }
+
+    /**
+     * @return void
+     */
+    public function testDeleteProjectMetaDataElementWithoutExistingProjectMetaDataElement(): void
+    {
+        $uuid = $this->getFaker()->uuid;
+        $request = $this->createRequest();
+        $request->offsetSet('uuid', $uuid);
+        $projectService = $this->createProjectService();
+        $this->mockProjectServiceRemoveProjectMetaDataElement(
+            $projectService,
+            $uuid,
+            new ModelNotFoundException(ProjectMetaDataElementModel::class, $uuid)
+        );
+
+        $this->expectException(ModelNotFoundException::class);
+
+        $this->getProjectsController(null, $projectService)->removeProjectMetaDataElement($request);
     }
 
     //endregion

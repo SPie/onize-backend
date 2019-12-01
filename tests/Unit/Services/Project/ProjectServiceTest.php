@@ -395,6 +395,45 @@ final class ProjectServiceTest extends TestCase
         )->createMetaDataElements($uuid, [$metaDataElementData]);
     }
 
+    /**
+     * @return void
+     */
+    public function testRemoveProjectMetaDataElement(): void
+    {
+        $uuid = $this->getFaker()->uuid;
+        $projectMetaDataElement = $this->createProjectMetaDataElementModel();
+        $projectMetaDataElementRepository = $this->createProjectMetaDataElementRepository();
+        $this->mockProjectMetaDataElementRepositoryFindOneByUuid(
+            $projectMetaDataElementRepository,
+            $projectMetaDataElement,
+            $uuid
+        );
+
+        $this->getProjectServiceForRemoveProjectMetaDataElements($projectMetaDataElementRepository)
+            ->removeProjectMetaDataElement($uuid);
+
+        $this->assertRepositoryDelete($projectMetaDataElementRepository, $projectMetaDataElement);
+    }
+
+    /**
+     * @return void
+     */
+    public function testRemoveProjectMetaDataElementWithoutModel(): void
+    {
+        $uuid = $this->getFaker()->uuid;
+        $projectMetaDataElementRepository = $this->createProjectMetaDataElementRepository();
+        $this->mockProjectMetaDataElementRepositoryFindOneByUuid(
+            $projectMetaDataElementRepository,
+            null,
+            $uuid
+        );
+
+        $this->expectException(ModelNotFoundException::class);
+
+        $this->getProjectServiceForRemoveProjectMetaDataElements($projectMetaDataElementRepository)
+            ->removeProjectMetaDataElement($uuid);
+    }
+
     //endregion
 
     /**
@@ -444,6 +483,24 @@ final class ProjectServiceTest extends TestCase
             $this->createProjectInviteModelFactory(),
             $metaDataElementRepository ?: $this->createProjectMetaDataElementRepository(),
             $metaDataElementModelFactory ?: $this->createProjectMetaDataElementModelFactory()
+        );
+    }
+
+    /**
+     * @param ProjectMetaDataElementRepository|null $metaDataElementRepository
+     *
+     * @return ProjectService
+     */
+    private function getProjectServiceForRemoveProjectMetaDataElements(
+        ProjectMetaDataElementRepository $metaDataElementRepository = null
+    ): ProjectService {
+        return new ProjectService(
+            $this->createProjectRepository(),
+            $this->createProjectModelFactory(),
+            $this->createProjectInviteRepository(),
+            $this->createProjectInviteModelFactory(),
+            $metaDataElementRepository ?: $this->createProjectMetaDataElementRepository(),
+            $this->createProjectMetaDataElementModelFactory()
         );
     }
 

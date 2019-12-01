@@ -47,12 +47,12 @@ final class ProjectService implements ProjectServiceInterface
     /**
      * @var ProjectMetaDataElementRepository
      */
-    private $metaDataElementRepository;
+    private $projectMetaDataElementRepository;
 
     /**
      * @var ProjectMetaDataElementModelFactory
      */
-    private $metaDataElementModelFactory;
+    private $projectMetaDataElementModelFactory;
 
     /**
      * ProjectService constructor.
@@ -61,23 +61,23 @@ final class ProjectService implements ProjectServiceInterface
      * @param ProjectModelFactory                $projectModelFactory
      * @param ProjectInviteRepository            $projectInviteRepository
      * @param ProjectInviteModelFactory          $projectInviteModelFactory
-     * @param ProjectMetaDataElementRepository   $metaDataElementRepository
-     * @param ProjectMetaDataElementModelFactory $metaDataElementModelFactory
+     * @param ProjectMetaDataElementRepository   $projectMetaDataElementRepository
+     * @param ProjectMetaDataElementModelFactory $projectMetaDataElementModelFactory
      */
     public function __construct(
         ProjectRepository $projectRepository,
         ProjectModelFactory $projectModelFactory,
         ProjectInviteRepository $projectInviteRepository,
         ProjectInviteModelFactory $projectInviteModelFactory,
-        ProjectMetaDataElementRepository $metaDataElementRepository,
-        ProjectMetaDataElementModelFactory $metaDataElementModelFactory
+        ProjectMetaDataElementRepository $projectMetaDataElementRepository,
+        ProjectMetaDataElementModelFactory $projectMetaDataElementModelFactory
     ) {
         $this->projectRepository = $projectRepository;
         $this->projectModelFactory = $projectModelFactory;
         $this->projectInviteRepository = $projectInviteRepository;
         $this->projectInviteModelFactory = $projectInviteModelFactory;
-        $this->metaDataElementRepository = $metaDataElementRepository;
-        $this->metaDataElementModelFactory = $metaDataElementModelFactory;
+        $this->projectMetaDataElementRepository = $projectMetaDataElementRepository;
+        $this->projectMetaDataElementModelFactory = $projectMetaDataElementModelFactory;
     }
 
     /**
@@ -115,17 +115,17 @@ final class ProjectService implements ProjectServiceInterface
     /**
      * @return ProjectMetaDataElementRepository
      */
-    private function getMetaDataElementRepository(): ProjectMetaDataElementRepository
+    private function getProjectMetaDataElementRepository(): ProjectMetaDataElementRepository
     {
-        return $this->metaDataElementRepository;
+        return $this->projectMetaDataElementRepository;
     }
 
     /**
      * @return ProjectMetaDataElementModelFactory
      */
-    private function getMetaDataElementModelFactory(): ProjectMetaDataElementModelFactory
+    private function getProjectMetaDataElementModelFactory(): ProjectMetaDataElementModelFactory
     {
-        return $this->metaDataElementModelFactory;
+        return $this->projectMetaDataElementModelFactory;
     }
 
     /**
@@ -275,7 +275,7 @@ final class ProjectService implements ProjectServiceInterface
             $metaDataElementModels[] = $this->createNewMetaDataElement($metaDataElement, $project);
         }
 
-        $this->getMetaDataElementRepository()->flush();
+        $this->getProjectMetaDataElementRepository()->flush();
 
         return $metaDataElementModels;
     }
@@ -288,11 +288,28 @@ final class ProjectService implements ProjectServiceInterface
      */
     private function createNewMetaDataElement(array $metaDataElementData, ProjectModel $project): ProjectMetaDataElementModel
     {
-        return $this->getMetaDataElementRepository()->save(
-            $this->getMetaDataElementModelFactory()->create(
+        return $this->getProjectMetaDataElementRepository()->save(
+            $this->getProjectMetaDataElementModelFactory()->create(
                 \array_merge($metaDataElementData, [ProjectMetaDataElementModel::PROPERTY_PROJECT => $project])
             ),
             false
         );
+    }
+
+    /**
+     * @param string $uuid
+     *
+     * @return ProjectServiceInterface
+     */
+    public function removeProjectMetaDataElement(string $uuid): ProjectServiceInterface
+    {
+        $projectMetaDataElement = $this->getProjectMetaDataElementRepository()->findOneByUuid($uuid);
+        if (!$projectMetaDataElement) {
+            throw new ModelNotFoundException(ProjectMetaDataElementModel::class, $uuid);
+        }
+
+        $this->getProjectMetaDataElementRepository()->delete($projectMetaDataElement);
+
+        return $this;
     }
 }
