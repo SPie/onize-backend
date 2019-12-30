@@ -5,6 +5,8 @@ namespace Test;
 use App\Models\ModelFactoryInterface;
 use App\Models\ModelInterface;
 use App\Repositories\DatabaseHandler;
+use App\Repositories\Query;
+use App\Repositories\QueryBuilder;
 use App\Services\Uuid\UuidFactory;
 use Doctrine\Common\Collections\Criteria;
 use Doctrine\ORM\EntityManager;
@@ -210,6 +212,150 @@ trait ModelHelper
                 return $argument == $criteria;
             }))
             ->andReturn($models);
+
+        return $this;
+    }
+
+    /**
+     * @param DatabaseHandler|MockInterface $databaseHandler
+     * @param QueryBuilder                  $queryBuilder
+     *
+     * @return $this
+     */
+    private function mockDatabaseHandlerCreateQueryBuilder(
+        MockInterface $databaseHandler,
+        QueryBuilder $queryBuilder
+    ): self {
+        $databaseHandler
+            ->shouldReceive('createQueryBuilder')
+            ->andReturn($queryBuilder);
+
+        return $this;
+    }
+
+    /**
+     * @return QueryBuilder|MockInterface
+     */
+    private function createQueryBuilder(): QueryBuilder
+    {
+        return Mockery::spy(QueryBuilder::class);
+    }
+
+    /**
+     * @param QueryBuilder|MockInterface $queryBuilder
+     * @param string                     $model
+     *
+     * @return $this
+     */
+    private function mockQueryBuilderUpdate(MockInterface $queryBuilder, string $model): self
+    {
+        $queryBuilder
+            ->shouldReceive('update')
+            ->with($model)
+            ->andReturn($queryBuilder);
+
+        return $this;
+    }
+
+    /**
+     * @param QueryBuilder|MockInterface $queryBuilder
+     * @param string                     $column
+     * @param string                     $value
+     *
+     * @return $this
+     */
+    private function mockQueryBuilderSet(MockInterface $queryBuilder, string $column, string $value): self
+    {
+        $queryBuilder
+            ->shouldReceive('set')
+            ->with($column, $value)
+            ->andReturn($queryBuilder);
+
+        return $this;
+    }
+
+    /**
+     * @param QueryBuilder|MockInterface $queryBuilder
+     * @param string                     $parameter
+     * @param string                     $value
+     *
+     * @return $this
+     */
+    private function mockQueryBuilderSetParameter(MockInterface $queryBuilder, string $parameter, string $value): self
+    {
+        $queryBuilder
+            ->shouldReceive('setParameter')
+            ->with($parameter, $value)
+            ->andReturn($queryBuilder);
+
+        return $this;
+    }
+
+    /**
+     * @param QueryBuilder|MockInterface $queryBuilder
+     * @param string                     $expression
+     *
+     * @return $this
+     */
+    private function mockQueryBuilderWhere(MockInterface $queryBuilder, string $expression): self
+    {
+        $queryBuilder
+            ->shouldReceive('where')
+            ->with($expression)
+            ->andReturn($queryBuilder);
+
+        return $this;
+    }
+
+    /**
+     * @param QueryBuilder|MockInterface $queryBuilder
+     * @param string                     $expression
+     *
+     * @return $this
+     */
+    private function mockQueryBuilderAndWhere(MockInterface $queryBuilder, string $expression): self
+    {
+        $queryBuilder
+            ->shouldReceive('andWhere')
+            ->with($expression)
+            ->andReturn($queryBuilder);
+
+        return $this;
+    }
+
+    /**
+     * @param QueryBuilder|MockInterface $queryBuilder
+     * @param Query         $query
+     *
+     * @return $this
+     */
+    private function mockQueryBuilderGetQuery(MockInterface $queryBuilder, Query $query): self
+    {
+        $queryBuilder
+            ->shouldReceive('getQuery')
+            ->andReturn($query);
+
+        return $this;
+    }
+
+    /**
+     * @return Query|MockInterface
+     */
+    private function createQuery(): Query
+    {
+        return Mockery::spy(Query::class);
+    }
+
+    /**
+     * @param Query|MockInterface $query
+     *
+     * @return $this
+     */
+    private function assertQueryExecute(MockInterface $query): self
+    {
+        $query
+            ->shouldHaveReceived('execute')
+            ->once();
 
         return $this;
     }

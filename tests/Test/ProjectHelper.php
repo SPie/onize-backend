@@ -345,6 +345,40 @@ trait ProjectHelper
     }
 
     /**
+     * @param ProjectMetaDataElementModel|MockInterface $projectMetaDataElementModel
+     * @param int|null                                  $id
+     *
+     * @return $this
+     */
+    private function mockProjectMetaDataElementModelGetId(
+        MockInterface $projectMetaDataElementModel,
+        ?int $id
+    ): self {
+        $projectMetaDataElementModel
+            ->shouldReceive('getId')
+            ->andReturn($id);
+
+        return $this;
+    }
+
+    /**
+     * @param ProjectMetaDataElementModel|MockInterface $projectMetaDataElementModel
+     * @param int                                       $position
+     *
+     * @return $this
+     */
+    private function mockProjectMetaDataElementModelGetPosition(
+        MockInterface $projectMetaDataElementModel,
+        int $position
+    ): self {
+        $projectMetaDataElementModel
+            ->shouldReceive('getPosition')
+            ->andReturn($position);
+
+        return $this;
+    }
+
+    /**
      * @return string
      */
     private function getRandomFieldType(): string
@@ -391,6 +425,46 @@ trait ProjectHelper
             ->shouldReceive('findOneByUuid')
             ->with($uuid)
             ->andReturn($metaDataElement);
+
+        return $this;
+    }
+
+    /**
+     * @param ProjectMetaDataElementRepository|MockInterface $projectMetaDataElementRepository
+     * @param int                                            $id
+     * @param int                                            $position
+     *
+     * @return $this
+     */
+    private function mockProjectMetaDataElementRepositoryDecreasePosition(
+        MockInterface $projectMetaDataElementRepository,
+        int $id,
+        int $position
+    ): self {
+        $projectMetaDataElementRepository
+            ->shouldReceive('decreasePosition')
+            ->with($id, $position)
+            ->andReturn($projectMetaDataElementRepository);
+
+        return $this;
+    }
+
+    /**
+     * @param ProjectMetaDataElementRepository|MockInterface $projectMetaDataElementRepository
+     * @param int                                            $id
+     * @param int                                            $position
+     *
+     * @return $this
+     */
+    private function assertProjectMetaDataElementRepositoryDecreasePosition(
+        MockInterface $projectMetaDataElementRepository,
+        int $id,
+        int $position
+    ): self {
+        $projectMetaDataElementRepository
+            ->shouldHaveReceived('decreasePosition')
+            ->with($id, $position)
+            ->once();
 
         return $this;
     }

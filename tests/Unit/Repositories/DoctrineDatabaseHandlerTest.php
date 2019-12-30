@@ -2,8 +2,10 @@
 
 use App\Models\ModelInterface;
 use App\Repositories\DoctrineDatabaseHandler;
+use App\Repositories\DoctrineQueryBuilder;
 use Doctrine\Common\Collections\Criteria;
 use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\QueryBuilder as RealQueryBuilder;
 use Doctrine\ORM\Persisters\Entity\EntityPersister;
 use Doctrine\ORM\UnitOfWork;
 use Illuminate\Support\Collection;
@@ -256,6 +258,20 @@ final class DoctrineDatabaseHandlerTest extends TestCase
         $this->assertEntityManagerFlush($entityManager);
     }
 
+    /**
+     * @return void
+     */
+    public function testCreateQueryBuilder(): void
+    {
+        $realQueryBuilder = $this->createRealQueryBuilder();
+        $entityManager = $this->createEntityManager();
+        $this->mockEntityManagerCreateQueryBuilder($entityManager, $realQueryBuilder);
+
+        $queryBuilder = $this->getDoctrineDatabaseHandler($entityManager)->createQueryBuilder();
+
+        $this->assertEquals(new DoctrineQueryBuilder($realQueryBuilder), $queryBuilder);
+    }
+
     //endregion
 
     /**
@@ -332,6 +348,23 @@ final class DoctrineDatabaseHandlerTest extends TestCase
             ->shouldReceive('find')
             ->with($className, $id)
             ->andReturn($model);
+
+        return $this;
+    }
+
+    /**
+     * @param EntityManager|MockInterface    $entityManager
+     * @param RealQueryBuilder|MockInterface $queryBuilder
+     *
+     * @return $this
+     */
+    private function mockEntityManagerCreateQueryBuilder(
+        MockInterface $entityManager,
+        RealQueryBuilder $queryBuilder
+    ): self {
+        $entityManager
+            ->shouldReceive('createQueryBuilder')
+            ->andReturn($queryBuilder);
 
         return $this;
     }
@@ -436,6 +469,14 @@ final class DoctrineDatabaseHandlerTest extends TestCase
             ->andReturn($models);
 
         return $this;
+    }
+
+    /**
+     * @return RealQueryBuilder
+     */
+    private function createRealQueryBuilder(): RealQueryBuilder
+    {
+        return m::spy(RealQueryBuilder::class);
     }
 
     /**

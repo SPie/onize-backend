@@ -69,4 +69,9 @@ interface DatabaseHandler
      * @return $this
      */
     public function flush(): self;
+
+    /**
+     * @return QueryBuilder
+     */
+    public function createQueryBuilder(): QueryBuilder;
 }

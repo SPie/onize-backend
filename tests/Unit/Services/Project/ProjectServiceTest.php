@@ -401,18 +401,27 @@ final class ProjectServiceTest extends TestCase
     public function testRemoveProjectMetaDataElement(): void
     {
         $uuid = $this->getFaker()->uuid;
+        $id = $this->getFaker()->numberBetween();
+        $position = $this->getFaker()->numberBetween();
         $projectMetaDataElement = $this->createProjectMetaDataElementModel();
+        $this
+            ->mockProjectMetaDataElementModelGetId($projectMetaDataElement, $id)
+            ->mockProjectMetaDataElementModelGetPosition($projectMetaDataElement, $position);
         $projectMetaDataElementRepository = $this->createProjectMetaDataElementRepository();
-        $this->mockProjectMetaDataElementRepositoryFindOneByUuid(
-            $projectMetaDataElementRepository,
-            $projectMetaDataElement,
-            $uuid
-        );
+        $this
+            ->mockProjectMetaDataElementRepositoryFindOneByUuid(
+                $projectMetaDataElementRepository,
+                $projectMetaDataElement,
+                $uuid
+            )
+            ->mockProjectMetaDataElementRepositoryDecreasePosition($projectMetaDataElementRepository, $id, $position);
 
         $this->getProjectServiceForRemoveProjectMetaDataElements($projectMetaDataElementRepository)
             ->removeProjectMetaDataElement($uuid);
 
-        $this->assertRepositoryDelete($projectMetaDataElementRepository, $projectMetaDataElement);
+        $this
+            ->assertProjectMetaDataElementRepositoryDecreasePosition($projectMetaDataElementRepository, $id, $position)
+            ->assertRepositoryDelete($projectMetaDataElementRepository, $projectMetaDataElement);
     }
 
     /**

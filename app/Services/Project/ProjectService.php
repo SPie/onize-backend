@@ -308,7 +308,9 @@ final class ProjectService implements ProjectServiceInterface
             throw new ModelNotFoundException(ProjectMetaDataElementModel::class, $uuid);
         }
 
-        $this->getProjectMetaDataElementRepository()->delete($projectMetaDataElement);
+        $this->getProjectMetaDataElementRepository()
+            ->decreasePosition($projectMetaDataElement->getId(), $projectMetaDataElement->getPosition())
+            ->delete($projectMetaDataElement);
 
         return $this;
     }

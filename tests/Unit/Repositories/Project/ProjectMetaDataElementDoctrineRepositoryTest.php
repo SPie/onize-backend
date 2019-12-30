@@ -1,5 +1,6 @@
 <?php
 
+use App\Models\Project\ProjectMetaDataElementDoctrineModel;
 use App\Repositories\DatabaseHandler;
 use App\Repositories\Project\ProjectMetaDataElementDoctrineRepository;
 use Test\ModelHelper;
@@ -41,6 +42,33 @@ final class ProjectMetaDataElementDoctrineRepositoryTest extends TestCase
         $this->mockDatabaseHandlerLoad($databaseHandler, null, ['uuid' => $uuid]);
 
         $this->assertEmpty($this->getProjectMetaDataElementDoctrineRepository($databaseHandler)->findOneByUuid($uuid));
+    }
+
+    /**
+     * @return void
+     */
+    public function testDecreasePosition(): void
+    {
+        $position = $this->getFaker()->numberBetween();
+        $projectId = $this->getFaker()->numberBetween();
+        $query = $this->createQuery();
+        $queryBuilder = $this->createQueryBuilder();
+        $this
+            ->mockQueryBuilderUpdate($queryBuilder, ProjectMetaDataElementDoctrineModel::class)
+            ->mockQueryBuilderSet($queryBuilder, 'position', ':newPosition')
+            ->mockQueryBuilderWhere($queryBuilder, 'projectId = :projectId')
+            ->mockQueryBuilderAndWhere($queryBuilder, 'position > :position')
+            ->mockQueryBuilderSetParameter($queryBuilder, 'newPosition', 'position - 1')
+            ->mockQueryBuilderSetParameter($queryBuilder, 'projectId', $projectId)
+            ->mockQueryBuilderSetParameter($queryBuilder, 'position', $position)
+            ->mockQueryBuilderGetQuery($queryBuilder, $query);
+        $databaseHandler = $this->createDatabaseHandler();
+        $this->mockDatabaseHandlerCreateQueryBuilder($databaseHandler, $queryBuilder);
+        $projectMetaDataElementRepository = $this->getProjectMetaDataElementDoctrineRepository($databaseHandler);
+
+        $projectMetaDataElementRepository->decreasePosition($projectId, $position);
+
+        $this->assertQueryExecute($query);
     }
 
     //endregion

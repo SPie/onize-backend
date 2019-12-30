@@ -27,4 +27,12 @@ interface ProjectMetaDataElementRepository extends RepositoryInterface
      * @return ProjectMetaDataElementModel|null
      */
     public function findOneByUuid(string $uuid): ?ProjectMetaDataElementModel;
+
+    /**
+     * @param int $projectId
+     * @param int $position
+     *
+     * @return $this
+     */
+    public function decreasePosition(int $projectId, int $position): self;
 }

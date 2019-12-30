@@ -151,6 +151,14 @@ final class DoctrineDatabaseHandler implements DatabaseHandler
     }
 
     /**
+     * @return QueryBuilder
+     */
+    public function createQueryBuilder(): QueryBuilder
+    {
+        return new DoctrineQueryBuilder($this->getEntityManager()->createQueryBuilder());
+    }
+
+    /**
      * @return EntityPersister
      */
     private function getEntityPersister(): EntityPersister
