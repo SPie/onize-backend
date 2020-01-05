@@ -54,11 +54,10 @@ final class ProjectMetaDataElementDoctrineRepositoryTest extends TestCase
         $query = $this->createQuery();
         $queryBuilder = $this->createQueryBuilder();
         $this
-            ->mockQueryBuilderUpdate($queryBuilder, ProjectMetaDataElementDoctrineModel::class)
-            ->mockQueryBuilderSet($queryBuilder, 'position', ':newPosition')
-            ->mockQueryBuilderWhere($queryBuilder, 'projectId = :projectId')
-            ->mockQueryBuilderAndWhere($queryBuilder, 'position > :position')
-            ->mockQueryBuilderSetParameter($queryBuilder, 'newPosition', 'position - 1')
+            ->mockQueryBuilderUpdate($queryBuilder, ProjectMetaDataElementDoctrineModel::class, 'pm')
+            ->mockQueryBuilderSet($queryBuilder, 'pm.position', 'pm.position - 1')
+            ->mockQueryBuilderWhere($queryBuilder, 'pm.project = :projectId')
+            ->mockQueryBuilderAndWhere($queryBuilder, 'pm.position > :position')
             ->mockQueryBuilderSetParameter($queryBuilder, 'projectId', $projectId)
             ->mockQueryBuilderSetParameter($queryBuilder, 'position', $position)
             ->mockQueryBuilderGetQuery($queryBuilder, $query);

@@ -1,5 +1,6 @@
 <?php
 
+use App\Models\Project\ProjectMetaDataElementModel;
 use App\Models\Project\ProjectModel;
 use App\Repositories\Project\ProjectMetaDataElementRepository;
 use App\Repositories\Project\ProjectInviteRepository;
@@ -961,6 +962,107 @@ final class ProjectApiCallsTest extends IntegrationTestCase
         );
 
         $this->assertResponseStatus(404);
+    }
+
+    /**
+     * @return void
+     */
+    public function testDecreasePositionOnRemoveProjectMetaDataElement(): void
+    {
+        $project = $this->createProjects()->first();
+        $firstMetaDataElement = $this->createProjectMetaDataElements(
+            1,
+            [
+                ProjectMetaDataElementModel::PROPERTY_PROJECT => $project,
+                ProjectMetaDataElementModel::PROPERTY_POSITION => 1,
+            ]
+        )->first();
+        $secondMetaDataElement = $this->createProjectMetaDataElements(
+            1,
+            [
+                ProjectMetaDataElementModel::PROPERTY_PROJECT => $project,
+                ProjectMetaDataElementModel::PROPERTY_POSITION => 2,
+            ]
+        )->first();
+        $thirdMetaDataElement = $this->createProjectMetaDataElements(
+            1,
+            [
+                ProjectMetaDataElementModel::PROPERTY_PROJECT => $project,
+                ProjectMetaDataElementModel::PROPERTY_POSITION => 3,
+            ]
+        )->first();
+
+        $this->clearModelCache();
+
+        $this->doApiCall(
+            URL::route('projects.removeProjectMetaDataElement'),
+            Request::METHOD_DELETE,
+            ['uuid' => $firstMetaDataElement->getUuid()],
+            null,
+            $this->createAuthHeader($this->createUsers()->first())
+        );
+
+        $this->assertResponseStatus(204);
+        $projectMetaDataElementRepository = $this->getMetaDataElementsRepository();
+        $this->assertEmpty($projectMetaDataElementRepository->findOneByUuid($firstMetaDataElement->getUuid()));
+        $this->assertEquals(
+            1,
+            $projectMetaDataElementRepository->findOneByUuid($secondMetaDataElement->getUuid())->getPosition()
+        );
+        $this->assertEquals(
+            2,
+            $projectMetaDataElementRepository->findOneByUuid($thirdMetaDataElement->getUuid())->getPosition()
+        );
+    }
+
+    /**
+     * @return void
+     */
+    public function testDecreasePositionOnRemoveProjectMetaDataElementOnlyOfTrailingElements(): void
+    {
+        $project = $this->createProjects()->first();
+        $firstMetaDataElement = $this->createProjectMetaDataElements(
+            1,
+            [
+                ProjectMetaDataElementModel::PROPERTY_PROJECT => $project,
+                ProjectMetaDataElementModel::PROPERTY_POSITION => 1,
+            ]
+        )->first();
+        $secondMetaDataElement = $this->createProjectMetaDataElements(
+            1,
+            [
+                ProjectMetaDataElementModel::PROPERTY_PROJECT => $project,
+                ProjectMetaDataElementModel::PROPERTY_POSITION => 2,
+            ]
+        )->first();
+        $thirdMetaDataElement = $this->createProjectMetaDataElements(
+            1,
+            [
+                ProjectMetaDataElementModel::PROPERTY_PROJECT => $project,
+                ProjectMetaDataElementModel::PROPERTY_POSITION => 3,
+            ]
+        )->first();
+
+        $this->clearModelCache();
+
+        $this->doApiCall(
+            URL::route('projects.removeProjectMetaDataElement'),
+            Request::METHOD_DELETE,
+            ['uuid' => $secondMetaDataElement->getUuid()],
+            null,
+            $this->createAuthHeader($this->createUsers()->first())
+        );
+
+        $this->assertResponseStatus(204);
+        $projectMetaDataElementRepository = $this->getMetaDataElementsRepository();
+        $this->assertEquals(
+            1,
+            $projectMetaDataElementRepository->findOneByUuid($firstMetaDataElement->getUuid())->getPosition()
+        );
+        $this->assertEquals(
+            2,
+            $projectMetaDataElementRepository->findOneByUuid($thirdMetaDataElement->getUuid())->getPosition()
+        );
     }
 
     //endregion

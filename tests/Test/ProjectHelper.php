@@ -71,6 +71,21 @@ trait ProjectHelper
     }
 
     /**
+     * @param ProjectModel|MockInterface $project
+     * @param int                        $id
+     *
+     * @return $this
+     */
+    private function mockProjectModelGetId(MockInterface $project, int $id): self
+    {
+        $project
+            ->shouldReceive('getId')
+            ->andReturn($id);
+
+        return $this;
+    }
+
+    /**
      * @return ProjectRepository|MockInterface
      */
     private function createProjectRepository(): ProjectRepository
@@ -374,6 +389,23 @@ trait ProjectHelper
         $projectMetaDataElementModel
             ->shouldReceive('getPosition')
             ->andReturn($position);
+
+        return $this;
+    }
+
+    /**
+     * @param ProjectMetaDataElementModel|MockInterface $projectMetaDataElementModel
+     * @param ProjectModel                              $project
+     *
+     * @return $this
+     */
+    private function mockProjectMetaDataElementModelGetProject(
+        MockInterface $projectMetaDataElementModel,
+        ProjectModel $project
+    ): self {
+        $projectMetaDataElementModel
+            ->shouldReceive('getProject')
+            ->andReturn($project);
 
         return $this;
     }

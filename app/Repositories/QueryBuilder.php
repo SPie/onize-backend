@@ -10,11 +10,12 @@ namespace App\Repositories;
 interface QueryBuilder
 {
     /**
-     * @param string $table
+     * @param string      $table
+     * @param string|null $alias
      *
      * @return $this
      */
-    public function update(string $table): self;
+    public function update(string $table, string $alias = null): self;
 
     /**
      * @param string $column

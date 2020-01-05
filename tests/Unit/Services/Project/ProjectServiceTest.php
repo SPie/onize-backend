@@ -401,11 +401,13 @@ final class ProjectServiceTest extends TestCase
     public function testRemoveProjectMetaDataElement(): void
     {
         $uuid = $this->getFaker()->uuid;
-        $id = $this->getFaker()->numberBetween();
+        $projectId = $this->getFaker()->numberBetween();
+        $project = $this->createProjectModel();
+        $this->mockProjectModelGetId($project, $projectId);
         $position = $this->getFaker()->numberBetween();
         $projectMetaDataElement = $this->createProjectMetaDataElementModel();
         $this
-            ->mockProjectMetaDataElementModelGetId($projectMetaDataElement, $id)
+            ->mockProjectMetaDataElementModelGetProject($projectMetaDataElement, $project)
             ->mockProjectMetaDataElementModelGetPosition($projectMetaDataElement, $position);
         $projectMetaDataElementRepository = $this->createProjectMetaDataElementRepository();
         $this
@@ -414,13 +416,13 @@ final class ProjectServiceTest extends TestCase
                 $projectMetaDataElement,
                 $uuid
             )
-            ->mockProjectMetaDataElementRepositoryDecreasePosition($projectMetaDataElementRepository, $id, $position);
+            ->mockProjectMetaDataElementRepositoryDecreasePosition($projectMetaDataElementRepository, $projectId, $position);
 
         $this->getProjectServiceForRemoveProjectMetaDataElements($projectMetaDataElementRepository)
             ->removeProjectMetaDataElement($uuid);
 
         $this
-            ->assertProjectMetaDataElementRepositoryDecreasePosition($projectMetaDataElementRepository, $id, $position)
+            ->assertProjectMetaDataElementRepositoryDecreasePosition($projectMetaDataElementRepository, $projectId, $position)
             ->assertRepositoryDelete($projectMetaDataElementRepository, $projectMetaDataElement);
     }
 

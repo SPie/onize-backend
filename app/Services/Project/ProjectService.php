@@ -309,7 +309,7 @@ final class ProjectService implements ProjectServiceInterface
         }
 
         $this->getProjectMetaDataElementRepository()
-            ->decreasePosition($projectMetaDataElement->getId(), $projectMetaDataElement->getPosition())
+            ->decreasePosition($projectMetaDataElement->getProject()->getId(), $projectMetaDataElement->getPosition())
             ->delete($projectMetaDataElement);
 
         return $this;

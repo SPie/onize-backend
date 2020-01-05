@@ -30,11 +30,10 @@ final class ProjectMetaDataElementDoctrineRepository extends AbstractDoctrineRep
     public function decreasePosition(int $projectId, int $position): ProjectMetaDataElementRepository
     {
         $this->getDatabaseHandler()->createQueryBuilder()
-            ->update(ProjectMetaDataElementDoctrineModel::class)
-            ->set('position', ':newPosition')
-            ->where('projectId = :projectId')
-            ->andWhere('position > :position')
-            ->setParameter('newPosition', 'position - 1')
+            ->update(ProjectMetaDataElementDoctrineModel::class, 'pm')
+            ->set('pm.position', 'pm.position - 1')
+            ->where('pm.project = :projectId')
+            ->andWhere('pm.position > :position')
             ->setParameter('projectId', $projectId)
             ->setParameter('position', $position)
             ->getQuery()

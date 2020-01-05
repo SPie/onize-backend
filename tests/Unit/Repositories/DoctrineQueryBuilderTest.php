@@ -28,12 +28,13 @@ final class DoctrineQueryBuilderTest extends TestCase
     public function testUpdate(): void
     {
         $table = $this->getFaker()->word;
+        $alias = $this->getFaker()->word;
         $newRealQueryBuilder = $this->createRealQueryBuilder();
         $realQueryBuilder = $this->createRealQueryBuilder();
-        $this->mockRealQueryBuilderUpdate($realQueryBuilder, $newRealQueryBuilder, $table);
+        $this->mockRealQueryBuilderUpdate($realQueryBuilder, $newRealQueryBuilder, $table, $alias);
         $queryBuilder = $this->getDoctrineQueryBuilder($realQueryBuilder);
 
-        $queryBuilder->update($table);
+        $queryBuilder->update($table, $alias);
 
         $this->assertEquals($newRealQueryBuilder, $this->getPrivateProperty($queryBuilder, 'realQueryBuilder'));
     }
@@ -141,17 +142,19 @@ final class DoctrineQueryBuilderTest extends TestCase
      * @param RealQueryBuilder|MockInterface $realQueryBuilder
      * @param RealQueryBuilder               $newRealQueryBuilder
      * @param string                         $table
+     * @param string|null                    $alias
      *
      * @return $this
      */
     private function mockRealQueryBuilderUpdate(
         MockInterface $realQueryBuilder,
         RealQueryBuilder $newRealQueryBuilder,
-        string $table
+        string $table,
+        string $alias = null
     ): self {
         $realQueryBuilder
             ->shouldReceive('update')
-            ->with($table)
+            ->with($table, $alias)
             ->andReturn($newRealQueryBuilder);
 
         return $this;

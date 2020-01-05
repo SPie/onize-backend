@@ -37,9 +37,9 @@ final class DoctrineQueryBuilder implements QueryBuilder
     /**
      * @inheritDoc
      */
-    public function update(string $table): QueryBuilder
+    public function update(string $table, string $alias = null): QueryBuilder
     {
-        $this->realQueryBuilder = $this->getRealQueryBuilder()->update($table);
+        $this->realQueryBuilder = $this->getRealQueryBuilder()->update($table, $alias);
 
         return $this;
     }

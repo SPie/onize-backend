@@ -33,4 +33,12 @@ final class DoctrineQuery implements Query
     {
         return $this->realQuery;
     }
+
+    /**
+     * @return mixed
+     */
+    public function execute()
+    {
+        return $this->getRealQuery()->getResult();
+    }
 }

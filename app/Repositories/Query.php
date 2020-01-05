@@ -9,5 +9,8 @@ namespace App\Repositories;
  */
 interface Query
 {
-
+    /**
+     * @return mixed
+     */
+    public function execute();
 }

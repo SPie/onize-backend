@@ -244,14 +244,15 @@ trait ModelHelper
     /**
      * @param QueryBuilder|MockInterface $queryBuilder
      * @param string                     $model
+     * @param string|null                $alias
      *
      * @return $this
      */
-    private function mockQueryBuilderUpdate(MockInterface $queryBuilder, string $model): self
+    private function mockQueryBuilderUpdate(MockInterface $queryBuilder, string $model, string $alias = null): self
     {
         $queryBuilder
             ->shouldReceive('update')
-            ->with($model)
+            ->with($model, $alias)
             ->andReturn($queryBuilder);
 
         return $this;
