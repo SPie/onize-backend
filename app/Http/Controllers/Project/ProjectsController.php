@@ -28,6 +28,7 @@ final class ProjectsController extends Controller
     const ROUTE_NAME_REMOVE                           = 'projects.remove';
     const ROUTE_NAME_INVITES                          = 'projects.invites';
     const ROUTE_NAME_META_DATA_ELEMENTS               = 'projects.metaDataElements';
+    const ROUTE_NAME_UPDATE_META_DATA_ELEMENTS        = 'projects.updateMetaDataElements';
     const ROUTE_NAME_REMOVE_PROJECT_META_DATA_ELEMENT = 'projects.removeProjectMetaDataElement';
 
     const REQUEST_PARAMETER_INVITE_URL         = 'inviteUrl';
@@ -173,7 +174,7 @@ final class ProjectsController extends Controller
      */
     public function createMetaDataElements(Request $request): JsonResponse
     {
-        $parameters = $this->validateDataForMetaDataElements($request);
+        $parameters = $this->validateDataForCreateMetaDataElements($request);
 
         $metaDataElements = $this->getProjectService()->createMetaDataElements(
             $parameters[ProjectModel::PROPERTY_UUID],
@@ -184,6 +185,20 @@ final class ProjectsController extends Controller
             [self::RESPONSE_PARAMETER_META_DATA_ELEMENTS => $metaDataElements],
             Response::HTTP_CREATED
         );
+    }
+
+    /**
+     * @param Request $request
+     *
+     * @return JsonResponse
+     */
+    public function updateProjectMetaDataElements(Request $request): JsonResponse
+    {
+        return $this->createResponse([
+            self::RESPONSE_PARAMETER_META_DATA_ELEMENTS => $this->getProjectService()->updateMetaDataElements(
+                $this->validateProjectMetaDataElementsForUpdate($request)
+            ),
+        ]);
     }
 
     /**
@@ -241,12 +256,12 @@ final class ProjectsController extends Controller
         return $this->validate(
             $request,
             [
-                'uuid' => ['required'],
-                'email' => [
+                ProjectModel::PROPERTY_UUID        => ['required'],
+                ProjectInviteModel::PROPERTY_EMAIL => [
                     'required',
                     'email',
                 ],
-                'inviteUrl' => ['required'],
+                self::REQUEST_PARAMETER_INVITE_URL => ['required'],
             ]
         );
     }
@@ -269,7 +284,7 @@ final class ProjectsController extends Controller
      *
      * @throws ValidationException
      */
-    private function validateDataForMetaDataElements(Request $request): array
+    private function validateDataForCreateMetaDataElements(Request $request): array
     {
         return $this->validate(
             $request,
@@ -306,6 +321,49 @@ final class ProjectsController extends Controller
                 ]
             ]
         );
+    }
+
+    /**
+     * @param Request $request
+     *
+     * @return array
+     *
+     * @throws ValidationException
+     */
+    private function validateProjectMetaDataElementsForUpdate(Request $request): array
+    {
+        return $this->validate(
+            $request,
+            [
+                self::REQUEST_PARAMETER_META_DATA_ELEMENTS => [
+                    'array'
+                ],
+                self::REQUEST_PARAMETER_META_DATA_ELEMENTS . '.*.' . ProjectMetaDataElementModel::PROPERTY_UUID       => [
+                    'required',
+                    'string',
+                ],
+                self::REQUEST_PARAMETER_META_DATA_ELEMENTS . '.*.' . ProjectMetaDataElementModel::PROPERTY_LABEL      => [
+                    'string',
+                ],
+                self::REQUEST_PARAMETER_META_DATA_ELEMENTS . '.*.' . ProjectMetaDataElementModel::PROPERTY_POSITION   => [
+                    'integer',
+                ],
+                self::REQUEST_PARAMETER_META_DATA_ELEMENTS . '.*.' . ProjectMetaDataElementModel::PROPERTY_REQUIRED   => [
+                    'boolean',
+                ],
+                self::REQUEST_PARAMETER_META_DATA_ELEMENTS . '.*.' . ProjectMetaDataElementModel::PROPERTY_IN_LIST    => [
+                    'boolean',
+                ],
+                self::REQUEST_PARAMETER_META_DATA_ELEMENTS . '.*.' . ProjectMetaDataElementModel::PROPERTY_FIELD_TYPE => [
+                    Rule::in([
+                        ProjectMetaDataElementModel::FIELD_TYPE_TEXT,
+                        ProjectMetaDataElementModel::FIELD_TYPE_NUMBER,
+                        ProjectMetaDataElementModel::FIELD_TYPE_DATE,
+                        ProjectMetaDataElementModel::FIELD_TYPE_EMAIL,
+                    ])
+                ]
+            ]
+        )[self::REQUEST_PARAMETER_META_DATA_ELEMENTS];
     }
 
     /**

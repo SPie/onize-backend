@@ -259,6 +259,23 @@ final class ProjectService implements ProjectServiceInterface
 
     /**
      * @param string $uuid
+     *
+     * @return ProjectMetaDataElementModel
+     *
+     * @throws ModelNotFoundException
+     */
+    public function getMetaDataElement(string $uuid): ProjectMetaDataElementModel
+    {
+        $metaDataElement = $this->getProjectMetaDataElementRepository()->findOneByUuid($uuid);
+        if (!$metaDataElement) {
+            throw new ModelNotFoundException(ProjectMetaDataElementModel::class, $uuid);
+        }
+
+        return $metaDataElement;
+    }
+
+    /**
+     * @param string $uuid
      * @param array  $metaDataElements
      *
      * @return ProjectMetaDataElementModel[]
@@ -294,6 +311,31 @@ final class ProjectService implements ProjectServiceInterface
             ),
             false
         );
+    }
+
+    /**
+     * @param array $metaDataElementsData
+     *
+     * @return ProjectMetaDataElementModel[]
+     */
+    public function updateMetaDataElements(array $metaDataElementsData): array
+    {
+        $metaDataElements = \array_map(
+            function (array $metaDataElementData) {
+                return $this->getProjectMetaDataElementRepository()->save(
+                    $this->getProjectMetaDataElementModelFactory()->fill(
+                        $this->getMetaDataElement($metaDataElementData[ProjectMetaDataElementModel::PROPERTY_UUID]),
+                        $metaDataElementData
+                    ),
+                    false
+                );
+            },
+            $metaDataElementsData
+        );
+
+        $this->getProjectMetaDataElementRepository()->flush();
+
+        return $metaDataElements;
     }
 
     /**

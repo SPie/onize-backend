@@ -445,6 +445,142 @@ final class ProjectServiceTest extends TestCase
             ->removeProjectMetaDataElement($uuid);
     }
 
+    /**
+     * @return void
+     */
+    public function testUpdateMetaDataElements(): void
+    {
+        $metaDataElementsData = [['uuid'      => $this->getFaker()->numberBetween()]];
+        $metaDataElement = $this->createProjectMetaDataElementModel();
+        $projectMetaDataElementRepository = $this->createProjectMetaDataElementRepository();
+        $this
+            ->mockProjectMetaDataElementRepositoryFindOneByUuid(
+                $projectMetaDataElementRepository,
+                $metaDataElement,
+                $metaDataElementsData[0]['uuid']
+            )
+            ->mockRepositorySave($projectMetaDataElementRepository, $metaDataElement, false);
+        $projectMetaDataElementModelFactory = $this->createProjectMetaDataElementModelFactory();
+        $this->mockModelFactoryFill(
+            $projectMetaDataElementModelFactory,
+            $metaDataElement,
+            $metaDataElementsData[0],
+            $metaDataElement
+        );
+
+        $this->assertEquals(
+            [$metaDataElement],
+            $this->getProjectService(
+                null,
+                null,
+                null,
+                null,
+                $projectMetaDataElementRepository,
+                $projectMetaDataElementModelFactory
+            )->updateMetaDataElements($metaDataElementsData)
+        );
+        $this->assertRepositoryFlush($projectMetaDataElementRepository);
+    }
+
+    /**
+     * @return void
+     */
+    public function testUpdateMetaDataElementsWithoutElement(): void
+    {
+        $metaDataElementsData = [['uuid'      => $this->getFaker()->numberBetween()]];
+        $projectMetaDataElementRepository = $this->createProjectMetaDataElementRepository();
+        $this ->mockProjectMetaDataElementRepositoryFindOneByUuid(
+            $projectMetaDataElementRepository,
+            null,
+            $metaDataElementsData[0]['uuid']
+        );
+
+        $this->expectException(ModelNotFoundException::class);
+
+        $this->getProjectService(
+            null,
+            null,
+            null,
+            null,
+            $projectMetaDataElementRepository
+        )->updateMetaDataElements($metaDataElementsData);
+    }
+
+    /**
+     * @return void
+     */
+    public function testUpdateMetaDataElementsWithInvalidParameters(): void
+    {
+        $metaDataElementsData = [['uuid'      => $this->getFaker()->numberBetween()]];
+        $metaDataElement = $this->createProjectMetaDataElementModel();
+        $projectMetaDataElementRepository = $this->createProjectMetaDataElementRepository();
+        $this ->mockProjectMetaDataElementRepositoryFindOneByUuid(
+            $projectMetaDataElementRepository,
+            $metaDataElement,
+            $metaDataElementsData[0]['uuid']
+        );
+        $projectMetaDataElementModelFactory = $this->createProjectMetaDataElementModelFactory();
+        $this->mockModelFactoryFill(
+            $projectMetaDataElementModelFactory,
+            new InvalidParameterException(),
+            $metaDataElementsData[0],
+            $metaDataElement
+        );
+
+        $this->expectException(InvalidParameterException::class);
+
+        $this->getProjectService(
+            null,
+            null,
+            null,
+            null,
+            $projectMetaDataElementRepository,
+            $projectMetaDataElementModelFactory
+        )->updateMetaDataElements($metaDataElementsData);
+    }
+
+    /**
+     * @return void
+     */
+    public function testGetMetaDataElement(): void
+    {
+        $uuid = $this->getFaker()->uuid;
+        $metaDataElement = $this->createProjectMetaDataElementModel();
+        $projectMetaDataElementRepository = $this->createProjectMetaDataElementRepository();
+        $this->mockProjectMetaDataElementRepositoryFindOneByUuid($projectMetaDataElementRepository, $metaDataElement, $uuid);
+
+        $this->assertEquals(
+            $metaDataElement,
+            $this->getProjectService(
+                null,
+                null,
+                null,
+                null,
+                $projectMetaDataElementRepository
+            )->getMetaDataElement($uuid)
+        );
+    }
+
+    /**
+     * @return void
+     */
+    public function testGetMetaDataElementWithoutModel(): void
+    {
+        $uuid = $this->getFaker()->uuid;
+        $projectMetaDataElementRepository = $this->createProjectMetaDataElementRepository();
+        $this->mockProjectMetaDataElementRepositoryFindOneByUuid($projectMetaDataElementRepository, null, $uuid);
+
+        $this->expectException(ModelNotFoundException::class);
+
+        $this->getProjectService(
+            null,
+            null,
+            null,
+            null,
+            $projectMetaDataElementRepository
+        )->getMetaDataElement($uuid);
+    }
+
     //endregion
 
     /**

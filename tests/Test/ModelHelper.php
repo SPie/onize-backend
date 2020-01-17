@@ -99,11 +99,11 @@ trait ModelHelper
      * @param ModelFactoryInterface|MockInterface $modelFactory
      * @param ModelInterface|\Exception           $returnModel
      * @param array                               $data
-     * @param MockInterface                       $model
+     * @param ModelInterface                      $model
      *
      * @return $this
      */
-    protected function mockModelFactoryFill(MockInterface $modelFactory, $returnModel, array $data, MockInterface $model)
+    protected function mockModelFactoryFill(MockInterface $modelFactory, $returnModel, array $data, ModelInterface $model)
     {
         $modelFactory
             ->shouldReceive('fill')

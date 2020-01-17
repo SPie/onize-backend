@@ -242,6 +242,33 @@ trait ProjectHelper
     }
 
     /**
+     * @param ProjectServiceInterface|MockInterface    $projectService
+     * @param ProjectMetaDataElementModel[]|\Exception $metaDataElements
+     * @param array                                    $metaDataElementsData
+     *
+     * @return $this
+     */
+    private function mockProjectServiceUpdateMetaDataElements(
+        MockInterface $projectService,
+        $metaDataElements,
+        array $metaDataElementsData
+    ): self {
+        $expectation = $projectService
+            ->shouldReceive('updateMetaDataElements')
+            ->with($metaDataElementsData);
+
+        if ($metaDataElements instanceof \Exception) {
+            $expectation->andThrow($metaDataElements);
+
+            return $this;
+        }
+
+        $expectation->andReturn($metaDataElements);
+
+        return $this;
+    }
+
+    /**
      * @param ProjectServiceInterface|MockInterface $projectService
      * @param string                                $uuid
      * @param \Exception|null                       $exception

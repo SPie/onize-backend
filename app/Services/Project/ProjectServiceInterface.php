@@ -2,6 +2,7 @@
 
 namespace App\Services\Project;
 
+use App\Exceptions\ModelNotFoundException;
 use App\Models\Project\ProjectMetaDataElementModel;
 use App\Models\Project\ProjectInviteModel;
 use App\Models\Project\ProjectModel;
@@ -47,11 +48,27 @@ interface ProjectServiceInterface
 
     /**
      * @param string $uuid
+     *
+     * @return ProjectMetaDataElementModel
+     *
+     * @throws ModelNotFoundException
+     */
+    public function getMetaDataElement(string $uuid): ProjectMetaDataElementModel;
+
+    /**
+     * @param string $uuid
      * @param array  $metaDataElements
      *
      * @return ProjectMetaDataElementModel[]
      */
     public function createMetaDataElements(string $uuid, array $metaDataElements): array;
+
+    /**
+     * @param array $metaDataElementsData
+     *
+     * @return ProjectMetaDataElementModel[]
+     */
+    public function updateMetaDataElements(array $metaDataElementsData): array;
 
     /**
      * @param string $uuid

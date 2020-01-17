@@ -757,6 +757,249 @@ final class ProjectsControllerTest extends TestCase
         $this->getProjectsController(null, $projectService)->removeProjectMetaDataElement($request);
     }
 
+    /**
+     * @return void
+     */
+    public function testUpdateProjectMetaDataElements(): void
+    {
+        $request = $this->createRequest();
+        $request->offsetSet(
+            'metaDataElements',
+            [
+                [
+                    'uuid'      => $this->getFaker()->uuid,
+                    'label'     => $this->getFaker()->word,
+                    'position'  => $this->getFaker()->numberBetween(),
+                    'required'  => $this->getFaker()->boolean,
+                    'inList'    => $this->getFaker()->boolean,
+                    'fieldType' => $this->getRandomFieldType(),
+                ],
+            ]
+        );
+        $projectMetaDataElement = $this->createProjectMetaDataElementModel();
+        $projectService = $this->createProjectService();
+        $this->mockProjectServiceUpdateMetaDataElements(
+            $projectService,
+            [$projectMetaDataElement],
+            $request->get('metaDataElements')
+        );
+
+        $this->assertEquals(
+            $this->createJsonResponse($this->createJsonResponseData(['metaDataElements' => [$projectMetaDataElement]])),
+            $this->getProjectsController(null, $projectService)->updateProjectMetaDataElements($request)
+        );
+    }
+
+    /**
+     * @return void
+     */
+    public function testUpdateProjectMetaDataElementsWithoutMetaDataElements(): void
+    {
+        $request = $this->createRequest();
+        $request->offsetSet('metaDataElements', []);
+        $projectService = $this->createProjectService();
+        $this->mockProjectServiceUpdateMetaDataElements($projectService, [], []);
+
+        $this->assertEquals(
+            $this->createJsonResponse($this->createJsonResponseData(['metaDataElements' => []])),
+            $this->getProjectsController(null, $projectService)->updateProjectMetaDataElements($request)
+        );
+    }
+
+    /**
+     * @return void
+     */
+    public function testUpdateProjectMetaDataElementsWithoutData(): void
+    {
+        $request = $this->createRequest();
+        $request->offsetSet('metaDataElements', [['uuid' => $this->getFaker()->uuid,]]);
+        $projectMetaDataElement = $this->createProjectMetaDataElementModel();
+        $projectService = $this->createProjectService();
+        $this->mockProjectServiceUpdateMetaDataElements(
+            $projectService,
+            [$projectMetaDataElement],
+            $request->get('metaDataElements')
+        );
+
+        $this->assertEquals(
+            $this->createJsonResponse($this->createJsonResponseData(['metaDataElements' => [$projectMetaDataElement]])),
+            $this->getProjectsController(null, $projectService)->updateProjectMetaDataElements($request)
+        );
+    }
+
+    /**
+     * @return void
+     */
+    public function testUpdateProjectMetaDataElementsWithMissingUuid(): void
+    {
+        $request = $this->createRequest();
+        $request->offsetSet(
+            'metaDataElements',
+            [
+                [
+                    'label'     => $this->getFaker()->word,
+                    'position'  => $this->getFaker()->numberBetween(),
+                    'required'  => $this->getFaker()->boolean,
+                    'inList'    => $this->getFaker()->boolean,
+                    'fieldType' => $this->getRandomFieldType(),
+                ],
+            ]
+        );
+
+        $this->expectException(ValidationException::class);
+
+        $this->getProjectsController()->updateProjectMetaDataElements($request);
+    }
+
+    /**
+     * @return void
+     */
+    public function testUpdateProjectMetaDataElementsWithInvalidUuid(): void
+    {
+        $request = $this->createRequest();
+        $request->offsetSet(
+            'metaDataElements',
+            [
+                [
+                    'uuid'      => $this->getFaker()->numberBetween(),
+                    'label'     => $this->getFaker()->word,
+                    'position'  => $this->getFaker()->numberBetween(),
+                    'required'  => $this->getFaker()->boolean,
+                    'inList'    => $this->getFaker()->boolean,
+                    'fieldType' => $this->getRandomFieldType(),
+                ],
+            ]
+        );
+
+        $this->expectException(ValidationException::class);
+
+        $this->getProjectsController()->updateProjectMetaDataElements($request);
+    }
+
+    /**
+     * @return void
+     */
+    public function testUpdateProjectMetaDataElementsWithInvalidLabel(): void
+    {
+        $request = $this->createRequest();
+        $request->offsetSet(
+            'metaDataElements',
+            [
+                [
+                    'uuid'      => $this->getFaker()->uuid,
+                    'label'     => $this->getFaker()->numberBetween(),
+                ],
+            ]
+        );
+
+        $this->expectException(ValidationException::class);
+
+        $this->getProjectsController()->updateProjectMetaDataElements($request);
+    }
+
+    /**
+     * @return void
+     */
+    public function testUpdateProjectMetaDataElementsWithInvalidPosition(): void
+    {
+        $request = $this->createRequest();
+        $request->offsetSet(
+            'metaDataElements',
+            [
+                [
+                    'uuid'      => $this->getFaker()->uuid,
+                    'position'  => $this->getFaker()->word,
+                ],
+            ]
+        );
+
+        $this->expectException(ValidationException::class);
+
+        $this->getProjectsController()->updateProjectMetaDataElements($request);
+    }
+
+    /**
+     * @return void
+     */
+    public function testUpdateProjectMetaDataElementsWithInvalidRequired(): void
+    {
+        $request = $this->createRequest();
+        $request->offsetSet(
+            'metaDataElements',
+            [
+                [
+                    'uuid'      => $this->getFaker()->uuid,
+                    'required'  => $this->getFaker()->word,
+                ],
+            ]
+        );
+
+        $this->expectException(ValidationException::class);
+
+        $this->getProjectsController()->updateProjectMetaDataElements($request);
+    }
+
+    /**
+     * @return void
+     */
+    public function testUpdateProjectMetaDataElementsWithInvalidInList(): void
+    {
+        $request = $this->createRequest();
+        $request->offsetSet(
+            'metaDataElements',
+            [
+                [
+                    'uuid'      => $this->getFaker()->uuid,
+                    'inList'    => $this->getFaker()->word,
+                ],
+            ]
+        );
+
+        $this->expectException(ValidationException::class);
+
+        $this->getProjectsController()->updateProjectMetaDataElements($request);
+    }
+
+    /**
+     * @return void
+     */
+    public function testUpdateProjectMetaDataElementsWithInvalidFieldType(): void
+    {
+        $request = $this->createRequest();
+        $request->offsetSet(
+            'metaDataElements',
+            [
+                [
+                    'uuid'      => $this->getFaker()->uuid,
+                    'fieldType' => $this->getFaker()->numberBetween(),
+                ],
+            ]
+        );
+
+        $this->expectException(ValidationException::class);
+
+        $this->getProjectsController()->updateProjectMetaDataElements($request);
+    }
+
+    /**
+     * @return void
+     */
+    public function testUpdateProjectMetaDataElementsWithMetaDataElementNotFound(): void
+    {
+        $request = $this->createRequest();
+        $request->offsetSet('metaDataElements', [['uuid' => $this->getFaker()->uuid,],]);
+        $projectService = $this->createProjectService();
+        $this->mockProjectServiceUpdateMetaDataElements(
+            $projectService,
+            new ModelNotFoundException(ProjectMetaDataElementModel::class),
+            $request->get('metaDataElements')
+        );
+
+        $this->expectException(ModelNotFoundException::class);
+
+        $this->getProjectsController(null, $projectService)->updateProjectMetaDataElements($request);
+    }
+
     //endregion
 
     /**
