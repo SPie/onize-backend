@@ -7,6 +7,7 @@ use App\Repositories\Project\ProjectInviteRepository;
 use App\Repositories\Project\ProjectRepository;
 use App\Repositories\User\UserRepository;
 use Illuminate\Http\Request;
+use Illuminate\Http\Response;
 use Illuminate\Support\Facades\URL;
 use LaravelDoctrine\Migrations\Testing\DatabaseMigrations;
 use Test\ApiHelper;
@@ -1065,6 +1066,275 @@ final class ProjectApiCallsTest extends IntegrationTestCase
         );
     }
 
+    /**
+     * @return void
+     */
+    public function testUpdateProjectMetaDataElements(): void
+    {
+        $projectMetaDataElement = $this->createProjectMetaDataElements()->first();
+        $newMetaDataElementData = [
+            'uuid'      => $projectMetaDataElement->getUuid(),
+            'label'     => $this->getFaker()->word,
+            'required'  => $this->getFaker()->boolean,
+            'inList'    => $this->getFaker()->boolean,
+            'position'  => $this->getFaker()->numberBetween(),
+            'fieldType' => $this->getRandomFieldType(),
+        ];
+
+        $response = $this->doApiCall(
+            URL::route('projects.updateMetaDataElements'),
+            Request::METHOD_PATCH,
+            [
+                'metaDataElements' => [$newMetaDataElementData]
+            ],
+            null,
+            $this->createAuthHeader($this->createUsers()->first())
+        );
+
+        $this->assertResponseOk();
+        $responseData = $response->getData(true);
+        $this->assertNotEmpty($responseData['metaDataElements']);
+        $this
+            ->assertMetaDataElementResponseEquals($newMetaDataElementData, $responseData['metaDataElements'][0])
+            ->assertMetaDataElementModelValuesEquals(
+                $newMetaDataElementData,
+                $this->getMetaDataElementsRepository()->findOneByUuid($newMetaDataElementData['uuid'])
+            );
+    }
+
+    /**
+     * @return void
+     */
+    public function testUpdateProjectMetaDataElementsWithoutElementsToUpdate(): void
+    {
+        $response = $this->doApiCall(
+            URL::route('projects.updateMetaDataElements'),
+            Request::METHOD_PATCH,
+            [
+                'metaDataElements' => []
+            ],
+            null,
+            $this->createAuthHeader($this->createUsers()->first())
+        );
+
+        $this->assertResponseOk();
+        $responseData = $response->getData(true);
+        $this->assertEmpty($responseData['metaDataElements']);
+    }
+
+    /**
+     * @return void
+     */
+    public function testUpdateProjectMetaDataElementsWithoutData(): void
+    {
+        $projectMetaDataElement = $this->createProjectMetaDataElements()->first();
+        $newMetaDataElementData = ['uuid' => $projectMetaDataElement->getUuid()];
+
+        $response = $this->doApiCall(
+            URL::route('projects.updateMetaDataElements'),
+            Request::METHOD_PATCH,
+            [
+                'metaDataElements' => [$newMetaDataElementData]
+            ],
+            null,
+            $this->createAuthHeader($this->createUsers()->first())
+        );
+
+        $this->assertResponseOk();
+        $responseData = $response->getData(true);
+        $this->assertNotEmpty($responseData['metaDataElements']);
+        $this
+            ->assertMetaDataElementResponseEquals($projectMetaDataElement->toArray(), $responseData['metaDataElements'][0])
+            ->assertMetaDataElementModelValuesEquals(
+                $projectMetaDataElement->toArray(),
+                $this->getMetaDataElementsRepository()->findOneByUuid($newMetaDataElementData['uuid'])
+            );
+    }
+
+    /**
+     * @return void
+     */
+    public function testUpdateProjectMetaDataElementsWithoutUuid(): void
+    {
+        $newMetaDataElementData = [
+            'label'     => $this->getFaker()->word,
+            'required'  => $this->getFaker()->boolean,
+            'inList'    => $this->getFaker()->boolean,
+            'position'  => $this->getFaker()->numberBetween(),
+            'fieldType' => $this->getRandomFieldType(),
+        ];
+
+        $response = $this->doApiCall(
+            URL::route('projects.updateMetaDataElements'),
+            Request::METHOD_PATCH,
+            [
+                'metaDataElements' => [$newMetaDataElementData]
+            ],
+            null,
+            $this->createAuthHeader($this->createUsers()->first())
+        );
+
+        $this->assertResponseStatus(422);
+        $responseData = $response->getData(true);
+        $this->assertEquals('validation.required', $responseData['metaDataElements.0.uuid'][0]);
+    }
+
+    /**
+     * @return void
+     */
+    public function testUpdateProjectMetaDataElementsWithInvalidLabel(): void
+    {
+        $projectMetaDataElement = $this->createProjectMetaDataElements()->first();
+        $newMetaDataElementData = [
+            'uuid'  => $projectMetaDataElement->getUuid(),
+            'label' => $this->getFaker()->numberBetween(),
+        ];
+
+        $response = $this->doApiCall(
+            URL::route('projects.updateMetaDataElements'),
+            Request::METHOD_PATCH,
+            [
+                'metaDataElements' => [$newMetaDataElementData]
+            ],
+            null,
+            $this->createAuthHeader($this->createUsers()->first())
+        );
+
+        $this->assertResponseStatus(422);
+        $responseData = $response->getData(true);
+        $this->assertEquals('validation.string', $responseData['metaDataElements.0.label'][0]);
+    }
+
+    /**
+     * @return void
+     */
+    public function testUpdateProjectMetaDataElementsWithInvalidPosition(): void
+    {
+        $projectMetaDataElement = $this->createProjectMetaDataElements()->first();
+        $newMetaDataElementData = [
+            'uuid'     => $projectMetaDataElement->getUuid(),
+            'position' => $this->getFaker()->word,
+        ];
+
+        $response = $this->doApiCall(
+            URL::route('projects.updateMetaDataElements'),
+            Request::METHOD_PATCH,
+            [
+                'metaDataElements' => [$newMetaDataElementData]
+            ],
+            null,
+            $this->createAuthHeader($this->createUsers()->first())
+        );
+
+        $this->assertResponseStatus(422);
+        $responseData = $response->getData(true);
+        $this->assertEquals('validation.integer', $responseData['metaDataElements.0.position'][0]);
+    }
+
+    /**
+     * @return void
+     */
+    public function testUpdateProjectMetaDataElementsWithInvalidRequired(): void
+    {
+        $projectMetaDataElement = $this->createProjectMetaDataElements()->first();
+        $newMetaDataElementData = [
+            'uuid'     => $projectMetaDataElement->getUuid(),
+            'required' => $this->getFaker()->word,
+        ];
+
+        $response = $this->doApiCall(
+            URL::route('projects.updateMetaDataElements'),
+            Request::METHOD_PATCH,
+            [
+                'metaDataElements' => [$newMetaDataElementData]
+            ],
+            null,
+            $this->createAuthHeader($this->createUsers()->first())
+        );
+
+        $this->assertResponseStatus(422);
+        $responseData = $response->getData(true);
+        $this->assertEquals('validation.boolean', $responseData['metaDataElements.0.required'][0]);
+    }
+
+    /**
+     * @return void
+     */
+    public function testUpdateProjectMetaDataElementsWithInvalidInList(): void
+    {
+        $projectMetaDataElement = $this->createProjectMetaDataElements()->first();
+        $newMetaDataElementData = [
+            'uuid'   => $projectMetaDataElement->getUuid(),
+            'inList' => $this->getFaker()->word,
+        ];
+
+        $response = $this->doApiCall(
+            URL::route('projects.updateMetaDataElements'),
+            Request::METHOD_PATCH,
+            [
+                'metaDataElements' => [$newMetaDataElementData]
+            ],
+            null,
+            $this->createAuthHeader($this->createUsers()->first())
+        );
+
+        $this->assertResponseStatus(422);
+        $responseData = $response->getData(true);
+        $this->assertEquals('validation.boolean', $responseData['metaDataElements.0.inList'][0]);
+    }
+
+    /**
+     * @return void
+     */
+    public function testUpdateProjectMetaDataElementsWithInvalidFieldType(): void
+    {
+        $projectMetaDataElement = $this->createProjectMetaDataElements()->first();
+        $newMetaDataElementData = [
+            'uuid'      => $projectMetaDataElement->getUuid(),
+            'fieldType' => $this->getFaker()->numberBetween(),
+        ];
+
+        $response = $this->doApiCall(
+            URL::route('projects.updateMetaDataElements'),
+            Request::METHOD_PATCH,
+            [
+                'metaDataElements' => [$newMetaDataElementData]
+            ],
+            null,
+            $this->createAuthHeader($this->createUsers()->first())
+        );
+
+        $this->assertResponseStatus(422);
+        $responseData = $response->getData(true);
+        $this->assertEquals('validation.in', $responseData['metaDataElements.0.fieldType'][0]);
+    }
+
+    /**
+     * @return void
+     */
+    public function testUpdateProjectMetaDataElementsWithInvalidMetaDataElements(): void
+    {
+        $projectMetaDataElement = $this->createProjectMetaDataElements()->first();
+        $newMetaDataElementData = [
+            'uuid'      => $projectMetaDataElement->getUuid(),
+            'fieldType' => $this->getFaker()->numberBetween(),
+        ];
+
+        $response = $this->doApiCall(
+            URL::route('projects.updateMetaDataElements'),
+            Request::METHOD_PATCH,
+            [
+                'metaDataElements' => $this->getFaker()->word,
+            ],
+            null,
+            $this->createAuthHeader($this->createUsers()->first())
+        );
+
+        $this->assertResponseStatus(422);
+        $responseData = $response->getData(true);
+        $this->assertEquals('validation.array', $responseData['metaDataElements'][0]);
+    }
+
     //endregion
 
     /**
@@ -1111,5 +1381,43 @@ final class ProjectApiCallsTest extends IntegrationTestCase
         $this->assertNotEmpty($queuedEmails[0]['context']['inviteUrl']);
 
         return $this;
+    }
+
+    /**
+     * @param array $expectedMetaDataElementData
+     * @param array $actualMetaDataElementData
+     *
+     * @return $this
+     */
+    private function assertMetaDataElementResponseEquals(
+        array $expectedMetaDataElementData,
+        array $actualMetaDataElementData
+    ): self {
+        $this->assertEquals($expectedMetaDataElementData['label'], $actualMetaDataElementData['label']);
+        $this->assertEquals($expectedMetaDataElementData['required'], $actualMetaDataElementData['required']);
+        $this->assertEquals($expectedMetaDataElementData['inList'], $actualMetaDataElementData['inList']);
+        $this->assertEquals($expectedMetaDataElementData['position'], $actualMetaDataElementData['position']);
+        $this->assertEquals($expectedMetaDataElementData['fieldType'], $actualMetaDataElementData['fieldType']);
+
+        return $this;
+    }
+
+    /**
+     * @param array                       $expectedMetaDataElementData
+     * @param ProjectMetaDataElementModel $projectMetaDataElement
+     *
+     * @return $this
+     */
+    private function assertMetaDataElementModelValuesEquals(
+        array $expectedMetaDataElementData,
+        ProjectMetaDataElementModel $projectMetaDataElement
+    ): self {
+        $this->assertEquals($expectedMetaDataElementData['label'], $projectMetaDataElement->getLabel());
+        $this->assertEquals($expectedMetaDataElementData['required'], $projectMetaDataElement->isRequired());
+        $this->assertEquals($expectedMetaDataElementData['inList'], $projectMetaDataElement->isInList());
+        $this->assertEquals($expectedMetaDataElementData['position'], $projectMetaDataElement->getPosition());
+        $this->assertEquals($expectedMetaDataElementData['fieldType'], $projectMetaDataElement->getFieldType());
+
+       return $this;
     }
 }

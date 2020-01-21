@@ -332,7 +332,7 @@ final class ProjectsController extends Controller
      */
     private function validateProjectMetaDataElementsForUpdate(Request $request): array
     {
-        return $this->validate(
+        $parameters = $this->validate(
             $request,
             [
                 self::REQUEST_PARAMETER_META_DATA_ELEMENTS => [
@@ -363,7 +363,9 @@ final class ProjectsController extends Controller
                     ])
                 ]
             ]
-        )[self::REQUEST_PARAMETER_META_DATA_ELEMENTS];
+        );
+
+        return $parameters[self::REQUEST_PARAMETER_META_DATA_ELEMENTS];
     }
 
     /**

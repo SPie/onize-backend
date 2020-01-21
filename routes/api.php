@@ -74,7 +74,7 @@ $router->group(
             $router->delete('', ['as' => ProjectsController::ROUTE_NAME_REMOVE, 'uses' => 'Project\ProjectsController@remove']);
 
             $router->post('/meta-data-elements', ['as' => ProjectsController::ROUTE_NAME_META_DATA_ELEMENTS, 'uses' => 'Project\ProjectsController@createMetaDataElements']);
-            $router->patch('/meta-data-elements', ['as' => ProjectsController::ROUTE_NAME_UPDATE_META_DATA_ELEMENTS, 'uses' => 'Project\ProjectsController@updateMetaDataElements']);
+            $router->patch('/meta-data-elements', ['as' => ProjectsController::ROUTE_NAME_UPDATE_META_DATA_ELEMENTS, 'uses' => 'Project\ProjectsController@updateProjectMetaDataElements']);
             $router->delete('/meta-data-elements', ['as' => ProjectsController::ROUTE_NAME_REMOVE_PROJECT_META_DATA_ELEMENT, 'uses' => 'Project\ProjectsController@removeProjectMetaDataElement']);
 
             $router->post('invites', ['as' => ProjectsController::ROUTE_NAME_INVITES, 'uses' => 'Project\ProjectsController@invite']);
