@@ -2,6 +2,7 @@
 
 namespace Test;
 
+use App\Exceptions\Project\InvalidInviteTokenException;
 use App\Models\Project\ProjectMetaDataElementDoctrineModel;
 use App\Models\Project\ProjectMetaDataElementModel;
 use App\Models\Project\ProjectMetaDataElementModelFactory;
@@ -81,6 +82,23 @@ trait ProjectHelper
         $project
             ->shouldReceive('getId')
             ->andReturn($id);
+
+        return $this;
+    }
+
+    /**
+     * @param ProjectModel|MockInterface               $projectModel
+     * @param ProjectMetaDataElementModel[]|Collection $projectMetaDataElements
+     *
+     * @return $this
+     */
+    private function mockProjectModelGetProjectMetaDataElements(
+        MockInterface $projectModel,
+        Collection $projectMetaDataElements
+    ): self {
+        $projectModel
+            ->shouldReceive('getProjectMetaDataElements')
+            ->andReturn($projectMetaDataElements);
 
         return $this;
     }
@@ -296,6 +314,28 @@ trait ProjectHelper
     }
 
     /**
+     * @param ProjectServiceInterface|MockInterface $projectService
+     * @param ProjectInviteModel|\exception         $projectInviteModel
+     * @param string                                $token
+     * @param string                                $email
+     *
+     * @return $this
+     */
+    private function mockProjectServiceVerifyInvite(
+        MockInterface $projectService,
+        $projectInviteModel,
+        string $token,
+        string $email
+    ): self {
+        $projectService
+            ->shouldReceive('verifyInvite')
+            ->with($token, $email)
+            ->andThrow($projectInviteModel);
+
+        return $this;
+    }
+
+    /**
      * @param int   $times
      * @param array $data
      *
@@ -325,6 +365,21 @@ trait ProjectHelper
         $projectInviteModel
             ->shouldReceive('getToken')
             ->andReturn($token);
+
+        return $this;
+    }
+
+    /**
+     * @param ProjectInviteModel|MockInterface $projectInviteModel
+     * @param ProjectModel                     $projectModel
+     *
+     * @return $this
+     */
+    private function mockProjectInviteModelGetProject(MockInterface $projectInviteModel, ProjectModel $projectModel): self
+    {
+        $projectInviteModel
+            ->shouldReceive('getProject')
+            ->andReturn($projectModel);
 
         return $this;
     }

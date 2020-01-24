@@ -2,6 +2,7 @@
 
 use App\Exceptions\Auth\NotAllowedException;
 use App\Exceptions\ModelNotFoundException;
+use App\Exceptions\Project\InvalidInviteTokenException;
 use App\Http\Controllers\Project\ProjectsController;
 use App\Models\Project\ProjectInviteModel;
 use App\Models\Project\ProjectMetaDataElementModel;
@@ -998,6 +999,94 @@ final class ProjectsControllerTest extends TestCase
         $this->expectException(ModelNotFoundException::class);
 
         $this->getProjectsController(null, $projectService)->updateProjectMetaDataElements($request);
+    }
+
+    /**
+     * @return void
+     */
+    public function testVerifyInvite(): void
+    {
+        $token = $this->getFaker()->uuid;
+        $request = $this->createRequest();
+        $request->offsetSet('token', $token);
+        $user = $this->createUserModel();
+        $this->mockUserModelGetEmail($user, $this->getFaker()->safeEmail);
+        $projectMetaDataElements = new Collection($this->createProjectMetaDataElementModel());
+        $project = $this->createProjectModel();
+        $this->mockProjectModelGetProjectMetaDataElements($project, $projectMetaDataElements);
+        $projectInviteModel = $this->createProjectInviteModel();
+        $this->mockProjectInviteModelGetProject($projectInviteModel, $project);
+        $projectService = $this->createProjectService();
+        $this->mockProjectServiceVerifyInvite($projectService, $projectInviteModel, $token, $user->getEmail());
+
+        $this->assertEquals(
+            $this->createJsonResponse($this->createJsonResponseData(['metaDataElements' => $projectMetaDataElements])),
+            $this->getProjectsController($user, $projectService)->verifyInvite($request)
+        );
+    }
+
+    /**
+     * @return void
+     */
+    public function testVerifyInviteWithoutToken(): void
+    {
+        $this->expectException(ValidationException::class);
+
+        $this->getProjectsController()->verifyInvite($this->createRequest());
+    }
+
+    /**
+     * @return void
+     */
+    public function testVerifyInviteWithInvalidTokenType(): void
+    {
+        $request = $this->createRequest();
+        $request->offsetSet('token', $this->getFaker()->numberBetween());
+
+        $this->expectException(ValidationException::class);
+
+        $this->getProjectsController()->verifyInvite($request);
+    }
+
+    /**
+     * @return void
+     */
+    public function testVerifyInviteWithInvalidToken(): void
+    {
+        $token = $this->getFaker()->uuid;
+        $request = $this->createRequest();
+        $request->offsetSet('token', $token);
+        $user = $this->createUserModel();
+        $this->mockUserModelGetEmail($user, $this->getFaker()->safeEmail);
+        $projectService = $this->createProjectService();
+        $this->mockProjectServiceVerifyInvite($projectService, new InvalidInviteTokenException(403), $token, $user->getEmail());
+
+        $this->expectException(InvalidInviteTokenException::class);
+
+        $this->getProjectsController($user, $projectService)->verifyInvite($request);
+    }
+
+    /**
+     * @return void
+     */
+    public function testVerifyInviteWithoutMetaDataElements(): void
+    {
+        $token = $this->getFaker()->uuid;
+        $request = $this->createRequest();
+        $request->offsetSet('token', $token);
+        $user = $this->createUserModel();
+        $this->mockUserModelGetEmail($user, $this->getFaker()->safeEmail);
+        $project = $this->createProjectModel();
+        $this->mockProjectModelGetProjectMetaDataElements($project, new Collection());
+        $projectInviteModel = $this->createProjectInviteModel();
+        $this->mockProjectInviteModelGetProject($projectInviteModel, $project);
+        $projectService = $this->createProjectService();
+        $this->mockProjectServiceVerifyInvite($projectService, $projectInviteModel, $token, $user->getEmail());
+
+        $this->assertEquals(
+            $this->createJsonResponse($this->createJsonResponseData(['metaDataElements' => new Collection()])),
+            $this->getProjectsController($user, $projectService)->verifyInvite($request)
+        );
     }
 
     //endregion

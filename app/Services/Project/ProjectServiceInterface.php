@@ -47,6 +47,14 @@ interface ProjectServiceInterface
     public function invite(string $uuid, string $email): ProjectInviteModel;
 
     /**
+     * @param string $token
+     * @param string $email
+     *
+     * @return ProjectInviteModel
+     */
+    public function verifyInvite(string $token, string $email): ProjectInviteModel;
+
+    /**
      * @param string $uuid
      *
      * @return ProjectMetaDataElementModel

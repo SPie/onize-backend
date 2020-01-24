@@ -258,6 +258,17 @@ final class ProjectService implements ProjectServiceInterface
     }
 
     /**
+     * @param string $token
+     * @param string $email
+     *
+     * @return ProjectInviteModel
+     */
+    public function verifyInvite(string $token, string $email): ProjectInviteModel
+    {
+        // TODO: Implement verifyInvite() method.
+    }
+
+    /**
      * @param string $uuid
      *
      * @return ProjectMetaDataElementModel

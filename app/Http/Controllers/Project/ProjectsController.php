@@ -172,6 +172,23 @@ final class ProjectsController extends Controller
      *
      * @return JsonResponse
      */
+    public function verifyInvite(Request $request): JsonResponse
+    {
+        $projectInvite = $this->getProjectService()->verifyInvite(
+            $this->validateDataForVerifyInvite($request),
+            $this->getAuthenticatedUser()->getEmail()
+        );
+
+        return $this->createResponse([
+            'metaDataElements' => $projectInvite->getProject()->getProjectMetaDataElements(),
+        ]);
+    }
+
+    /**
+     * @param Request $request
+     *
+     * @return JsonResponse
+     */
     public function createMetaDataElements(Request $request): JsonResponse
     {
         $parameters = $this->validateDataForCreateMetaDataElements($request);
@@ -280,6 +297,26 @@ final class ProjectsController extends Controller
     /**
      * @param Request $request
      *
+     * @return string
+     *
+     * @throws ValidationException
+     */
+    private function validateDataForVerifyInvite(Request $request): string
+    {
+        return $this->validate(
+            $request,
+            [
+                ProjectInviteModel::PROPERTY_TOKEN => [
+                    'required',
+                    'string',
+                ]
+            ]
+        )[ProjectInviteModel::PROPERTY_TOKEN];
+    }
+
+    /**
+     * @param Request $request
+     *
      * @return array
      *
      * @throws ValidationException
@@ -332,7 +369,7 @@ final class ProjectsController extends Controller
      */
     private function validateProjectMetaDataElementsForUpdate(Request $request): array
     {
-        $parameters = $this->validate(
+        return $this->validate(
             $request,
             [
                 self::REQUEST_PARAMETER_META_DATA_ELEMENTS => [
@@ -363,9 +400,7 @@ final class ProjectsController extends Controller
                     ])
                 ]
             ]
-        );
-
-        return $parameters[self::REQUEST_PARAMETER_META_DATA_ELEMENTS];
+        )[self::REQUEST_PARAMETER_META_DATA_ELEMENTS];
     }
 
     /**

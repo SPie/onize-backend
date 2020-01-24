@@ -1314,12 +1314,6 @@ final class ProjectApiCallsTest extends IntegrationTestCase
      */
     public function testUpdateProjectMetaDataElementsWithInvalidMetaDataElements(): void
     {
-        $projectMetaDataElement = $this->createProjectMetaDataElements()->first();
-        $newMetaDataElementData = [
-            'uuid'      => $projectMetaDataElement->getUuid(),
-            'fieldType' => $this->getFaker()->numberBetween(),
-        ];
-
         $response = $this->doApiCall(
             URL::route('projects.updateMetaDataElements'),
             Request::METHOD_PATCH,
@@ -1418,6 +1412,6 @@ final class ProjectApiCallsTest extends IntegrationTestCase
         $this->assertEquals($expectedMetaDataElementData['position'], $projectMetaDataElement->getPosition());
         $this->assertEquals($expectedMetaDataElementData['fieldType'], $projectMetaDataElement->getFieldType());
 
-       return $this;
+        return $this;
     }
 }
