@@ -20,4 +20,12 @@ interface ProjectInviteRepository extends RepositoryInterface
      * @return ProjectInviteModel|null
      */
     public function findByEmailAndProject(string $email, ProjectModel $project): ?ProjectInviteModel;
+
+    /**
+     * @param string $token
+     * @param string $email
+     *
+     * @return ProjectInviteModel|null
+     */
+    public function findByTokenAndEmail(string $token, string $email): ?ProjectInviteModel;
 }

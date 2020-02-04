@@ -23,7 +23,22 @@ final class ProjectInviteDoctrineRepository extends AbstractDoctrineRepository i
     public function findByEmailAndProject(string $email, ProjectModel $project): ?ProjectInviteModel
     {
         return $this->getDatabaseHandler()->load([
-            ProjectInviteModel::PROPERTY_EMAIL => $email, ProjectInviteModel::PROPERTY_PROJECT => $project
+            ProjectInviteModel::PROPERTY_EMAIL   => $email,
+            ProjectInviteModel::PROPERTY_PROJECT => $project,
+        ]);
+    }
+
+    /**
+     * @param string $token
+     * @param string $email
+     *
+     * @return ProjectInviteModel|ModelInterface|null
+     */
+    public function findByTokenAndEmail(string $token, string $email): ?ProjectInviteModel
+    {
+        return $this->getDatabaseHandler()->load([
+            ProjectInviteModel::PROPERTY_TOKEN => $token,
+            ProjectInviteModel::PROPERTY_EMAIL => $email,
         ]);
     }
 }

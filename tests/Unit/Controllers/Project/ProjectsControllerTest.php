@@ -2,7 +2,6 @@
 
 use App\Exceptions\Auth\NotAllowedException;
 use App\Exceptions\ModelNotFoundException;
-use App\Exceptions\Project\InvalidInviteTokenException;
 use App\Http\Controllers\Project\ProjectsController;
 use App\Models\Project\ProjectInviteModel;
 use App\Models\Project\ProjectMetaDataElementModel;
@@ -1059,9 +1058,14 @@ final class ProjectsControllerTest extends TestCase
         $user = $this->createUserModel();
         $this->mockUserModelGetEmail($user, $this->getFaker()->safeEmail);
         $projectService = $this->createProjectService();
-        $this->mockProjectServiceVerifyInvite($projectService, new InvalidInviteTokenException(403), $token, $user->getEmail());
+        $this->mockProjectServiceVerifyInvite(
+            $projectService,
+            new ModelNotFoundException(ProjectInviteModel::class),
+            $token,
+            $user->getEmail()
+        );
 
-        $this->expectException(InvalidInviteTokenException::class);
+        $this->expectException(ModelNotFoundException::class);
 
         $this->getProjectsController($user, $projectService)->verifyInvite($request);
     }

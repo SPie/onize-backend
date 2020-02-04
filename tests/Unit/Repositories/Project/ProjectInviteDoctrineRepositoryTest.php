@@ -44,9 +44,37 @@ final class ProjectInviteDoctrineRepositoryTest extends TestCase
         $databaseHandler = $this->createDatabaseHandler();
         $this->mockDatabaseHandlerLoad($databaseHandler, null, ['email' => $email, 'project' => $project]);
 
-        $this->assertEmpty(
-            $this->getProjectInviteDoctrineRepository($databaseHandler)->findByEmailAndProject($email, $project)
+        $this->assertEmpty($this->getProjectInviteDoctrineRepository($databaseHandler)->findByEmailAndProject($email, $project));
+    }
+
+    /**
+     * @return void
+     */
+    public function testFindByTokenAndEmail(): void
+    {
+        $token = $this->getFaker()->uuid;
+        $email = $this->getFaker()->safeEmail;
+        $projectInvite = $this->createProjectInviteModel();
+        $databaseHandler = $this->createDatabaseHandler();
+        $this->mockDatabaseHandlerLoad($databaseHandler, $projectInvite, ['token' => $token, 'email' => $email]);
+
+        $this->assertEquals(
+            $projectInvite,
+            $this->getProjectInviteDoctrineRepository($databaseHandler)->findByTokenAndEmail($token, $email)
         );
+    }
+
+    /**
+     * @return void
+     */
+    public function testFindByTokenAndEmailWithoutModel(): void
+    {
+        $token = $this->getFaker()->uuid;
+        $email = $this->getFaker()->safeEmail;
+        $databaseHandler = $this->createDatabaseHandler();
+        $this->mockDatabaseHandlerLoad($databaseHandler, null, ['token' => $token, 'email' => $email]);
+
+        $this->assertEmpty($this->getProjectInviteDoctrineRepository($databaseHandler)->findByTokenAndEmail($token, $email));
     }
 
     //endregion

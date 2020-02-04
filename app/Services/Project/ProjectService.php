@@ -4,6 +4,7 @@ namespace App\Services\Project;
 
 use App\Exceptions\Auth\NotAllowedException;
 use App\Exceptions\ModelNotFoundException;
+use App\Exceptions\Project\InvalidInviteTokenException;
 use App\Exceptions\Project\UserAlreadyMemberException;
 use App\Models\ModelInterface;
 use App\Models\Project\ProjectMetaDataElementModel;
@@ -265,7 +266,12 @@ final class ProjectService implements ProjectServiceInterface
      */
     public function verifyInvite(string $token, string $email): ProjectInviteModel
     {
-        // TODO: Implement verifyInvite() method.
+        $projectInvite = $this->getProjectInviteRepository()->findByTokenAndEmail($token, $email);
+        if (!$projectInvite) {
+            throw new ModelNotFoundException(ProjectInviteModel::class, $token . ',' . $email);
+        }
+
+        return $projectInvite;
     }
 
     /**

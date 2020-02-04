@@ -68,16 +68,17 @@ $router->group(
         //region Project calls
 
         $router->group(['prefix' => 'projects', 'middleware' => ['token']], function (Router $router) {
-            $router->get('', ['as' => ProjectsController::ROUTE_NAME_LIST, 'uses' => 'Project\ProjectsController@projects']);
-            $router->get('{uuid}', ['as' => ProjectsController::ROUTE_NAME_DETAILS, 'uses' => 'Project\ProjectsController@details']);
-            $router->post('', ['as' => ProjectsController::ROUTE_NAME_ADD, 'uses' => 'Project\ProjectsController@add']);
-            $router->delete('', ['as' => ProjectsController::ROUTE_NAME_REMOVE, 'uses' => 'Project\ProjectsController@remove']);
+            $router->post('invites', ['as' => ProjectsController::ROUTE_NAME_INVITES, 'uses' => 'Project\ProjectsController@invite']);
+            $router->get('invites', ['as' => ProjectsController::ROUTE_NAME_VERIFY_INVITE, 'uses' => 'Project\ProjectsController@verifyInvite']);
 
             $router->post('/meta-data-elements', ['as' => ProjectsController::ROUTE_NAME_META_DATA_ELEMENTS, 'uses' => 'Project\ProjectsController@createMetaDataElements']);
             $router->patch('/meta-data-elements', ['as' => ProjectsController::ROUTE_NAME_UPDATE_META_DATA_ELEMENTS, 'uses' => 'Project\ProjectsController@updateProjectMetaDataElements']);
             $router->delete('/meta-data-elements', ['as' => ProjectsController::ROUTE_NAME_REMOVE_PROJECT_META_DATA_ELEMENT, 'uses' => 'Project\ProjectsController@removeProjectMetaDataElement']);
 
-            $router->post('invites', ['as' => ProjectsController::ROUTE_NAME_INVITES, 'uses' => 'Project\ProjectsController@invite']);
+            $router->get('', ['as' => ProjectsController::ROUTE_NAME_LIST, 'uses' => 'Project\ProjectsController@projects']);
+            $router->get('{uuid}', ['as' => ProjectsController::ROUTE_NAME_DETAILS, 'uses' => 'Project\ProjectsController@details']);
+            $router->post('', ['as' => ProjectsController::ROUTE_NAME_ADD, 'uses' => 'Project\ProjectsController@add']);
+            $router->delete('', ['as' => ProjectsController::ROUTE_NAME_REMOVE, 'uses' => 'Project\ProjectsController@remove']);
         });
 
         //endregion

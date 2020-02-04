@@ -423,6 +423,28 @@ trait ProjectHelper
     }
 
     /**
+     * @param ProjectInviteRepository|MockInterface $projectInviteRepository
+     * @param ProjectInviteModel|null               $projectInvite
+     * @param string                                $token
+     * @param string                                $email
+     *
+     * @return $this
+     */
+    private function mockProjectInviteRepositoryFindByTokenAndEmail(
+        MockInterface $projectInviteRepository,
+        ?ProjectInviteModel $projectInvite,
+        string $token,
+        string $email
+    ): self {
+        $projectInviteRepository
+            ->shouldReceive('findByTokenAndEmail')
+            ->with($token, $email)
+            ->andReturn($projectInvite);
+
+        return $this;
+    }
+
+    /**
      * @param int   $times
      * @param array $data
      *

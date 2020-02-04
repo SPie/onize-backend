@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers\Project;
 
+use App\Exceptions\ModelNotFoundException;
+use App\Exceptions\Project\InvalidInviteTokenException;
 use App\Http\Controllers\Controller;
 use App\Models\Project\ProjectMetaDataElementModel;
 use App\Models\Project\ProjectInviteModel;
@@ -27,6 +29,7 @@ final class ProjectsController extends Controller
     const ROUTE_NAME_ADD                              = 'projects.add';
     const ROUTE_NAME_REMOVE                           = 'projects.remove';
     const ROUTE_NAME_INVITES                          = 'projects.invites';
+    const ROUTE_NAME_VERIFY_INVITE                    = 'projects.verifyInvite';
     const ROUTE_NAME_META_DATA_ELEMENTS               = 'projects.metaDataElements';
     const ROUTE_NAME_UPDATE_META_DATA_ELEMENTS        = 'projects.updateMetaDataElements';
     const ROUTE_NAME_REMOVE_PROJECT_META_DATA_ELEMENT = 'projects.removeProjectMetaDataElement';

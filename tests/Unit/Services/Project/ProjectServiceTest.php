@@ -3,6 +3,7 @@
 use App\Exceptions\Auth\NotAllowedException;
 use App\Exceptions\InvalidParameterException;
 use App\Exceptions\ModelNotFoundException;
+use App\Exceptions\Project\InvalidInviteTokenException;
 use App\Exceptions\Project\UserAlreadyMemberException;
 use App\Models\Project\ProjectMetaDataElementModelFactory;
 use App\Models\Project\ProjectInviteModel;
@@ -301,6 +302,39 @@ final class ProjectServiceTest extends TestCase
         $this->expectException(UserAlreadyMemberException::class);
 
         $this->getProjectService($projectRepository)->invite($uuid, $email);
+    }
+
+    /**
+     * @return void
+     */
+    public function testVerifyInvite(): void
+    {
+        $token = $this->getFaker()->uuid;
+        $email = $this->getFaker()->safeEmail;
+        $projectInvite = $this->createProjectInviteModel();
+        $projectInviteRepository = $this->createProjectInviteRepository();
+        $this->mockProjectInviteRepositoryFindByTokenAndEmail($projectInviteRepository, $projectInvite, $token, $email);
+
+        $this->assertEquals(
+            $projectInvite,
+            $this->getProjectService(null, null, $projectInviteRepository)
+                ->verifyInvite($token, $email)
+        );
+    }
+
+    /**
+     * @return void
+     */
+    public function testVerifyInviteWithoutValidToken(): void
+    {
+        $token = $this->getFaker()->uuid;
+        $email = $this->getFaker()->safeEmail;
+        $projectInviteRepository = $this->createProjectInviteRepository();
+        $this->mockProjectInviteRepositoryFindByTokenAndEmail($projectInviteRepository, null, $token, $email);
+
+        $this->expectException(ModelNotFoundException::class);
+
+        $this->getProjectService(null, null, $projectInviteRepository)->verifyInvite($token, $email);
     }
 
     /**

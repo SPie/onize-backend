@@ -433,6 +433,139 @@ final class ProjectApiCallsTest extends IntegrationTestCase
     /**
      * @return void
      */
+    public function testVerifyInvite(): void
+    {
+        $user = $this->createUsers()->first();
+        $project = $this->createProjects()->first();
+        $projectInvite = $this->createProjectInvites(1, ['project' => $project, 'email' => $user->getEmail()])->first();
+        $projectMetaDataElement = $this->createProjectMetaDataElements(1, ['project' => $project])->first();
+        $this->clearModelCache();
+
+        $response = $this->doApiCall(
+            URL::route('projects.verifyInvite'),
+            Request::METHOD_GET,
+            [
+                'token' => $projectInvite->getToken(),
+            ],
+            null,
+            $this->createAuthHeader($user)
+        );
+
+        $this->assertResponseOk();
+        $responseData = $response->getData(true);
+        $this->assertEquals(
+            [$projectMetaDataElement->toArray()],
+            $responseData['metaDataElements']
+        );
+    }
+
+    /**
+     * @return void
+     */
+    public function testVerifyInviteWithoutProjectMetaDataElements(): void
+    {
+        $user = $this->createUsers()->first();
+        $project = $this->createProjects()->first();
+        $projectInvite = $this->createProjectInvites(1, ['project' => $project, 'email' => $user->getEmail()])->first();
+        $this->clearModelCache();
+
+        $response = $this->doApiCall(
+            URL::route('projects.verifyInvite'),
+            Request::METHOD_GET,
+            [
+                'token' => $projectInvite->getToken(),
+            ],
+            null,
+            $this->createAuthHeader($user)
+        );
+
+        $this->assertResponseOk();
+        $responseData = $response->getData(true);
+        $this->assertEquals([], $responseData['metaDataElements']);
+    }
+
+    /**
+     * @return void
+     */
+    public function testVerifyInviteWithoutToken(): void
+    {
+        $user = $this->createUsers()->first();
+        $project = $this->createProjects()->first();
+        $this->createProjectInvites(1, ['project' => $project, 'email' => $user->getEmail()])->first();
+        $this->clearModelCache();
+
+        $response = $this->doApiCall(
+            URL::route('projects.verifyInvite'),
+            Request::METHOD_GET,
+            [],
+            null,
+            $this->createAuthHeader($user)
+        );
+
+        $this->assertResponseStatus(422);
+        $responseData = $response->getData(true);
+        $this->assertEquals('validation.required', $responseData['token'][0]);
+    }
+
+    /**
+     * @return void
+     */
+    public function testVerifyInviteWithInvalidToken(): void
+    {
+        $user = $this->createUsers()->first();
+        $project = $this->createProjects()->first();
+        $this->createProjectInvites(1, ['project' => $project, 'email' => $user->getEmail()])->first();
+        $this->clearModelCache();
+
+        $response = $this->doApiCall(
+            URL::route('projects.verifyInvite'),
+            Request::METHOD_GET,
+            ['token' => $this->getFaker()->numberBetween()],
+            null,
+            $this->createAuthHeader($user)
+        );
+
+        $this->assertResponseStatus(422);
+        $responseData = $response->getData(true);
+        $this->assertEquals('validation.string', $responseData['token'][0]);
+    }
+
+    /**
+     * @return void
+     */
+    public function testVerifyInviteWithoutProjectInvite(): void
+    {
+        $this->doApiCall(
+            URL::route('projects.verifyInvite'),
+            Request::METHOD_GET,
+            ['token' => $this->getFaker()->uuid],
+            null,
+            $this->createAuthHeader($this->createUsers()->first())
+        );
+
+        $this->assertResponseStatus(404);
+    }
+
+    /**
+     * @return void
+     */
+    public function testVerifyInviteWithoutAuthenticatedUser(): void
+    {
+        $projectInvite = $this->createProjectInvites()->first();
+        $this->clearModelCache();
+
+        $this->doApiCall(
+            URL::route('projects.verifyInvite'),
+            Request::METHOD_GET,
+            ['token' => $projectInvite->getToken()]
+        );
+
+        $this->assertResponseStatus(401);
+    }
+
+    /**
+     * @return void
+     */
     public function testProjectDetails(): void
     {
         $user = $this->createUsers()->first();
