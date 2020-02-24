@@ -1093,6 +1093,225 @@ final class ProjectsControllerTest extends TestCase
         );
     }
 
+    /**
+     * @return void
+     */
+    public function testAcceptInvite(): void
+    {
+        $token = $this->getFaker()->uuid;
+        $projectMetaData = [$this->getFaker()->uuid => $this->getFaker()->word];
+        $request = $this->createRequest();
+        $request->offsetSet('token', $token);
+        $request->offsetSet('metaData', $projectMetaData);
+        $user = $this->createUserModel();
+        $this->mockUserModelGetEmail($user, $this->getFaker()->safeEmail);
+        $projectInvite = $this->createProjectInviteModel();
+        $projectService = $this->createProjectService();
+        $this->mockProjectServiceVerifyInvite($projectService, $projectInvite, $token, $user->getEmail());
+
+        $this->assertEquals(
+            $this->createJsonResponse($this->createJsonResponseData([]), 201),
+            $this->getProjectsController($user, $projectService)->acceptInvite($request)
+        );
+        $this->assertProjectServiceFinishInvite($projectService, $projectInvite, $user, $projectMetaData);
+    }
+
+    /**
+     * @return void
+     */
+    public function testAcceptInviteWithoutToken(): void
+    {
+        $request = $this->createRequest();
+        $request->offsetSet('metaData', [$this->getFaker()->uuid => $this->getFaker()->word]);
+
+        $this->expectException(ValidationException::class);
+
+        $this->getProjectsController()->acceptInvite($request);
+    }
+
+    /**
+     * @return void
+     */
+    public function testAcceptInviteWithInvalidToken(): void
+    {
+        $request = $this->createRequest();
+        $request->offsetSet('token', $this->getFaker()->numberBetween());
+        $request->offsetSet('metaData', [$this->getFaker()->uuid => $this->getFaker()->word]);
+
+        $this->expectException(ValidationException::class);
+
+        $this->getProjectsController()->acceptInvite($request);
+    }
+
+    /**
+     * @return void
+     */
+    public function testAcceptInviteWithInvalidMetaData(): void
+    {
+        $request = $this->createRequest();
+        $request->offsetSet('token', $this->getFaker()->uuid);
+        $request->offsetSet('metaData', $this->getFaker()->word);
+        $user = $this->createUserModel();
+        $this->mockUserModelGetEmail($user, $this->getFaker()->safeEmail);
+        $project = $this->createProjectModel();
+        $projectInvite = $this->createProjectInviteModel();
+        $this->mockProjectInviteModelGetProject($projectInvite, $project);
+        $projectService = $this->createProjectService();
+        $this->mockProjectServiceVerifyInvite($projectService, $projectInvite, $request->get('token'), $user->getEmail());
+
+        $this->expectException(ValidationException::class);
+
+        $this->getProjectsController($user, $projectService)->acceptInvite($request);
+    }
+
+    /**
+     * @return void
+     */
+    public function testAcceptInviteWithoutValidInvite(): void
+    {
+        $token = $this->getFaker()->uuid;
+        $request = $this->createRequest();
+        $request->offsetSet('token', $token);
+        $request->offsetSet('metaData', [$this->getFaker()->uuid => $this->getFaker()->word]);
+        $user = $this->createUserModel();
+        $this->mockUserModelGetEmail($user, $this->getFaker()->safeEmail);
+        $projectService = $this->createProjectService();
+        $this->mockProjectServiceVerifyInvite(
+            $projectService,
+            new ModelNotFoundException(ProjectInviteModel::class, $token),
+            $token,
+            $user->getEmail()
+        );
+
+        $this->expectException(ModelNotFoundException::class);
+
+        $this->getProjectsController($user, $projectService)->acceptInvite($request);
+    }
+
+    /**
+     * @return void
+     */
+    public function testAcceptInviteWithoutRequiredMetaDataElements(): void
+    {
+        $token = $this->getFaker()->uuid;
+        $request = $this->createRequest();
+        $request->offsetSet('token', $token);
+        $request->offsetSet('metaData', [$this->getFaker()->uuid => $this->getFaker()->word]);
+        $user = $this->createUserModel();
+        $this->mockUserModelGetEmail($user, $this->getFaker()->safeEmail);
+        $project = $this->createProjectModel();
+        $projectInvite = $this->createProjectInviteModel();
+        $this->mockProjectInviteModelGetProject($projectInvite, $project);
+        $projectService = $this->createProjectService();
+        $this
+            ->mockProjectServiceVerifyInvite($projectService, $projectInvite, $token, $user->getEmail())
+            ->mockProjectServiceGetMetaDataValidators($projectService, [\sprintf('metaData.%s', $this->getFaker()->uuid) => ['required']], $project);
+
+        $this->expectException(ValidationException::class);
+
+        $this->getProjectsController($user, $projectService)->acceptInvite($request);
+    }
+
+    /**
+     * @return void
+     */
+    public function testAcceptInviteWithInvalidStringMetaDataElements(): void
+    {
+        $token = $this->getFaker()->uuid;
+        $metaDataElement = $this->getFaker()->uuid;
+        $request = $this->createRequest();
+        $request->offsetSet('token', $token);
+        $request->offsetSet('metaData', [$metaDataElement => $this->getFaker()->numberBetween()]);
+        $user = $this->createUserModel();
+        $this->mockUserModelGetEmail($user, $this->getFaker()->safeEmail);
+        $project = $this->createProjectModel();
+        $projectInvite = $this->createProjectInviteModel();
+        $this->mockProjectInviteModelGetProject($projectInvite, $project);
+        $projectService = $this->createProjectService();
+        $this
+            ->mockProjectServiceVerifyInvite($projectService, $projectInvite, $token, $user->getEmail())
+            ->mockProjectServiceGetMetaDataValidators($projectService, [\sprintf('metaData.%s', $metaDataElement) => ['string']], $project);
+
+        $this->expectException(ValidationException::class);
+
+        $this->getProjectsController($user, $projectService)->acceptInvite($request);
+    }
+
+    /**
+     * @return void
+     */
+    public function testAcceptInviteWithInvalidNumberMetaDataElements(): void
+    {
+        $token = $this->getFaker()->uuid;
+        $metaDataElement = $this->getFaker()->uuid;
+        $request = $this->createRequest();
+        $request->offsetSet('token', $token);
+        $request->offsetSet('metaData', [$metaDataElement => $this->getFaker()->word]);
+        $user = $this->createUserModel();
+        $this->mockUserModelGetEmail($user, $this->getFaker()->safeEmail);
+        $project = $this->createProjectModel();
+        $projectInvite = $this->createProjectInviteModel();
+        $this->mockProjectInviteModelGetProject($projectInvite, $project);
+        $projectService = $this->createProjectService();
+        $this
+            ->mockProjectServiceVerifyInvite($projectService, $projectInvite, $token, $user->getEmail())
+            ->mockProjectServiceGetMetaDataValidators($projectService, [\sprintf('metaData.%s', $metaDataElement) => ['integer']], $project);
+
+        $this->expectException(ValidationException::class);
+
+        $this->getProjectsController($user, $projectService)->acceptInvite($request);
+    }
+
+    /**
+     * @return void
+     */
+    public function testAcceptInviteWithInvalidDateMetaDataElements(): void
+    {
+        $token = $this->getFaker()->uuid;
+        $metaDataElement = $this->getFaker()->uuid;
+        $request = $this->createRequest();
+        $request->offsetSet('token', $token);
+        $request->offsetSet('metaData', [$metaDataElement => $this->getFaker()->word]);
+        $user = $this->createUserModel();
+        $this->mockUserModelGetEmail($user, $this->getFaker()->safeEmail);
+        $project = $this->createProjectModel();
+        $projectInvite = $this->createProjectInviteModel();
+        $this->mockProjectInviteModelGetProject($projectInvite, $project);
+        $projectService = $this->createProjectService();
+        $this
+            ->mockProjectServiceVerifyInvite($projectService, $projectInvite, $token, $user->getEmail())
+            ->mockProjectServiceGetMetaDataValidators($projectService, [\sprintf('metaData.%s', $metaDataElement) => ['date']], $project);
+
+        $this->expectException(ValidationException::class);
+
+        $this->getProjectsController($user, $projectService)->acceptInvite($request);
+    }
+
+    /**
+     * @return void
+     */
+    public function testAcceptInviteWithInvalidEmailMetaDataElements(): void
+    {
+        $token = $this->getFaker()->uuid;
+        $metaDataElement = $this->getFaker()->uuid;
+        $request = $this->createRequest();
+        $request->offsetSet('token', $token);
+        $request->offsetSet('metaData', [$metaDataElement => $this->getFaker()->word]);
+        $user = $this->createUserModel();
+        $this->mockUserModelGetEmail($user, $this->getFaker()->safeEmail);
+        $project = $this->createProjectModel();
+        $projectInvite = $this->createProjectInviteModel();
+        $this->mockProjectInviteModelGetProject($projectInvite, $project);
+        $projectService = $this->createProjectService();
+        $this
+            ->mockProjectServiceVerifyInvite($projectService, $projectInvite, $token, $user->getEmail())
+            ->mockProjectServiceGetMetaDataValidators($projectService, [\sprintf('metaData.%s', $metaDataElement) => ['email']], $project);
+
+        $this->expectException(ValidationException::class);
+
+        $this->getProjectsController($user, $projectService)->acceptInvite($request);
+    }
+
     //endregion
 
     /**

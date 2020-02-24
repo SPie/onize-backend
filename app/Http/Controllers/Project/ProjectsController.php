@@ -2,8 +2,6 @@
 
 namespace App\Http\Controllers\Project;
 
-use App\Exceptions\ModelNotFoundException;
-use App\Exceptions\Project\InvalidInviteTokenException;
 use App\Http\Controllers\Controller;
 use App\Models\Project\ProjectMetaDataElementModel;
 use App\Models\Project\ProjectInviteModel;
@@ -36,6 +34,7 @@ final class ProjectsController extends Controller
 
     const REQUEST_PARAMETER_INVITE_URL         = 'inviteUrl';
     const REQUEST_PARAMETER_META_DATA_ELEMENTS = 'metaDataElements';
+    const REQUEST_PARAMETER_META_DATA          = 'metaData';
 
     const RESPONSE_PARAMETER_PROJECT            = 'project';
     const RESPONSE_PARAMETER_PROJECTS           = 'projects';
@@ -178,13 +177,34 @@ final class ProjectsController extends Controller
     public function verifyInvite(Request $request): JsonResponse
     {
         $projectInvite = $this->getProjectService()->verifyInvite(
-            $this->validateDataForVerifyInvite($request),
+            $this->validateDataForInviteToken($request),
             $this->getAuthenticatedUser()->getEmail()
         );
 
         return $this->createResponse([
             'metaDataElements' => $projectInvite->getProject()->getProjectMetaDataElements(),
         ]);
+    }
+
+    /**
+     * @param Request $request
+     *
+     * @return JsonResponse
+     */
+    public function acceptInvite(Request $request): JsonResponse
+    {
+        $projectInvite = $this->getProjectService()->verifyInvite(
+            $this->validateDataForInviteToken($request),
+            $this->getAuthenticatedUser()->getEmail()
+        );
+
+        $this->getProjectService()->finishInvite(
+            $projectInvite,
+            $this->getAuthenticatedUser(),
+            $this->validateMetaData($request, $projectInvite->getProject())
+        );
+
+        return $this->createResponse([], Response::HTTP_CREATED);
     }
 
     /**
@@ -304,7 +324,7 @@ final class ProjectsController extends Controller
      *
      * @throws ValidationException
      */
-    private function validateDataForVerifyInvite(Request $request): string
+    private function validateDataForInviteToken(Request $request): string
     {
         return $this->validate(
             $request,
@@ -419,5 +439,24 @@ final class ProjectsController extends Controller
             $request,
             [ProjectMetaDataElementModel::PROPERTY_UUID => ['required']]
         )[ProjectMetaDataElementModel::PROPERTY_UUID];
+    }
+
+    /**
+     * @param Request      $request
+     * @param ProjectModel $project
+     *
+     * @return array
+     *
+     * @throws ValidationException
+     */
+    private function validateMetaData(Request $request, ProjectModel $project): array
+    {
+        return $this->validate(
+            $request,
+            \array_merge(
+                $this->getProjectService()->getMetaDataValidators($project),
+                [self::REQUEST_PARAMETER_META_DATA => ['array']]
+            )
+        )[self::REQUEST_PARAMETER_META_DATA];
     }
 }

@@ -615,6 +615,28 @@ final class ProjectServiceTest extends TestCase
         )->getMetaDataElement($uuid);
     }
 
+    /**
+     * @return void
+     */
+    public function testGetMetaDataValidatorsWithRequiredMetaDataElement(): void
+    {
+        $metaDataElement = $this->createProjectMetaDataElementModel();
+        //todo
+        $project = $this->createProjectModel();
+        $projectMetaDataElementRepository = $this->createProjectMetaDataElementRepository();
+        $this->mockProjectmetaDataElementRepositoryFindByProject($projectMetaDataElementRepository, [$metaDataElement], $project);
+        $projectService = $this->getProjectService(
+            null,
+            null,
+            null,
+            null,
+            $projectMetaDataElementRepository
+        );
+
+        $validators = $projectService->getMetaDataValidators($project);
+
+    }
+
     //endregion
 
     /**

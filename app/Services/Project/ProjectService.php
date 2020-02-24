@@ -275,6 +275,28 @@ final class ProjectService implements ProjectServiceInterface
     }
 
     /**
+     * @param ProjectModel $project
+     *
+     * @return array
+     */
+    public function getMetaDataValidators(ProjectModel $project): array
+    {
+        // TODO: Implement getMetaDataValidators() method.
+    }
+
+    /**
+     * @param ProjectInviteModel $projectInvite
+     * @param UserModelInterface $user
+     * @param array              $metaData
+     *
+     * @return ProjectServiceInterface
+     */
+    public function finishInvite(ProjectInviteModel $projectInvite, UserModelInterface $user, array $metaData): ProjectServiceInterface
+    {
+        // TODO
+    }
+
+    /**
      * @param string $uuid
      *
      * @return ProjectMetaDataElementModel

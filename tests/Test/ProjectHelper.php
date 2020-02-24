@@ -13,6 +13,7 @@ use App\Models\Project\ProjectInviteModelFactory;
 use App\Models\Project\ProjectModel;
 use App\Models\Project\ProjectModelFactory;
 use App\Models\User\UserModelInterface;
+use App\Repositories\Project\ProjectMetaDataElementDoctrineRepository;
 use App\Repositories\Project\ProjectMetaDataElementRepository;
 use App\Repositories\Project\ProjectInviteRepository;
 use App\Repositories\Project\ProjectRepository;
@@ -336,6 +337,57 @@ trait ProjectHelper
     }
 
     /**
+     * @param ProjectServiceInterface|MockInterface $projectService
+     * @param array                                 $validators
+     * @param ProjectModel                          $project
+     *
+     * @return $this
+     */
+    private function mockProjectServiceGetMetaDataValidators(
+        MockInterface $projectService,
+        array $validators,
+        ProjectModel $project
+    ): self {
+        $projectService
+            ->shouldReceive('getMetaDataValidators')
+            ->with($project)
+            ->andReturn($validators);
+
+        return $this;
+    }
+
+    /**
+     * @param MockInterface   $projectService
+     * @param string          $token
+     * @param string          $email
+     * @param array           $metaData
+     * @param \Exception|null $exception
+     *
+     * @return $this
+     */
+    private function mockProjectServiceFinishInvite(
+        MockInterface $projectService,
+        string $token,
+        string $email,
+        array $metaData,
+        \Exception $exception = null
+    ): self {
+        $expectation = $projectService
+            ->shouldReceive('finishInvite')
+            ->with($token, $email, $metaData);
+
+        if ($exception) {
+            $expectation->andThrow($exception);
+
+            return $this;
+        }
+
+        $expectation->andReturn($projectService);
+
+        return $this;
+    }
+
+    /**
      * @param int   $times
      * @param array $data
      *
@@ -515,6 +567,21 @@ trait ProjectHelper
     }
 
     /**
+     * @param ProjectMetaDataElementModel|MockInterface $projectMetaDataElementModel
+     * @param bool                                      $required
+     *
+     * @return $this
+     */
+    private function mockProjectMetaDataElementModelIsRequired(MockInterface $projectMetaDataElementModel, bool $required): self
+    {
+        $projectMetaDataElementModel
+            ->shouldReceive('isRequired')
+            ->andReturn($required);
+
+        return $this;
+    }
+
+    /**
      * @return string
      */
     private function getRandomFieldType(): string
@@ -587,6 +654,26 @@ trait ProjectHelper
 
     /**
      * @param ProjectMetaDataElementRepository|MockInterface $projectMetaDataElementRepository
+     * @param array                                          $projectMetaDataElements
+     * @param ProjectModel                                   $project
+     *
+     * @return $this
+     */
+    private function mockProjectMetaDataElementRepositoryFindByProject(
+        MockInterface $projectMetaDataElementRepository,
+        array $projectMetaDataElements,
+        ProjectModel $project
+    ): self {
+        $projectMetaDataElementRepository
+            ->shouldReceive('findByProject')
+            ->with($project)
+            ->andReturn($projectMetaDataElements);
+
+        return $this;
+    }
+
+    /**
+     * @param ProjectMetaDataElementRepository|MockInterface $projectMetaDataElementRepository
      * @param int                                            $id
      * @param int                                            $position
      *
@@ -651,6 +738,28 @@ trait ProjectHelper
         $projectService
             ->shouldHaveReceived('removeProjectMetaDataElement')
             ->with($uuid)
+            ->once();
+
+        return $this;
+    }
+
+    /**
+     * @param ProjectServiceInterface|MockInterface $projectService
+     * @param ProjectInviteModel                    $projectInvite
+     * @param UserModelInterface                    $user
+     * @param array                                 $metaData
+     *
+     * @return $this
+     */
+    private function assertProjectServiceFinishInvite(
+        MockInterface $projectService,
+        ProjectInviteModel $projectInvite,
+        UserModelInterface $user,
+        array $metaData
+    ): self {
+        $projectService
+            ->shouldHaveReceived('finishInvite')
+            ->with($projectInvite, $user, $metaData)
             ->once();
 
         return $this;

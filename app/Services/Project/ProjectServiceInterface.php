@@ -55,6 +55,22 @@ interface ProjectServiceInterface
     public function verifyInvite(string $token, string $email): ProjectInviteModel;
 
     /**
+     * @param ProjectModel $project
+     *
+     * @return array
+     */
+    public function getMetaDataValidators(ProjectModel $project): array;
+
+    /**
+     * @param ProjectInviteModel $projectInvite
+     * @param UserModelInterface $user
+     * @param array              $metaData
+     *
+     * @return $this
+     */
+    public function finishInvite(ProjectInviteModel $projectInvite, UserModelInterface $user, array $metaData): self;
+
+    /**
      * @param string $uuid
      *
      * @return ProjectMetaDataElementModel
