@@ -15,6 +15,7 @@ use App\Repositories\Project\ProjectMetaDataElementRepository;
 use App\Repositories\Project\ProjectInviteRepository;
 use App\Repositories\Project\ProjectRepository;
 use App\Services\Project\ProjectService;
+use Illuminate\Support\Collection;
 use Mockery as m;
 use Mockery\MockInterface;
 use Test\ModelHelper;
@@ -618,13 +619,91 @@ final class ProjectServiceTest extends TestCase
     /**
      * @return void
      */
-    public function testGetMetaDataValidatorsWithRequiredMetaDataElement(): void
+    public function testGetMetaDataValidatorsWithStringMetaDataElement(): void
     {
-        $metaDataElement = $this->createProjectMetaDataElementModel();
-        //todo
+        [$projectService, $project, $metaDataElements] = $this->setupGetMetaDataValidatorsTest();
+
+        $this->assertEquals([$metaDataElements->first()->getLabel() => ['string']], $projectService->getMetaDataValidators($project));
+    }
+
+    /**
+     * @return void
+     */
+    public function testGetMetaDataValidatorsWithEmailDataElement(): void
+    {
+        [$projectService, $project, $metaDataElements] = $this->setupGetMetaDataValidatorsTest('email');
+
+        $this->assertEquals([$metaDataElements->first()->getLabel() => ['email']], $projectService->getMetaDataValidators($project));
+    }
+
+    /**
+     * @return void
+     */
+    public function testGetMetaDataValidatorsWithDateDataElement(): void
+    {
+        [$projectService, $project, $metaDataElements] = $this->setupGetMetaDataValidatorsTest('date');
+
+        $this->assertEquals([$metaDataElements->first()->getLabel() => ['date']], $projectService->getMetaDataValidators($project));
+    }
+
+    /**
+     * @return void
+     */
+    public function testGetMetaDataValidatorsWithNumberDataElement(): void
+    {
+        [$projectService, $project, $metaDataElements] = $this->setupGetMetaDataValidatorsTest('number');
+
+        $this->assertEquals([$metaDataElements->first()->getLabel() => ['integer']], $projectService->getMetaDataValidators($project));
+    }
+
+    /**
+     * @return void
+     */
+    public function testGetMetaDataValidatorsWithRequiredDataElement(): void
+    {
+        [$projectService, $project, $metaDataElements] = $this->setupGetMetaDataValidatorsTest('text', true);
+
+        $this->assertEquals([$metaDataElements->first()->getLabel() => ['string', 'required']], $projectService->getMetaDataValidators($project));
+    }
+
+    /**
+     * @return void
+     */
+    public function testGetMetaDataValidatorsWithMultipleMetaDataElements(): void
+    {
+        [$projectService, $project, $metaDataElements] = $this->setupGetMetaDataValidatorsTest('text', false, 2);
+
+        $expectedValidators = [];
+        foreach ($metaDataElements->all() as $metaDataElement) {
+            $expectedValidators[$metaDataElement->getLabel()] = ['string'];
+        }
+        $this->assertEquals($expectedValidators, $projectService->getMetaDataValidators($project));
+    }
+
+    /**
+     * @param string $type
+     * @param bool $required
+     * @param int $numberOfElements
+     *
+     * @return array
+     */
+    private function setupGetMetaDataValidatorsTest(
+        string $type = 'text',
+        bool $required = false,
+        int $numberOfElements = 1
+    ): array {
+        $metaDataElements = Collection::times($numberOfElements, function ($i) use ($type, $required) {
+            $metaDataElement = $this->createProjectMetaDataElementModel();
+            $this
+                ->mockProjectMetaDataElementModelGetFieldType($metaDataElement, $type)
+                ->mockProjectMetaDataElementModelIsRequired($metaDataElement, $required)
+                ->mockProjectMetaDataElementModelGetLabel($metaDataElement, $i);
+
+            return $metaDataElement;
+        });
         $project = $this->createProjectModel();
         $projectMetaDataElementRepository = $this->createProjectMetaDataElementRepository();
-        $this->mockProjectmetaDataElementRepositoryFindByProject($projectMetaDataElementRepository, [$metaDataElement], $project);
+        $this->mockProjectMetaDataElementRepositoryFindByProject($projectMetaDataElementRepository, $metaDataElements, $project);
         $projectService = $this->getProjectService(
             null,
             null,
@@ -633,8 +712,7 @@ final class ProjectServiceTest extends TestCase
             $projectMetaDataElementRepository
         );
 
-        $validators = $projectService->getMetaDataValidators($project);
-
+        return [$projectService, $project, $metaDataElements];
     }
 
     //endregion

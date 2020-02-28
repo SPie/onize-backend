@@ -582,6 +582,36 @@ trait ProjectHelper
     }
 
     /**
+     * @param ProjectMetaDataElementModel|MockInterface $projectMetaDataElementModel
+     * @param string                                    $label
+     *
+     * @return $this
+     */
+    private function mockProjectMetaDataElementModelGetLabel(MockInterface $projectMetaDataElementModel, string $label): self
+    {
+        $projectMetaDataElementModel
+            ->shouldReceive('getLabel')
+            ->andReturn($label);
+
+        return $this;
+    }
+
+    /**
+     * @param MockInterface $projectMetaDataElementModel
+     * @param string        $type
+     *
+     * @return $this
+     */
+    private function mockProjectMetaDataElementModelGetFieldType(MockInterface $projectMetaDataElementModel, string $type): self
+    {
+        $projectMetaDataElementModel
+            ->shouldReceive('getFieldType')
+            ->andReturn($type);
+
+        return $this;
+    }
+
+    /**
      * @return string
      */
     private function getRandomFieldType(): string
@@ -654,14 +684,14 @@ trait ProjectHelper
 
     /**
      * @param ProjectMetaDataElementRepository|MockInterface $projectMetaDataElementRepository
-     * @param array                                          $projectMetaDataElements
+     * @param Collection                                     $projectMetaDataElements
      * @param ProjectModel                                   $project
      *
      * @return $this
      */
     private function mockProjectMetaDataElementRepositoryFindByProject(
         MockInterface $projectMetaDataElementRepository,
-        array $projectMetaDataElements,
+        Collection $projectMetaDataElements,
         ProjectModel $project
     ): self {
         $projectMetaDataElementRepository

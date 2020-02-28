@@ -4,7 +4,9 @@ namespace App\Repositories\Project;
 
 use App\Models\ModelInterface;
 use App\Models\Project\ProjectMetaDataElementModel;
+use App\Models\Project\ProjectModel;
 use App\Repositories\RepositoryInterface;
+use Illuminate\Support\Collection;
 
 /**
  * Interface ProjectMetaDataElementRepository
@@ -27,6 +29,13 @@ interface ProjectMetaDataElementRepository extends RepositoryInterface
      * @return ProjectMetaDataElementModel|null
      */
     public function findOneByUuid(string $uuid): ?ProjectMetaDataElementModel;
+
+    /**
+     * @param ProjectModel $project
+     *
+     * @return ProjectModel[]|Collection
+     */
+    public function findByProject(ProjectModel $project): Collection;
 
     /**
      * @param int $projectId

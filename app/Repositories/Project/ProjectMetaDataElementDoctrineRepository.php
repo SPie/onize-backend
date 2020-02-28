@@ -5,7 +5,9 @@ namespace App\Repositories\Project;
 use App\Models\ModelInterface;
 use App\Models\Project\ProjectMetaDataElementDoctrineModel;
 use App\Models\Project\ProjectMetaDataElementModel;
+use App\Models\Project\ProjectModel;
 use App\Repositories\AbstractDoctrineRepository;
+use Illuminate\Support\Collection;
 
 /**
  * Class ProjectMetaDataElementDoctrineRepository
@@ -22,6 +24,16 @@ final class ProjectMetaDataElementDoctrineRepository extends AbstractDoctrineRep
     public function findOneByUuid(string $uuid): ?ProjectMetaDataElementModel
     {
         return $this->getDatabaseHandler()->load([ProjectMetaDataElementModel::PROPERTY_UUID => $uuid]);
+    }
+
+    /**
+     * @param ProjectModel $project
+     *
+     * @return Collection
+     */
+    public function findByProject(ProjectModel $project): Collection
+    {
+        // TODO: Implement findByProject() method.
     }
 
     /**
