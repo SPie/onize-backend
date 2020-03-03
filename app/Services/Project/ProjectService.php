@@ -281,10 +281,8 @@ final class ProjectService implements ProjectServiceInterface
      */
     public function getMetaDataValidators(ProjectModel $project): array
     {
-        $metaDataElements = $this->getProjectMetaDataElementRepository()->findByProject($project);
-
         $metaDataValidators = [];
-        foreach ($metaDataElements->all() as $metaDataElement) {
+        foreach ($this->getProjectMetaDataElementRepository()->findByProject($project)->all() as $metaDataElement) {
             $validators = [$this->getMetaDataElementTypeValidator($metaDataElement->getFieldType())];
 
             if ($metaDataElement->isRequired()) {

@@ -234,6 +234,32 @@ trait ModelHelper
     }
 
     /**
+     * @param DatabaseHandler|MockInterface $databaseHandler
+     * @param Collection                    $models
+     * @param array                         $criteria
+     * @param array|null                    $orderBy
+     * @param int|null                      $limit
+     * @param int|null                      $offset
+     *
+     * @return $this
+     */
+    private function mockDatabaseHandlerLoadAll(
+        MockInterface $databaseHandler,
+        Collection $models,
+        array $criteria = [],
+        array $orderBy = null,
+        int $limit = null,
+        int $offset = null
+    ): self {
+        $databaseHandler
+            ->shouldReceive('loadAll')
+            ->with($criteria, $orderBy, $limit, $offset)
+            ->andReturn($models);
+
+        return $this;
+    }
+
+    /**
      * @return QueryBuilder|MockInterface
      */
     private function createQueryBuilder(): QueryBuilder

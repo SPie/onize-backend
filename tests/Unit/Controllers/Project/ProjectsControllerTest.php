@@ -1205,7 +1205,7 @@ final class ProjectsControllerTest extends TestCase
         $projectService = $this->createProjectService();
         $this
             ->mockProjectServiceVerifyInvite($projectService, $projectInvite, $token, $user->getEmail())
-            ->mockProjectServiceGetMetaDataValidators($projectService, [\sprintf('metaData.%s', $this->getFaker()->uuid) => ['required']], $project);
+            ->mockProjectServiceGetMetaDataValidators($projectService, [$this->getFaker()->uuid => ['required']], $project);
 
         $this->expectException(ValidationException::class);
 
@@ -1230,7 +1230,7 @@ final class ProjectsControllerTest extends TestCase
         $projectService = $this->createProjectService();
         $this
             ->mockProjectServiceVerifyInvite($projectService, $projectInvite, $token, $user->getEmail())
-            ->mockProjectServiceGetMetaDataValidators($projectService, [\sprintf('metaData.%s', $metaDataElement) => ['string']], $project);
+            ->mockProjectServiceGetMetaDataValidators($projectService, [$metaDataElement => ['string']], $project);
 
         $this->expectException(ValidationException::class);
 
@@ -1255,7 +1255,7 @@ final class ProjectsControllerTest extends TestCase
         $projectService = $this->createProjectService();
         $this
             ->mockProjectServiceVerifyInvite($projectService, $projectInvite, $token, $user->getEmail())
-            ->mockProjectServiceGetMetaDataValidators($projectService, [\sprintf('metaData.%s', $metaDataElement) => ['integer']], $project);
+            ->mockProjectServiceGetMetaDataValidators($projectService, [$metaDataElement => ['integer']], $project);
 
         $this->expectException(ValidationException::class);
 
@@ -1280,7 +1280,7 @@ final class ProjectsControllerTest extends TestCase
         $projectService = $this->createProjectService();
         $this
             ->mockProjectServiceVerifyInvite($projectService, $projectInvite, $token, $user->getEmail())
-            ->mockProjectServiceGetMetaDataValidators($projectService, [\sprintf('metaData.%s', $metaDataElement) => ['date']], $project);
+            ->mockProjectServiceGetMetaDataValidators($projectService, [$metaDataElement => ['date']], $project);
 
         $this->expectException(ValidationException::class);
 
@@ -1305,7 +1305,7 @@ final class ProjectsControllerTest extends TestCase
         $projectService = $this->createProjectService();
         $this
             ->mockProjectServiceVerifyInvite($projectService, $projectInvite, $token, $user->getEmail())
-            ->mockProjectServiceGetMetaDataValidators($projectService, [\sprintf('metaData.%s', $metaDataElement) => ['email']], $project);
+            ->mockProjectServiceGetMetaDataValidators($projectService, [$metaDataElement => ['email']], $project);
 
         $this->expectException(ValidationException::class);
 

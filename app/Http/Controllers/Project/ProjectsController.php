@@ -451,12 +451,11 @@ final class ProjectsController extends Controller
      */
     private function validateMetaData(Request $request, ProjectModel $project): array
     {
-        return $this->validate(
-            $request,
-            \array_merge(
-                $this->getProjectService()->getMetaDataValidators($project),
-                [self::REQUEST_PARAMETER_META_DATA => ['array']]
-            )
-        )[self::REQUEST_PARAMETER_META_DATA];
+        $validators = [];
+        foreach ($this->getProjectService()->getMetaDataValidators($project) as $metaDataElement => $metaDataValidators) {
+            $validators[\sprintf('%s.%s', self::REQUEST_PARAMETER_META_DATA, $metaDataElement)] = $metaDataValidators;
+        }
+
+        return $this->validate($request, \array_merge($validators, [self::REQUEST_PARAMETER_META_DATA => ['array']]))[self::REQUEST_PARAMETER_META_DATA];
     }
 }

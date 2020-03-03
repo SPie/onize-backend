@@ -23,7 +23,7 @@ final class ProjectMetaDataElementDoctrineRepository extends AbstractDoctrineRep
      */
     public function findOneByUuid(string $uuid): ?ProjectMetaDataElementModel
     {
-        return $this->getDatabaseHandler()->load([ProjectMetaDataElementModel::PROPERTY_UUID => $uuid]);
+        return $this->findOneBy([ProjectMetaDataElementModel::PROPERTY_UUID => $uuid]);
     }
 
     /**
@@ -33,7 +33,7 @@ final class ProjectMetaDataElementDoctrineRepository extends AbstractDoctrineRep
      */
     public function findByProject(ProjectModel $project): Collection
     {
-        // TODO: Implement findByProject() method.
+        return $this->findBy(['project' => $project]);
     }
 
     /**

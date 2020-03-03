@@ -715,6 +715,14 @@ final class ProjectServiceTest extends TestCase
         return [$projectService, $project, $metaDataElements];
     }
 
+    /**
+     * @return void
+     */
+    public function testFinishInvite(): void
+    {
+        // TODO
+    }
+
     //endregion
 
     /**

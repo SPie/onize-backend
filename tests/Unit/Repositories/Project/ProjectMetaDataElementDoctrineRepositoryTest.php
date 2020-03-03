@@ -3,6 +3,7 @@
 use App\Models\Project\ProjectMetaDataElementDoctrineModel;
 use App\Repositories\DatabaseHandler;
 use App\Repositories\Project\ProjectMetaDataElementDoctrineRepository;
+use Illuminate\Support\Collection;
 use Test\ModelHelper;
 use Test\ProjectHelper;
 
@@ -68,6 +69,29 @@ final class ProjectMetaDataElementDoctrineRepositoryTest extends TestCase
         $projectMetaDataElementRepository->decreasePosition($projectId, $position);
 
         $this->assertQueryExecute($query);
+    }
+
+    /**
+     * @return void
+     */
+    public function testFindByProject(): void
+    {
+        $project = $this->createProjectModel();
+        $projectMetaDataElement = $this->createProjectMetaDataElementModel();
+        $databaseHandler = $this->createDatabaseHandler();
+        $this->mockDatabaseHandlerLoadAll(
+            $databaseHandler,
+            new Collection([$projectMetaDataElement]),
+            ['project' => $project],
+            [],
+            null,
+            null
+        );
+
+        $this->assertEquals(
+            new Collection([$projectMetaDataElement]),
+            $this->getProjectMetaDataElementDoctrineRepository($databaseHandler)->findByProject($project)
+        );
     }
 
     //endregion
